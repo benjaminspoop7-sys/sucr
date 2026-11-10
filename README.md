@@ -1,6 +1,10 @@
-# Sucr
+<p align="center">
+  <img src="branding/sucr-icon-256.png" width="112" height="112" alt="Sucr logo">
+</p>
 
-**Sucr 0.1.0 (Alpha)** — a download manager for Windows that shows you the work: every connection, every chunk, and which adapter carried it.
+<h1 align="center">Sucr</h1>
+
+<p align="center"><strong>Sucr 0.1.0 (Alpha)</strong> — a download manager for Windows that shows you the work: every connection, every chunk, and which adapter carried it.</p>
 
 Sucr is a single native executable (Tauri 2 + WebView2, no Electron) of about 4.7 MB. It does not ship a browser engine, a background service, or an installer that runs at boot.
 
