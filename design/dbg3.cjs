@@ -1,0 +1,35 @@
+const puppeteer = require('C:/Users/Benjamin/AppData/Roaming/npm/node_modules/puppeteer-core');
+(async () => {
+  const b = await puppeteer.launch({executablePath:'C:/Users/Benjamin/AppData/Local/ms-playwright/chromium-1248/chrome-win64/chrome.exe', headless:true, args:['--no-sandbox','--allow-file-access-from-files']});
+  const p = await b.newPage(); await p.setViewport({width:1400,height:900});
+  p.on('pageerror', e=>console.log('PAGEERROR',e.message));
+  await p.goto('file:///D:/RE/Sucr/design/sucr-android-motion-prototype.html',{waitUntil:'load'});
+  await new Promise(r=>setTimeout(r,600));
+  const probe = (sel,label)=>p.evaluate((s,l)=>{const el=document.querySelector(s); if(!el) return l+': MISSING';
+    const r=el.getBoundingClientRect(); const cx=r.x+r.width/2, cy=r.y+Math.min(r.height/2,20);
+    const hit=document.elementFromPoint(cx,cy);
+    return l+': '+JSON.stringify({rect:[Math.round(r.x),Math.round(r.y),Math.round(r.width),Math.round(r.height)],hidden:!!el.closest('[hidden]'),hit:hit?(hit.id||hit.className||hit.tagName):'null'});},sel,label).then(r=>console.log(r));
+
+  console.log('--- replaying harness steps ---');
+  await p.click('#row-host .row-dl'); await new Promise(r=>setTimeout(r,500));
+  const bx=await p.$eval('#back-edge',el=>{const r=el.getBoundingClientRect();return{x:r.x,y:r.y+300}});
+  await p.mouse.move(bx.x+4,bx.y); await p.mouse.down(); await p.mouse.move(bx.x+150,bx.y,{steps:8}); await p.mouse.move(bx.x+280,bx.y,{steps:6}); await p.mouse.up();
+  await new Promise(r=>setTimeout(r,900));
+  await p.click('#row-host .row-dl'); await new Promise(r=>setTimeout(r,500));
+  await p.click('#open-sheet'); await new Promise(r=>setTimeout(r,600));
+  await probe('#open-sheet','open-sheet while sheet up');
+  const sb=await p.$eval('#sheet',el=>{const r=el.getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+12}});
+  await p.mouse.move(sb.x,sb.y); await p.mouse.down(); await p.mouse.move(sb.x,sb.y+90,{steps:3}); await p.mouse.move(sb.x,sb.y+210,{steps:3}); await p.mouse.up();
+  await new Promise(r=>setTimeout(r,700));
+  console.log('sheet transform:', await p.evaluate(()=>document.querySelector('#sheet').style.transform));
+  console.log('scrim show class:', await p.evaluate(()=>document.querySelector('#scrim').className));
+  await probe('#goto-wizard','wizard row after fling');
+  await p.click('.nav-item[data-dest="map"]'); await new Promise(r=>setTimeout(r,500));
+  await p.click('.nav-item[data-dest="list"]'); await new Promise(r=>setTimeout(r,400));
+  await probe('#goto-wizard','wizard row after nav');
+  await p.click('#fab'); await new Promise(r=>setTimeout(r,500));
+  await p.click('#addbar-cancel'); await new Promise(r=>setTimeout(r,400));
+  await probe('#goto-wizard','wizard row after addbar cancel');
+  await probe('#addbar','addbar'); await probe('#kbd','kbd');
+  await b.close();
+})();

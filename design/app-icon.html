@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sucr app icon: one mark, five sizes</title>
+<meta name="description" content="Two redrawn Sucr app icons compared with the shipped one at 256, 64, 48, 32, 24 and 16 pixels, on light and dark.">
+<style>
+/* Hallmark · v2.0.0 · theme: Sucr house system (by project) · genre: app screen · scope: component board · hero: Stage, copy left · surface: absolute */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V3 · weakest: V, an icon board is a grid of squares; the 16px proof is the one part a reader remembers */
+/* Hallmark · waive 1 · the Sucr app ships Inter · the mark sits beside the app it belongs to */
+/* Hallmark · waive 22 · these greys are the Sucr app's measured palette · the board must read as the app */
+/* Hallmark · hero-review: not run separately · the board opens with the mark at its real size */
+
+:root {
+  color-scheme: light;
+  --bg:#FFFFFF; --surface-1:#F8F9FA; --surface-2:#F1F3F4;
+  --text:#202124; --text-2:#5F6368; --text-3:#666D73;
+  --border:#DADCE0; --border-2:#E8EAED; --border-strong:#B4B9BE;
+  --hairline:0.5px;
+  --accent:#1A73E8; --accent-hover:#1765CC; --accent-press:#1357B4; --accent-text:#FFFFFF;
+  --accent-tint:#E8F0FE; --hover:#F1F3F4;
+  --danger:#D93025; --danger-tint:#FCE8E6;
+  --stage:#202124; --stage-ink:#F1F3F4; --stage-line:rgba(255,255,255,.16); --stage-btn:rgba(255,255,255,.10);
+  --tile:#1A73E8; --tile-ink:#FFFFFF;
+  --mono:"Roboto Mono",ui-monospace,Consolas,monospace;
+  --sans:"Inter","Segoe UI",system-ui,sans-serif;
+  --font-display:var(--sans);
+  --font-body:var(--sans);
+  --font-mono:var(--mono);
+
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:20px; --s-6:24px; --s-7:32px; --s-8:40px; --s-9:56px;
+  --r-control:6px; --r-card:8px; --r-sheet:12px; --r-window:16px; --r-pill:999px;
+  --e-1:0 1px 2px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06);
+  --e-2:0 8px 24px rgba(0,0,0,.16);
+
+  --f-11:11px; --f-12:12px; --f-13:13px; --f-14:14px; --f-16:16px; --f-20:20px; --f-28:28px; --f-40:40px;
+  --lh:1.5;
+
+  --dur-1:80ms; --dur-2:120ms; --dur-3:180ms; --dur-4:220ms; --dur-5:260ms; --dur-6:400ms;
+  --e-std:cubic-bezier(.2,0,0,1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg:#1B1D1F; --surface-1:#252729; --surface-2:#2D2F31;
+    --text:#E8EAED; --text-2:#A8ADB2; --text-3:#959AA0;
+    --border:#3C4043; --border-2:#303133; --border-strong:#5F6368;
+    --accent:#8AB4F8; --accent-hover:#A6C8FF; --accent-press:#C2DBFF; --accent-text:#0B1A33;
+    --accent-tint:#26344A; --hover:#2D2F31;
+    --danger:#F28B82; --danger-tint:#3C1F1E;
+    --stage:#111315; --stage-ink:#E8EAED; --stage-line:rgba(255,255,255,.14); --stage-btn:rgba(255,255,255,.14);
+    --tile:#1A73E8; --tile-ink:#FFFFFF;
+    --e-2:0 0 0 1px #5F6368;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { overflow-x: clip; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: var(--f-14)/var(--lh) var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -.025em; text-wrap: balance; }
+p { margin: 0; text-wrap: pretty; }
+img { display: block; }
+svg { display: block; flex-shrink: 0; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+::selection { background: var(--accent-tint); }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: clamp(var(--s-5), 4vw, var(--s-8)); }
+
+/* --- top bar ------------------------------------------------------------ */
+.topbar {
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s-4);
+  border-bottom: var(--hairline) solid var(--border);
+}
+.brand { display: flex; align-items: center; gap: var(--s-2); font-size: var(--f-14); font-weight: 600; }
+.brand img { width: 20px; height: 20px; border-radius: 5px; }
+.board-note { font-size: var(--f-12); color: var(--text-3); }
+
+/* --- hero --------------------------------------------------------------- */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: clamp(var(--s-6), 5vw, var(--s-9));
+  align-items: center;
+  padding-block: clamp(40px, 6vw, 76px);
+}
+.hero-copy { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-4); }
+.hero h1 { font-size: clamp(38px, 5vw, 68px); line-height: 1.04; max-width: 13ch; }
+.lede { font-size: var(--f-16); line-height: 1.55; color: var(--text-2); max-width: 44ch; }
+.hero-meta { font-size: var(--f-12); color: var(--text-3); }
+
+.stage { display: grid; gap: var(--s-5); justify-items: center; padding: var(--s-6); background: var(--surface-1); border: var(--hairline) solid var(--border); border-radius: var(--r-sheet); }
+.stage-main { display: grid; justify-items: center; gap: var(--s-4); }
+.stage-main > img { width: 256px; height: 256px; }
+.stage-rail { display: flex; align-items: flex-end; gap: var(--s-4); }
+.stage-rail img { width: auto; height: auto; }
+.stage-cap { font-size: var(--f-12); color: var(--text-3); }
+
+/* --- sections ----------------------------------------------------------- */
+.section { padding-block: clamp(32px, 5vw, 64px); border-top: var(--hairline) solid var(--border); }
+.section-head { display: grid; gap: var(--s-2); margin-bottom: var(--s-6); }
+.section-head h2 { font-size: clamp(24px, 2.6vw, 34px); line-height: 1.15; }
+.section-head p { font-size: var(--f-14); color: var(--text-2); max-width: 62ch; }
+
+/* --- candidates --------------------------------------------------------- */
+.picks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(var(--s-4), 2.4vw, var(--s-6)); }
+.pick {
+  display: grid; gap: var(--s-4);
+  padding: var(--s-5);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--r-card);
+  background: var(--bg);
+}
+.pick--lead { border-color: var(--accent); box-shadow: var(--e-1); }
+.pick-top { display: flex; align-items: center; gap: var(--s-4); }
+.pick-top img { width: 96px; height: 96px; }
+.pick-name { display: grid; gap: var(--s-1); }
+.pick-name h3 { font-size: var(--f-16); }
+.pick-name span { font-size: var(--f-12); color: var(--text-3); }
+.pick p { font-size: var(--f-13); color: var(--text-2); }
+.pick-ladder { display: flex; align-items: flex-end; gap: var(--s-3); padding-top: var(--s-3); border-top: var(--hairline) solid var(--border-2); }
+.pick-ladder img { width: auto; }
+.lead-tag {
+  display: inline-flex; align-items: center; gap: var(--s-1);
+  padding: 2px var(--s-2);
+  border-radius: var(--r-pill);
+  background: var(--accent-tint); color: var(--accent);
+  font-size: var(--f-11); font-weight: 600;
+}
+
+/* --- size table --------------------------------------------------------- */
+.sizes { display: grid; gap: var(--s-1); }
+.sizes-head, .sizes-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) repeat(5, 64px);
+  align-items: center;
+  gap: var(--s-2);
+}
+.sizes-head { padding-bottom: var(--s-2); }
+.sizes-head span { font-size: var(--f-12); color: var(--text-3); font-family: var(--mono); }
+.sizes-row { padding-block: var(--s-3); border-top: var(--hairline) solid var(--border-2); }
+.sizes-row strong { font-size: var(--f-13); font-weight: 600; }
+.cell { display: grid; place-items: center; height: 64px; }
+.cell--dark { background: var(--stage); color: var(--stage-ink); border-radius: var(--r-control); height: 64px; }
+.row-pair { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(6, 72px); align-items: center; gap: var(--s-2); }
+.proof { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-5); margin-top: var(--s-7); }
+.proof figure { margin: 0; display: grid; gap: var(--s-3); justify-items: start; }
+.proof img { width: 100%; max-width: 128px; height: auto; image-rendering: pixelated; border-radius: var(--r-control); }
+.proof figcaption { font-size: var(--f-12); color: var(--text-3); }
+
+/* --- contexts ----------------------------------------------------------- */
+.where { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-4); }
+.ctx { display: grid; gap: var(--s-3); }
+.ctx-frame {
+  display: grid; place-items: center;
+  min-height: 108px; padding: var(--s-4);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--r-card);
+  background: var(--surface-1);
+}
+.ctx-frame--dark { background: var(--stage); color: var(--stage-ink); border-color: transparent; }
+.ctx-label { font-size: var(--f-12); color: var(--text-3); }
+
+.bar { width: 100%; display: flex; justify-content: center; }
+.taskbtn {
+  display: grid; place-items: center;
+  width: 40px; height: 40px;
+  border-radius: var(--r-control);
+  background: var(--stage-btn);
+}
+.taskbtn img { width: 24px; height: 24px; }
+.starttile { display: flex; align-items: center; gap: var(--s-2); color: var(--text); font-size: var(--f-13); }
+.starttile img { width: 32px; height: 32px; }
+.tray { display: flex; align-items: center; gap: var(--s-2); }
+.tray img { width: 16px; height: 16px; }
+
+/* --- costs -------------------------------------------------------------- */
+.notes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(var(--s-5), 3vw, var(--s-8)); }
+.note { display: grid; gap: var(--s-3); }
+.note h3 { font-size: var(--f-16); }
+.note p, .note li { font-size: var(--f-13); color: var(--text-2); }
+.note ul { margin: 0; padding-left: var(--s-5); display: grid; gap: var(--s-1); }
+code { font-family: var(--mono); font-size: .92em; }
+
+.foot {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s-3);
+  padding-block: var(--s-6);
+  border-top: var(--hairline) solid var(--border);
+  font-size: var(--f-12); color: var(--text-3);
+}
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .picks { grid-template-columns: minmax(0, 1fr); }
+  .where { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .notes { grid-template-columns: minmax(0, 1fr); }
+  .sizes-head, .sizes-row { grid-template-columns: minmax(0, 1fr) repeat(5, 52px); }
+  .cell, .cell--dark { height: 48px; }
+}
+@media (max-width: 560px) {
+  .stage { padding: var(--s-4); }
+  .stage-main { gap: var(--s-4); }
+  .stage-main > img { width: 168px; height: 168px; }
+  .stage-rail { flex-wrap: wrap; justify-content: center; row-gap: var(--s-3); }
+  .where { grid-template-columns: minmax(0, 1fr); }
+  .sizes-head, .sizes-row { grid-template-columns: minmax(0, 1fr) repeat(4, 52px); }
+  .sizes-head span:nth-child(2), .sizes-row > div:nth-child(2) { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar wrap">
+  <div class="brand">
+    <img src="art/icon/a-octopus-32.png" width="20" height="20" alt="">
+    Sucr
+  </div>
+  <div class="board-note">app icon, three directions, drawn 7 November 2026</div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <div class="hero-copy">
+      <h1>One mark, five sizes.</h1>
+      <p class="lede">Windows draws this icon at 256, 48, 32, 24 and 16 pixels. The shipped octopus loses its suckers and its tile below 48, so the taskbar only ever sees a pale blue blob.</p>
+      <p class="hero-meta">Two redraws below. Neither adds a colour: tile #1A73E8, glyph #FFFFFF, flat.</p>
+    </div>
+    <div class="stage">
+      <div class="stage-main">
+        <img src="art/icon/a-octopus-256.png" width="256" height="256" alt="The redrawn octopus icon at 256 pixels: a white octopus on a solid blue rounded tile.">
+        <div class="stage-rail">
+          <img src="art/icon/a-octopus-64.png" width="64" height="64" alt="The same icon at 64 pixels.">
+          <img src="art/icon/a-octopus-48.png" width="48" height="48" alt="The same icon at 48 pixels.">
+          <img src="art/icon/a-octopus-32.png" width="32" height="32" alt="The same icon at 32 pixels.">
+          <img src="art/icon/a-octopus-24.png" width="24" height="24" alt="The same icon at 24 pixels.">
+          <img src="art/icon/a-octopus-16.png" width="16" height="16" alt="The same icon at 16 pixels.">
+        </div>
+      </div>
+      <p class="stage-cap">256, then 64, 48, 32, 24 and 16, each drawn at that pixel count.</p>
+    </div>
+  </section>
+
+  <section class="section wrap" id="picks">
+    <div class="section-head">
+      <h2>The three directions</h2>
+      <p>Same tile, same blue. What changes is what the mark is.</p>
+    </div>
+    <div class="picks">
+      <article class="pick pick--lead">
+        <div class="pick-top">
+          <img src="art/icon/a-octopus-256.png" width="96" height="96" alt="">
+          <div class="pick-name">
+            <h3>A · Octopus</h3>
+            <span class="lead-tag">recommended</span>
+          </div>
+        </div>
+        <p>The creature the app already is, redrawn for the small sizes: three separated arms, a mantle that tapers into them, a full-bleed tile instead of a white card with a hairline. At 16 and 24 a simplified cut drops the suckers and thickens the arms.</p>
+        <div class="pick-ladder">
+          <img src="art/icon/a-octopus-64.png" width="64" height="64" alt="64 pixels">
+          <img src="art/icon/a-octopus-48.png" width="48" height="48" alt="48 pixels">
+          <img src="art/icon/a-octopus-32.png" width="32" height="32" alt="32 pixels">
+          <img src="art/icon/a-octopus-24.png" width="24" height="24" alt="24 pixels">
+          <img src="art/icon/a-octopus-16.png" width="16" height="16" alt="16 pixels">
+        </div>
+      </article>
+
+      <article class="pick">
+        <div class="pick-top">
+          <img src="art/icon/b-tentacle-s-256.png" width="96" height="96" alt="">
+          <div class="pick-name">
+            <h3>B · Sucker S</h3>
+            <span>the name, drawn</span>
+          </div>
+        </div>
+        <p>One tentacle forming an S, the tail ending in a suction cup. The most legible of the three at 16, and the least like the app it belongs to.</p>
+        <div class="pick-ladder">
+          <img src="art/icon/b-tentacle-s-64.png" width="64" height="64" alt="64 pixels">
+          <img src="art/icon/b-tentacle-s-48.png" width="48" height="48" alt="48 pixels">
+          <img src="art/icon/b-tentacle-s-32.png" width="32" height="32" alt="32 pixels">
+          <img src="art/icon/b-tentacle-s-24.png" width="24" height="24" alt="24 pixels">
+          <img src="art/icon/b-tentacle-s-16.png" width="16" height="16" alt="16 pixels">
+        </div>
+      </article>
+
+      <article class="pick">
+        <div class="pick-top">
+          <img src="art/icon/current-256.png" width="96" height="96" alt="">
+          <div class="pick-name">
+            <h3>Today</h3>
+            <span>shipped at v0.1.0</span>
+          </div>
+        </div>
+        <p>Twelve sucker dots, four arms and a 1.5 px border, inside a white tile 24 px off the edge. Below 48 the detail turns to noise and the tile disappears into a light UI.</p>
+        <div class="pick-ladder">
+          <img src="art/icon/current-64.png" width="64" height="64" alt="64 pixels">
+          <img src="art/icon/current-48.png" width="48" height="48" alt="48 pixels">
+          <img src="art/icon/current-32.png" width="32" height="32" alt="32 pixels">
+          <img src="art/icon/current-24.png" width="24" height="24" alt="24 pixels">
+          <img src="art/icon/current-16.png" width="16" height="16" alt="16 pixels">
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section wrap" id="sizes">
+    <div class="section-head">
+      <h2>Every size, both grounds</h2>
+      <p>The same raster on white and on the taskbar’s #202124. Below the table, each 16 px file enlarged to 128 so its pixels are visible.</p>
+    </div>
+    <div class="sizes">
+      <div class="sizes-head">
+        <span></span>
+        <span>64</span><span>48</span><span>32</span><span>24</span><span>16</span>
+      </div>
+
+      <div class="sizes-row">
+        <strong>A, Octopus</strong>
+        <div class="cell"><img src="art/icon/a-octopus-64.png" width="64" height="64" alt=""></div>
+        <div class="cell"><img src="art/icon/a-octopus-48.png" width="48" height="48" alt=""></div>
+        <div class="cell"><img src="art/icon/a-octopus-32.png" width="32" height="32" alt=""></div>
+        <div class="cell"><img src="art/icon/a-octopus-24.png" width="24" height="24" alt=""></div>
+        <div class="cell"><img src="art/icon/a-octopus-16.png" width="16" height="16" alt=""></div>
+      </div>
+
+      <div class="sizes-row">
+        <strong>B, Sucker S</strong>
+        <div class="cell"><img src="art/icon/b-tentacle-s-64.png" width="64" height="64" alt=""></div>
+        <div class="cell"><img src="art/icon/b-tentacle-s-48.png" width="48" height="48" alt=""></div>
+        <div class="cell"><img src="art/icon/b-tentacle-s-32.png" width="32" height="32" alt=""></div>
+        <div class="cell"><img src="art/icon/b-tentacle-s-24.png" width="24" height="24" alt=""></div>
+        <div class="cell"><img src="art/icon/b-tentacle-s-16.png" width="16" height="16" alt=""></div>
+      </div>
+
+      <div class="sizes-row">
+        <strong>Today</strong>
+        <div class="cell"><img src="art/icon/current-64.png" width="64" height="64" alt=""></div>
+        <div class="cell"><img src="art/icon/current-48.png" width="48" height="48" alt=""></div>
+        <div class="cell"><img src="art/icon/current-32.png" width="32" height="32" alt=""></div>
+        <div class="cell"><img src="art/icon/current-24.png" width="24" height="24" alt=""></div>
+        <div class="cell"><img src="art/icon/current-16.png" width="16" height="16" alt=""></div>
+      </div>
+
+      <div class="sizes-row">
+        <strong>A on the taskbar</strong>
+        <div class="cell cell--dark"><img src="art/icon/a-octopus-64.png" width="64" height="64" alt=""></div>
+        <div class="cell cell--dark"><img src="art/icon/a-octopus-48.png" width="48" height="48" alt=""></div>
+        <div class="cell cell--dark"><img src="art/icon/a-octopus-32.png" width="32" height="32" alt=""></div>
+        <div class="cell cell--dark"><img src="art/icon/a-octopus-24.png" width="24" height="24" alt=""></div>
+        <div class="cell cell--dark"><img src="art/icon/a-octopus-16.png" width="16" height="16" alt=""></div>
+      </div>
+
+      <div class="sizes-row">
+        <strong>B on the taskbar</strong>
+        <div class="cell cell--dark"><img src="art/icon/b-tentacle-s-64.png" width="64" height="64" alt=""></div>
+        <div class="cell cell--dark"><img src="art/icon/b-tentacle-s-48.png" width="48" height="48" alt=""></div>
+        <div class="cell cell--dark"><img src="art/icon/b-tentacle-s-32.png" width="32" height="32" alt=""></div>
+        <div class="cell cell--dark"><img src="art/icon/b-tentacle-s-24.png" width="24" height="24" alt=""></div>
+        <div class="cell cell--dark"><img src="art/icon/b-tentacle-s-16.png" width="16" height="16" alt=""></div>
+      </div>
+
+      <div class="proof">
+        <figure>
+          <img src="art/icon/a-octopus-16.png" width="128" height="128" alt="A at 16 pixels, enlarged sixteen times.">
+          <figcaption>A at 16, enlarged 16×</figcaption>
+        </figure>
+        <figure>
+          <img src="art/icon/b-tentacle-s-16.png" width="128" height="128" alt="B at 16 pixels, enlarged sixteen times.">
+          <figcaption>B at 16, enlarged 16×</figcaption>
+        </figure>
+        <figure>
+          <img src="art/icon/current-16.png" width="128" height="128" alt="Today’s icon at 16 pixels, enlarged sixteen times.">
+          <figcaption>Today at 16, enlarged 16×</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap" id="where">
+    <div class="section-head">
+      <h2>Where it lives</h2>
+      <p>Four places the icon is drawn at a different size, each at that size rather than scaled in the browser.</p>
+    </div>
+    <div class="where">
+      <figure class="ctx">
+        <div class="ctx-frame ctx-frame--dark">
+          <div class="bar"><div class="taskbtn"><img src="art/icon/a-octopus-24.png" width="24" height="24" alt="Sucr at 24 pixels on a taskbar button."></div></div>
+        </div>
+        <figcaption class="ctx-label">Taskbar, 24 in a 40 px button</figcaption>
+      </figure>
+      <figure class="ctx">
+        <div class="ctx-frame">
+          <div class="starttile"><img src="art/icon/a-octopus-32.png" width="32" height="32" alt="Sucr at 32 pixels beside its name.">Sucr</div>
+        </div>
+        <figcaption class="ctx-label">Start list, 32</figcaption>
+      </figure>
+      <figure class="ctx">
+        <div class="ctx-frame">
+          <img src="art/icon/a-octopus-48.png" width="48" height="48" alt="Sucr at 48 pixels, a shortcut icon.">
+        </div>
+        <figcaption class="ctx-label">Shortcut, 48</figcaption>
+      </figure>
+      <figure class="ctx">
+        <div class="ctx-frame ctx-frame--dark">
+          <div class="tray"><img src="art/icon/a-octopus-16.png" width="16" height="16" alt="Sucr at 16 pixels in the notification area."></div>
+        </div>
+        <figcaption class="ctx-label">Tray, 16</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section wrap" id="cost">
+    <div class="section-head">
+      <h2>What shipping it costs</h2>
+      <p>The tray-and-arrow mark was built and relinked on 7 November 2026, then rejected by the owner that same day. The octopus is the shipped icon again; A and B above stay drafts.</p>
+    </div>
+    <div class="notes">
+      <div class="note">
+        <h3>The export set</h3>
+        <ul>
+          <li>One SVG at 1024, the master.</li>
+          <li>PNG at 16, 24, 32, 48, 64, 128, 256, 512.</li>
+          <li>One <code>.ico</code>: 16, 24, 32, 48, 64 and 128 as bitmap frames, 256 as PNG.</li>
+          <li>The tray PNGs at 16 and 32.</li>
+        </ul>
+      </div>
+      <div class="note">
+        <h3>The product cost</h3>
+        <p>The icon is a Windows resource, so it only lands when the exe is relinked. The tray-and-arrow build measured <code>sucr.exe</code> 4,654,592 B (+60,928). Reverted 7 November 2026: the octopus relinked at <code>sucr.exe</code> 4,591,616 B, 651,264 B under the 5 MB ceiling. No Rust, renderer or IPC code was touched in either build.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot wrap">
+  <span>Rasters drawn from the SVGs at each pixel count, not downscaled in the browser.</span>
+  <span>Sources: <code>branding/_drafts/icon-v2/</code></span>
+</footer>
+
+</body>
+</html>

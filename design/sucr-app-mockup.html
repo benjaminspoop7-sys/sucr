@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>Sucr — Application Mockup</title>
+</head>
+<body style="margin:0; background:#F1F3F4; transition:background-color 150ms ease;">
+<div id="sucr-mock" data-theme="light" data-motion="full" data-listmode="cards">
+  <style>
+    #sucr-mock {
+      --bg:#FFFFFF; --s1:#F8F9FA; --s2:#F1F3F4;
+      --text:#202124; --text2:#5F6368; --text3:#666D73;
+      --border:#DADCE0; --border2:#E8EAED; --bstrong:#B4B9BE; --track:#E8EAED;
+      --accent:#1A73E8; --accent-ink:#1765CC; --accent-tint:#E8F0FE; --accent-text:#FFFFFF;
+      --success:#188038; --success-ink:#146C2E; --success-tint:#E6F4EA;
+      /* the toast swaps bg/text, so it is a dark surface in light theme: its green must not be
+         the light-surface ink (#146C2E on #202124 = 2.46). Verified 8.22 here, 5.42 in dark. */
+      --success-on-inverse:#81C995;
+      --danger:#D93025; --danger-ink:#A31515; --danger-tint:#FCE8E6;
+      --warning:#B63A0A; --warning-ink:#B63A0A; --warning-fill:#F9AB00; --warning-tint:#FEF7E0;
+      --n1:#0E8D7F; --n2:#1A73E8; --n3:#D26A00; --n4:#6A52E8;
+      --dur-1:80ms; --dur-2:120ms; --dur-3:180ms; --dur-4:220ms; --dur-5:260ms; --dur-6:400ms;
+      /* wavy aggregate — M3 Expressive's parameter model, see tokens.css */
+      --wave-h:18px; --wave-stroke:4px; --wave-amp:3px; --wave-len:20px;
+      --e-std:cubic-bezier(.2,0,0,1); --e-dec:cubic-bezier(.05,.7,.1,1); --e-acc:cubic-bezier(.3,0,.8,.15);
+      font-family:-apple-system,"Segoe UI",Roboto,Inter,sans-serif;
+      font-size:13px; color:var(--text); background:var(--s2);
+      display:block; line-height:1.45; -webkit-font-smoothing:antialiased;
+    }
+    #sucr-mock[data-theme="dark"]{
+      --bg:#1B1D1F; --s1:#252729; --s2:#2D2F31; --text:#E8EAED; --text2:#A8ADB2; --text3:#959AA0;
+      --border:#3C4043; --border2:#303133; --bstrong:#5F6368; --track:#3C4043;
+      --accent:#8AB4F8; --accent-ink:#A6C8FF; --accent-tint:#26344A; --accent-text:#0B1A33;
+      --success:#81C995; --success-ink:#81C995; --success-tint:#10331C;
+      --success-on-inverse:#146C2E;
+      --danger:#F28B82; --danger-ink:#F28B82; --danger-tint:#3C1F1E;
+      --warning:#FDD663; --warning-ink:#FDD663; --warning-fill:#B8860B; --warning-tint:#302A01;
+      --n1:#4CC2B4; --n2:#8AB4F8; --n3:#F0955A; --n4:#B6A2FF;
+    }
+    #sucr-mock[data-motion="off"] *,
+    #sucr-mock[data-motion="off"] *::before,
+    #sucr-mock[data-motion="off"] *::after{ transition-duration:.01ms!important; animation:none!important }
+    #sucr-mock[data-motion="reduced"] .anim-loop{ animation:none!important }
+    #sucr-mock[data-motion="reduced"] .anim-move{ transform:none!important }
+    #sucr-mock .mono{ font-family:"Cascadia Mono","Roboto Mono",Consolas,monospace; font-variant-numeric:tabular-nums }
+    #sucr-mock button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer }
+    #sucr-mock :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:4px }
+
+    /* ---- outer frame ---- */
+    #sucr-mock .frame{ max-width:1240px; margin:0 auto; padding:20px 16px 40px }
+    #sucr-mock .intro{ background:var(--bg); border:.5px solid var(--border); border-radius:12px; padding:16px 20px; margin-bottom:16px }
+    #sucr-mock .intro h1{ margin:0 0 4px; font-size:20px; font-weight:600; letter-spacing:-.2px }
+    #sucr-mock .intro p{ margin:0; color:var(--text2); font-size:12.5px; max-width:78ch }
+    #sucr-mock .tabs{ display:flex; flex-wrap:wrap; gap:4px; margin:14px 0 14px }
+    #sucr-mock .tab{ padding:7px 13px; border-radius:8px; font-size:12.5px; font-weight:500; color:var(--text2);
+      transition:background var(--dur-2) var(--e-std), color var(--dur-2) var(--e-std) }
+    #sucr-mock .tab:hover{ background:var(--s2); color:var(--text) }
+    #sucr-mock .tab[aria-selected="true"]{ background:var(--accent); color:var(--accent-text) }
+    #sucr-mock .panel{ display:none }
+    #sucr-mock .panel.on{ display:block }
+    #sucr-mock .ctrls{ display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-bottom:12px;
+      background:var(--bg); border:.5px solid var(--border); border-radius:10px; padding:8px 12px; font-size:12px; color:var(--text2) }
+    #sucr-mock .seg{ display:inline-flex; border:1px solid var(--bstrong); border-radius:7px; overflow:hidden }
+    #sucr-mock .seg button{ padding:4px 10px; font-size:11.5px; color:var(--text2);
+      transition:background var(--dur-2) var(--e-std), color var(--dur-2) var(--e-std) }
+    #sucr-mock .seg button[aria-pressed="true"]{ background:var(--s2); color:var(--text); font-weight:500 }
+    #sucr-mock .lbl{ font-weight:500; color:var(--text3); text-transform:uppercase; font-size:10px; letter-spacing:.5px }
+
+    /* ---- app window ---- */
+    #sucr-mock .win{ background:var(--bg); border:.5px solid var(--border); border-radius:14px; overflow:hidden;
+      box-shadow:0 8px 24px rgba(0,0,0,.10) }
+    #sucr-mock .tbar{ height:40px; display:flex; align-items:center; gap:10px; padding:0 12px; border-bottom:.5px solid var(--border2) }
+    #sucr-mock .tbar .mark{ width:20px; height:20px; border-radius:5px; background:var(--accent); position:relative; flex:none }
+    #sucr-mock .tbar .mark::after{ content:""; position:absolute; inset:5px 5px auto 5px; height:3px; border-radius:2px; background:var(--accent-text) }
+    #sucr-mock .tbar .name{ font-weight:600; font-size:12.5px }
+    #sucr-mock .tbar .search{ margin-left:auto; display:flex; align-items:center; gap:7px; width:230px; height:26px;
+      padding:0 9px; border:.5px solid var(--border); border-radius:7px; color:var(--text3); font-size:11.5px;
+      transition:border-color var(--dur-2) var(--e-std) }
+    #sucr-mock .tbar .search:hover{ border-color:var(--accent) }
+    #sucr-mock .wbtns{ display:flex; gap:2px }
+    #sucr-mock .wbtns i{ width:26px; height:20px; display:grid; place-items:center; font-style:normal; color:var(--text3); border-radius:4px }
+    #sucr-mock .body{ display:flex; height:520px }
+
+    /* rail */
+    #sucr-mock .rail{ width:212px; flex:none; border-right:.5px solid var(--border2); padding:10px 8px; overflow:auto }
+    #sucr-mock .rail .grp{ margin-bottom:14px }
+    #sucr-mock .rail .grp>div:first-child{ padding:0 8px 5px }
+    #sucr-mock .ritem{ display:flex; align-items:center; gap:8px; width:100%; text-align:left; padding:6px 8px; border-radius:7px;
+      color:var(--text2); font-size:12.5px; transition:background var(--dur-2) var(--e-std), color var(--dur-2) var(--e-std) }
+    #sucr-mock .ritem:hover{ background:var(--s1); color:var(--text) }
+    #sucr-mock .ritem[aria-current="true"]{ background:var(--accent-tint); color:var(--accent-ink); font-weight:500 }
+    #sucr-mock .ritem .dot{ width:7px; height:7px; border-radius:50%; flex:none }
+    #sucr-mock .ritem .n{ margin-left:auto; font-size:11px; color:var(--text3) }
+
+    /* list */
+    #sucr-mock .mid{ flex:1; min-width:0; display:flex; flex-direction:column }
+    #sucr-mock .lbar{ height:44px; flex:none; display:flex; align-items:center; gap:8px; padding:0 14px; border-bottom:.5px solid var(--border2) }
+    #sucr-mock .lbar h2{ margin:0; font-size:13.5px; font-weight:600 }
+    #sucr-mock .lbar .sum{ font-size:11.5px; color:var(--text3) }
+    #sucr-mock .ghost{ display:flex; align-items:center; gap:6px; padding:5px 9px; border:1px solid var(--bstrong); border-radius:7px;
+      font-size:12px; color:var(--text2); transition:background var(--dur-2) var(--e-std), border-color var(--dur-2) var(--e-std) }
+    #sucr-mock .ghost:hover{ background:var(--s1); color:var(--text) }
+    #sucr-mock .primary{ background:var(--accent); color:var(--accent-text); border-color:var(--accent); font-weight:500 }
+    #sucr-mock .primary:hover{ filter:brightness(.94); background:var(--accent); color:var(--accent-text) }
+    #sucr-mock .list{ flex:1; overflow:auto; padding:6px 8px }
+    #sucr-mock .ghead{ display:flex; align-items:center; gap:8px; padding:10px 8px 4px; color:var(--text3) }
+    #sucr-mock .ghead span{ font-size:10px; letter-spacing:.6px; text-transform:uppercase; font-weight:600 }
+    #sucr-mock .row{ display:flex; align-items:center; gap:12px; padding:10px 10px; border-radius:9px; cursor:default;
+      transition:background var(--dur-2) var(--e-std) }
+    #sucr-mock .row:hover{ background:var(--s1) }
+    #sucr-mock .row.sel{ background:var(--accent-tint); box-shadow:inset 0 0 0 1px var(--accent-ink) }
+    #sucr-mock .badge{ width:38px; height:38px; flex:none; border:.5px solid var(--border); border-radius:8px; background:var(--s1);
+      display:grid; place-items:center; font-size:9.5px; font-weight:600; letter-spacing:.4px; color:var(--text2) }
+    #sucr-mock .cell{ min-width:0; flex:1 }
+    #sucr-mock .fname{ display:flex; align-items:center; gap:7px; font-size:13px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+    #sucr-mock .meta{ font-size:11.5px; color:var(--text2); margin-top:2px }
+    #sucr-mock .meta.err{ color:var(--danger-ink) }
+    #sucr-mock .bar{ display:flex; height:4px; border-radius:99px; background:var(--track); overflow:hidden; margin-top:6px }
+    #sucr-mock .bar i{ display:block; height:100%; transition:width var(--dur-5) ease-out }
+    #sucr-mock .bar.fade{ opacity:.4 }
+    #sucr-mock .wave{ position:relative; height:var(--wave-h); margin:8px 0 14px }
+    #sucr-mock .wave svg{ display:block; overflow:visible }
+    #sucr-mock .dots{ display:flex; gap:3px; align-items:center; padding:3px 5px; border:.5px solid var(--border); border-radius:99px; flex:none }
+    #sucr-mock .dots i{ width:6px; height:6px; border-radius:50%; display:block }
+    #sucr-mock .dots i.off{ background:var(--text3); opacity:.3 }
+    #sucr-mock .dots i.live{ animation:sucr-pulse 1800ms ease-in-out infinite alternate }
+    #sucr-mock .spd{ width:74px; text-align:right; font-size:11.5px; font-weight:500; flex:none }
+    #sucr-mock .chev{ color:var(--text3); flex:none }
+    /* secondary glyphs on the accent tint step up one rung of the ladder: --text3 on the dark
+       tint measures 4.43, --text2 measures 5.55 (light 5.28). */
+    #sucr-mock .ritem[aria-current="true"] .n,
+    #sucr-mock .row.sel .chev{ color:var(--text2) }
+    @keyframes sucr-pulse{ from{ opacity:.45 } to{ opacity:1 } }
+    #sucr-mock .dots i.live{ animation-name:sucr-pulse }
+
+    /* table mode */
+    /* colour is set explicitly because this is a doctype-less fragment: in quirks mode Chrome
+       does not inherit colour into <table>, so every cell computes to black and the dark theme
+       loses all table text (measured: rgb(0,0,0) on #1B1D1F = 1.54). */
+    #sucr-mock table{ width:100%; border-collapse:collapse; font-size:12px; color:var(--text) }
+    #sucr-mock th{ text-align:left; padding:7px 10px; border-bottom:.5px solid var(--border); color:var(--text3);
+      font-size:10px; text-transform:uppercase; letter-spacing:.5px; font-weight:600; white-space:nowrap; cursor:pointer }
+    #sucr-mock th:hover{ color:var(--text) }
+    #sucr-mock td{ padding:8px 10px; border-bottom:.5px solid var(--border2); white-space:nowrap }
+    #sucr-mock tr:hover td{ background:var(--s1) }
+
+    /* inspector */
+    #sucr-mock .insp{ width:340px; flex:none; border-left:.5px solid var(--border2); display:flex; flex-direction:column }
+    #sucr-mock .ihead{ padding:12px 14px 10px; border-bottom:.5px solid var(--border2) }
+    #sucr-mock .ihead .t{ font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+    #sucr-mock .ihead .s{ font-size:11.5px; color:var(--text2); margin-top:2px }
+    #sucr-mock .itabs{ display:flex; align-items:center; gap:2px; padding:6px; border-bottom:.5px solid var(--border2);
+      overflow-x:auto; scrollbar-width:none }
+    #sucr-mock .itabs::-webkit-scrollbar{ display:none }
+    /* active = tinted pill, inactive = bare text (reference: Antigravity's tab strip).
+       --accent-ink on --accent-tint measures 4.86 light / 7.37 dark; --text2 is 6.05 / 7.48. */
+    #sucr-mock .itab{ flex:none; padding:4px 8px; border-radius:6px; font-size:11.5px; color:var(--text2);
+      transition:background var(--dur-2) var(--e-std), color var(--dur-2) var(--e-std) }
+    #sucr-mock .itab:hover{ background:var(--s2); color:var(--text) }
+    #sucr-mock .itab[aria-selected="true"]{ background:var(--accent-tint); color:var(--accent-ink); font-weight:500 }
+    #sucr-mock .ipane{ animation:sucr-tab-in var(--dur-2) var(--e-std) }
+    @keyframes sucr-tab-in{ from{ opacity:0 } to{ opacity:1 } }
+    #sucr-mock .log{ list-style:none; margin:0; padding:0; font-size:11.5px }
+    #sucr-mock .log li{ display:flex; gap:8px; align-items:baseline; padding:5px 0; border-bottom:.5px solid var(--border2); color:var(--text2) }
+    #sucr-mock .log time{ flex:none; color:var(--text3); font-variant-numeric:tabular-nums }
+    #sucr-mock .ibody{ flex:1; overflow:auto; padding:14px }
+    #sucr-mock .hero{ display:flex; align-items:baseline; gap:8px }
+    #sucr-mock .hero .pct{ font-size:34px; font-weight:600; letter-spacing:-1px; line-height:1.1 }
+    #sucr-mock .hero .of{ font-size:11.5px; color:var(--text2) }
+    #sucr-mock .kv{ display:flex; justify-content:space-between; gap:10px; padding:5px 0; border-bottom:.5px solid var(--border2); font-size:12px }
+    #sucr-mock .kv dt{ color:var(--text2) }
+    #sucr-mock .kv dd{ margin:0; font-weight:500 }
+    #sucr-mock .why{ display:inline-flex; align-items:center; gap:4px; padding:2px 7px; border:.5px solid var(--border);
+      border-radius:99px; font-size:10.5px; color:var(--accent-ink); font-weight:500; cursor:pointer;
+      transition:background var(--dur-2) var(--e-std) }
+    #sucr-mock .why:hover{ background:var(--accent-tint); color:var(--accent-ink) }
+
+    /* bonding diagram */
+    #sucr-mock .bond{ margin:2px 0 14px }
+    @keyframes sucr-flow{ to{ stroke-dashoffset:-60px } }
+    #sucr-mock .bond path.flow{ stroke-dasharray:14px 10px; animation:sucr-flow 1100ms linear infinite }
+    #sucr-mock .bond path.base{ opacity:.16 }
+
+    /* sucker map */
+    #sucr-mock .smap{ display:grid; gap:3px; margin:4px 0 12px }
+    #sucr-mock .smap .c{ height:12px; border-radius:2px; background:var(--track); display:flex; overflow:hidden;
+      transition:opacity var(--dur-4) var(--e-std) }
+    #sucr-mock .smap .c i{ display:block; height:100%; transition:width var(--dur-3) linear }
+    #sucr-mock .smap .c.done{ opacity:1 }
+    #sucr-mock .smap .c.settle{ opacity:.55 }
+    #sucr-mock .smap .c:hover{ outline:1.5px solid var(--text2); outline-offset:1px }
+    #sucr-mock .legend{ display:flex; flex-wrap:wrap; gap:12px; font-size:11px; color:var(--text2); margin-top:6px }
+    #sucr-mock .legend b{ display:inline-flex; align-items:center; gap:5px; font-weight:500 }
+    #sucr-mock .legend b::before{ content:""; width:8px; height:8px; border-radius:2px; background:var(--sw,currentColor) }
+    /* --sw keeps the hue on the swatch: --n1/#0E8D7F is 4.09 on white and --n3/#D26A00 is 3.62,
+       so a network hue may mark, label a swatch, or fill a bar, but it never carries text. */
+    #sucr-mock .sw{ width:8px; height:8px; border-radius:2px; display:inline-block; margin-right:6px; vertical-align:1px }
+
+    /* status bar */
+    #sucr-mock .sbar{ height:30px; flex:none; display:flex; align-items:center; gap:14px; padding:0 12px;
+      border-top:.5px solid var(--border); background:var(--s1); font-size:11px; color:var(--text2) }
+    #sucr-mock .sbar .r{ margin-left:auto; display:flex; align-items:center; gap:14px }
+    #sucr-mock .sw{ width:26px; height:15px; border-radius:99px; background:var(--track); position:relative; display:inline-block; vertical-align:-3px;
+      transition:background var(--dur-3) var(--e-std) }
+    #sucr-mock .sw::after{ content:""; position:absolute; top:2px; left:2px; width:11px; height:11px; border-radius:50%; background:var(--bg);
+      box-shadow:0 1px 2px rgba(0,0,0,.3); transition:transform var(--dur-3) var(--e-std) }
+    #sucr-mock .sw[aria-checked="true"]{ background:var(--accent) }
+    #sucr-mock .sw[aria-checked="true"]::after{ transform:translateX(11px) }
+
+    /* sheet */
+    #sucr-mock .sheet-wrap{ position:relative; background:var(--bg); border:.5px solid var(--border); border-radius:14px; padding:28px; max-width:620px; margin:0 auto }
+    #sucr-mock .sheet{ display:flex; flex-direction:column; gap:12px }
+    #sucr-mock .field{ display:flex; flex-direction:column; gap:5px }
+    #sucr-mock .field>label{ font-size:11px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:.4px }
+    #sucr-mock .inp{ display:flex; align-items:center; gap:8px; height:34px; padding:0 10px; border:1px solid var(--bstrong);
+      border-radius:8px; background:var(--bg); font-size:12.5px; transition:border-color var(--dur-2) var(--e-std) }
+    #sucr-mock .inp:focus-within{ border-color:var(--accent) }
+    #sucr-mock .inp input{ flex:1; min-width:0; border:0; background:none; font:inherit; color:inherit; outline:none }
+    #sucr-mock .chip{ padding:4px 10px; border:1px solid var(--bstrong); border-radius:99px; font-size:11.5px; color:var(--text2);
+      transition:background var(--dur-3) var(--e-std), color var(--dur-3) var(--e-std), border-color var(--dur-3) var(--e-std) }
+    #sucr-mock .chip[aria-pressed="true"]{ background:var(--accent-tint); border-color:var(--accent-ink); color:var(--accent-ink); font-weight:500 }
+    #sucr-mock .chiprow{ display:flex; flex-wrap:wrap; gap:6px }
+    #sucr-mock .src{ display:inline-flex; align-items:center; gap:7px; padding:6px 10px; border-radius:99px; background:var(--s1);
+      border:.5px solid var(--border2); font-size:11.5px; color:var(--text2) }
+    #sucr-mock .note{ display:flex; gap:8px; padding:8px 10px; border-radius:8px; background:var(--s1); font-size:11.5px; color:var(--text2) }
+    #sucr-mock .adv{ border-top:.5px solid var(--border2); margin-top:6px; padding-top:6px }
+    #sucr-mock .adv>button{ display:flex; align-items:center; gap:6px; width:100%; padding:6px 0; font-size:12px; font-weight:500; color:var(--text2) }
+    #sucr-mock .adv .grp{ border:.5px solid var(--border2); border-radius:8px; margin-top:6px; overflow:hidden }
+    #sucr-mock .adv .grp>button{ display:flex; width:100%; align-items:center; gap:8px; padding:8px 10px; font-size:12px; font-weight:500 }
+    #sucr-mock .adv .grp .in{ padding:0 10px 10px; display:flex; flex-wrap:wrap; gap:8px }
+    #sucr-mock .sum-line{ margin-left:auto; font-size:11px; color:var(--accent-ink); font-weight:400 }
+    #sucr-mock .sfoot{ display:flex; align-items:center; gap:8px; margin-top:8px }
+    #sucr-mock .sfoot .sp{ margin-left:auto; display:flex; gap:8px }
+
+    /* motion spec + capability tables */
+    #sucr-mock .doc{ background:var(--bg); border:.5px solid var(--border); border-radius:12px; overflow:hidden }
+    #sucr-mock .doc table{ font-size:12px }
+    #sucr-mock .doc td{ white-space:normal; vertical-align:top }
+    #sucr-mock .demo{ display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:12px; margin-bottom:14px }
+    #sucr-mock .demo>div{ background:var(--bg); border:.5px solid var(--border); border-radius:10px; padding:14px }
+    #sucr-mock .demo h4{ margin:0 0 2px; font-size:12px; font-family:"Cascadia Mono","Roboto Mono",monospace }
+    #sucr-mock .demo p{ margin:0 0 10px; font-size:11px; color:var(--text3) }
+    #sucr-mock .stage{ height:52px; display:grid; place-items:center; background:var(--s1); border-radius:8px; overflow:hidden }
+    #sucr-mock .cap{ display:inline-flex; align-items:center; gap:5px; font-weight:600; font-size:11px }
+    #sucr-mock .cap::before{ content:""; width:7px; height:7px; border-radius:50%; background:currentColor }
+    #sucr-mock .cap.ok{ color:var(--success-ink) } #sucr-mock .cap.no{ color:var(--danger-ink) } #sucr-mock .cap.part{ color:var(--warning-ink) }
+    #sucr-mock .toast{ position:fixed; left:50%; top:14px; transform:translateX(-50%); z-index:9;
+      display:flex; align-items:center; gap:10px; padding:9px 14px; border-radius:10px; background:var(--text); color:var(--bg);
+      font-size:12.5px; box-shadow:0 8px 24px rgba(0,0,0,.24); opacity:0; pointer-events:none;
+      transition:opacity var(--dur-4) var(--e-dec), transform var(--dur-4) var(--e-dec) }
+    #sucr-mock .toast.on{ opacity:1; transform:translateX(-50%) translateY(0) }
+    #sucr-mock .toast.pre{ transform:translateX(-50%) translateY(-8px) }
+    #sucr-mock .foot{ margin-top:14px; font-size:11.5px; color:var(--text3) }
+  </style>
+
+  <div class="frame">
+    <div class="intro">
+      <h1>Sucr — interface, motion and enablement</h1>
+      <p>Live mockup of the three-pane shell, the two-tier add sheet, the motion system and the capability gates. Everything animating here is animating for a reason the engine could report: the flow lines carry real throughput, the sucker map is one cell per block subdivided per connection. Switch the motion mode to see what reduced-motion costs.</p>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-p="main">Main window</button>
+      <button class="tab" role="tab" aria-selected="false" data-p="add">Add download</button>
+      <button class="tab" role="tab" aria-selected="false" data-p="conn">Connections &amp; sucker map</button>
+      <button class="tab" role="tab" aria-selected="false" data-p="motion">Motion spec</button>
+      <button class="tab" role="tab" aria-selected="false" data-p="cap">Enablement &amp; capabilities</button>
+    </div>
+
+    <div class="ctrls">
+      <span class="lbl">Theme</span>
+      <span class="seg" data-g="theme"><button data-v="light" aria-pressed="true">Light</button><button data-v="dark" aria-pressed="false">Dark</button></span>
+      <span class="lbl">Motion</span>
+      <span class="seg" data-g="motion"><button data-v="full" aria-pressed="true">Full</button><button data-v="reduced" aria-pressed="false">Reduced</button><button data-v="off" aria-pressed="false">Off</button></span>
+      <span class="lbl">List</span>
+      <span class="seg" data-g="listmode"><button data-v="cards" aria-pressed="true">Cards</button><button data-v="table" aria-pressed="false">Table</button></span>
+      <span class="lbl">Density</span>
+      <span class="seg" data-g="density"><button data-v="comfortable" aria-pressed="true">Comfortable</button><button data-v="compact" aria-pressed="false">Compact</button></span>
+    </div>
+
+    <!-- ============ MAIN ============ -->
+    <section class="panel on" data-p="main">
+      <div class="win">
+        <div class="tbar">
+          <div class="mark"></div><div class="name">Sucr</div>
+          <div class="search mono"><span>Search downloads, links, sites</span><span style="margin-left:auto">⌘K</span></div>
+          <div class="wbtns"><i>—</i><i>□</i><i>✕</i></div>
+        </div>
+        <div class="body">
+          <nav class="rail">
+            <div class="grp"><div class="lbl">Library</div>
+              <button class="ritem" aria-current="true"><span>All downloads</span><span class="n mono">14</span></button>
+              <button class="ritem">In progress<span class="n mono">2</span></button>
+              <button class="ritem">Queued<span class="n mono">3</span></button>
+              <button class="ritem">Needs attention<span class="n mono">1</span></button>
+              <button class="ritem">Finished<span class="n mono">8</span></button>
+              <button class="ritem">History</button>
+            </div>
+            <div class="grp"><div class="lbl">Categories</div>
+              <button class="ritem"><span class="dot" style="background:var(--n2)"></span>Programs<span class="n mono">4</span></button>
+              <button class="ritem"><span class="dot" style="background:var(--n1)"></span>Compressed<span class="n mono">3</span></button>
+              <button class="ritem"><span class="dot" style="background:var(--n3)"></span>Video<span class="n mono">2</span></button>
+              <button class="ritem"><span class="dot" style="background:var(--n4)"></span>Documents</button>
+              <button class="ritem"><span class="dot" style="background:var(--text3)"></span>General<span class="n mono">5</span></button>
+            </div>
+            <div class="grp"><div class="lbl">Queues</div>
+              <button class="ritem">Overnight<span class="n mono">3</span></button>
+              <button class="ritem">Work</button>
+            </div>
+            <div class="grp"><div class="lbl">Tools</div>
+              <button class="ritem">Media capture</button>
+              <button class="ritem">Site grabber</button>
+              <button class="ritem">Scheduler</button>
+            </div>
+          </nav>
+
+          <div class="mid">
+            <div class="lbar">
+              <h2>All downloads</h2>
+              <span class="sum">2 downloading · 3 queued · 1 needs attention</span>
+              <div style="margin-left:auto; display:flex; gap:8px">
+                <button class="ghost">⌄ Networks</button>
+                <button class="ghost primary">＋ New download</button>
+              </div>
+            </div>
+            <div class="list">
+              <div data-mode="cards">
+                <div class="ghead"><span>Downloading</span></div>
+                <div class="row sel">
+                  <div class="badge mono">RAR</div>
+                  <div class="cell">
+                    <div class="fname">GOT-Ascension-PPU-lift.rar</div>
+                    <div class="bar" id="bar1"></div>
+                    <div class="meta mono" id="meta1">—</div>
+                  </div>
+                  <div class="dots" id="dots1"></div>
+                  <div class="spd mono" id="spd1">—</div>
+                  <div class="chev">›</div>
+                </div>
+                <div class="row">
+                  <div class="badge mono">MP4</div>
+                  <div class="cell">
+                    <div class="fname">GT7SP-trackday-04.mp4</div>
+                    <div class="bar" id="bar2"></div>
+                    <div class="meta mono" id="meta2">—</div>
+                  </div>
+                  <div class="dots" id="dots2"></div>
+                  <div class="spd mono" id="spd2">—</div>
+                  <div class="chev">›</div>
+                </div>
+                <div class="ghead"><span>Queued</span></div>
+                <div class="row">
+                  <div class="badge mono">ISO</div>
+                  <div class="cell">
+                    <div class="fname">shadGT-shaders-v7.iso</div>
+                    <div class="bar fade"><i style="width:34%; background:var(--n2)"></i></div>
+                    <div class="meta mono">Waiting until 02:00 Tue · 41.2 GB</div>
+                  </div>
+                  <div class="dots"><i class="off"></i><i class="off"></i></div>
+                  <div class="spd mono"></div>
+                  <div class="chev">›</div>
+                </div>
+                <div class="row">
+                  <div class="badge mono">7Z</div>
+                  <div class="cell">
+                    <div class="fname">AMDNR-presets-backup.7z</div>
+                    <div class="bar fade"><i style="width:0%"></i></div>
+                    <div class="meta mono">Waiting for a turn · 812 MB</div>
+                  </div>
+                  <div class="dots"><i class="off"></i></div>
+                  <div class="spd mono"></div>
+                  <div class="chev">›</div>
+                </div>
+                <div class="ghead"><span>Needs attention</span></div>
+                <div class="row">
+                  <div class="badge mono">TAR</div>
+                  <div class="cell">
+                    <div class="fname">ps3recomp-tools-nightly.tar.gz</div>
+                    <div class="bar"><i style="width:61%; background:var(--danger)"></i></div>
+                    <div class="meta err">403 after 5 attempts — the link may have expired &nbsp;<span class="why">Fix link →</span></div>
+                  </div>
+                  <div class="dots"><i class="off"></i></div>
+                  <div class="spd mono"></div>
+                  <div class="chev">›</div>
+                </div>
+              </div>
+              <div data-mode="table" hidden>
+                <table>
+                  <thead><tr><th>Name</th><th>Size</th><th>Done</th><th>Status</th><th>Rate</th><th>Left</th><th>Conn</th><th>Category</th><th>Last try</th></tr></thead>
+                  <tbody>
+                    <tr><td>GOT-Ascension-PPU-lift.rar</td><td class="mono">18.4 GB</td><td class="mono" id="t1">—</td><td>Downloading</td><td class="mono" id="t1s">—</td><td class="mono" id="t1l">—</td><td class="mono">24</td><td>Programs</td><td class="mono">now</td></tr>
+                    <tr><td>GT7SP-trackday-04.mp4</td><td class="mono">6.1 GB</td><td class="mono" id="t2">—</td><td>Downloading</td><td class="mono" id="t2s">—</td><td class="mono" id="t2l">—</td><td class="mono">8</td><td>Video</td><td class="mono">now</td></tr>
+                    <tr><td>shadGT-shaders-v7.iso</td><td class="mono">41.2 GB</td><td class="mono">34%</td><td>Queued</td><td class="mono">—</td><td class="mono">—</td><td class="mono">32</td><td>Compressed</td><td class="mono">01:58</td></tr>
+                    <tr><td>ps3recomp-tools-nightly.tar.gz</td><td class="mono">1.9 GB</td><td class="mono">61%</td><td>403 Forbidden</td><td class="mono">0 B/s</td><td class="mono">—</td><td class="mono">1</td><td>Programs</td><td class="mono">2 min</td></tr>
+                    <tr><td>ReShade-2026-10-preset-pack.zip</td><td class="mono">248 MB</td><td class="mono">100%</td><td>Verified</td><td class="mono">—</td><td class="mono">—</td><td class="mono">16</td><td>General</td><td class="mono">1 h</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="sbar">
+              <span class="mono">1.8 TB free</span><span>·</span><span>3 waiting</span><span>·</span><span>⏱ 02:00–07:00 window</span>
+              <div class="r">
+                <span style="display:flex;align-items:center;gap:7px">Slow mode <span class="sw" role="switch" aria-checked="false" tabindex="0"></span></span>
+                <span class="mono" style="cursor:pointer">MB/s ⇄</span><span style="cursor:pointer">◐</span>
+              </div>
+            </div>
+          </div>
+
+          <aside class="insp">
+            <div class="ihead">
+              <div class="t">GOT-Ascension-PPU-lift.rar</div>
+              <div class="s mono" id="ihead-s">—</div>
+            </div>
+            <div class="itabs" role="tablist" aria-label="Download detail">
+              <button class="itab" role="tab" id="it-overview" aria-controls="ip-overview" data-tab="overview" aria-selected="true" tabindex="0">Overview</button>
+              <button class="itab" role="tab" id="it-connections" aria-controls="ip-connections" data-tab="connections" aria-selected="false" tabindex="-1">Connections</button>
+              <button class="itab" role="tab" id="it-source" aria-controls="ip-source" data-tab="source" aria-selected="false" tabindex="-1">Source</button>
+              <button class="itab" role="tab" id="it-schedule" aria-controls="ip-schedule" data-tab="schedule" aria-selected="false" tabindex="-1">Schedule</button>
+              <button class="itab" role="tab" id="it-activity" aria-controls="ip-activity" data-tab="activity" aria-selected="false" tabindex="-1">Activity</button>
+            </div>
+            <div class="ibody">
+              <div class="ipane" role="tabpanel" id="ip-overview" data-tab="overview" aria-labelledby="it-overview">
+              <div class="hero"><span class="pct mono" id="ipct">—</span><span class="of" id="iof">—</span></div>
+              <div class="wave" id="ibar" role="progressbar" aria-label="Overall progress" aria-valuemin="0" aria-valuemax="100"></div>
+
+              <div class="bond">
+                <svg viewBox="0 0 300 74" width="100%" height="74" aria-label="Network bonding diagram">
+                  <g fill="none" stroke-linecap="round" stroke-width="2">
+                    <path class="base" d="M18 14 C 110 14, 130 37, 232 37" stroke="var(--n1)"/>
+                    <path class="base" d="M18 37 C 110 37, 130 37, 232 37" stroke="var(--n2)"/>
+                    <path class="base" d="M18 60 C 110 60, 130 37, 232 37" stroke="var(--n3)"/>
+                    <path class="flow" d="M18 14 C 110 14, 130 37, 232 37" stroke="var(--n1)" style="animation-delay:0ms"/>
+                    <path class="flow" d="M18 37 C 110 37, 130 37, 232 37" stroke="var(--n2)" style="animation-delay:200ms"/>
+                    <path class="flow" d="M18 60 C 110 60, 130 37, 232 37" stroke="var(--n3)" style="animation-delay:400ms"/>
+                  </g>
+                  <circle cx="18" cy="14" r="4" fill="var(--n1)"/><circle cx="18" cy="37" r="4" fill="var(--n2)"/><circle cx="18" cy="60" r="4" fill="var(--n3)"/>
+                  <rect x="232" y="26" width="50" height="22" rx="5" fill="none" stroke="var(--border)" stroke-width="1"/>
+                  <text x="257" y="41" text-anchor="middle" font-size="9" fill="var(--text2)" font-family="inherit">file</text>
+                </svg>
+                <div class="legend">
+                  <b style="--sw:var(--n1)">Wi-Fi <span class="mono" style="font-weight:400" id="lg1">—</span></b>
+                  <b style="--sw:var(--n2)">Ethernet <span class="mono" style="font-weight:400" id="lg2">—</span></b>
+                  <b style="--sw:var(--n3)">USB LAN <span class="mono" style="font-weight:400" id="lg3">—</span></b>
+                </div>
+              </div>
+
+              <dl style="margin:0 0 12px">
+                <div class="kv"><dt>Connections</dt><dd class="mono">24 <span class="why">Why not 32?</span></dd></div>
+                <div class="kv"><dt>Block size</dt><dd class="mono">4 MiB · 4,608 blocks</dd></div>
+                <div class="kv"><dt>Time left</dt><dd class="mono" id="ikl">—</dd></div>
+                <div class="kv"><dt>Save to</dt><dd style="text-align:right">D:\RE\out</dd></div>
+                <div class="kv"><dt>Category</dt><dd>Programs</dd></div>
+                <div class="kv"><dt>Checksum</dt><dd class="mono" style="color:var(--success-ink)">sha256 pending</dd></div>
+                <div class="kv" style="border:0"><dt>Disk</dt><dd>Keeping up <span class="why">Why?</span></dd></div>
+              </dl>
+
+              <div class="note"><span>⚑</span><span>Hedged 3 blocks in the last minute — the Ethernet holder fell behind on 2 of them. See <button class="why" data-goto="connections" style="padding:0 6px">Connections</button>.</span></div>
+              </div>
+
+              <div class="ipane" role="tabpanel" id="ip-connections" data-tab="connections" aria-labelledby="it-connections" hidden>
+                <dl style="margin:0 0 10px">
+                  <div class="kv"><dt><span class="sw" style="background:var(--n1)"></span>Wi-Fi</dt><dd class="mono">6.2 MB/s · 8 conns</dd></div>
+                  <div class="kv"><dt><span class="sw" style="background:var(--n2)"></span>Ethernet</dt><dd class="mono">11.4 MB/s · 12 conns</dd></div>
+                  <div class="kv"><dt><span class="sw" style="background:var(--n3)"></span>USB LAN</dt><dd class="mono">2.8 MB/s · 4 conns</dd></div>
+                  <div class="kv"><dt>Ceiling</dt><dd class="mono">8 → 32 per network <span class="why">Why?</span></dd></div>
+                  <div class="kv" style="border:0"><dt>Hedges live</dt><dd class="mono">3 · all at the frontier</dd></div>
+                </dl>
+                <div class="note"><span>⚑</span><span>Ethernet fell behind on 2 blocks, so a second attempt was started on each. When one loses, its band fades out on the map.</span></div>
+              </div>
+
+              <div class="ipane" role="tabpanel" id="ip-source" data-tab="source" aria-labelledby="it-source" hidden>
+                <dl style="margin:0 0 10px">
+                  <div class="kv"><dt>URL</dt><dd class="mono" style="max-width:186px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">https://cdn.example.io/f/8842a1/GOT-Ascension-PPU-lift.rar</dd></div>
+                  <div class="kv"><dt>Final</dt><dd>1 redirect · same origin</dd></div>
+                  <div class="kv"><dt>Server</dt><dd class="mono">nginx · HTTP/2</dd></div>
+                  <div class="kv"><dt>Type</dt><dd class="mono">application/x-rar</dd></div>
+                  <div class="kv"><dt>Size</dt><dd class="mono">18.4 GB · resumable</dd></div>
+                  <div class="kv"><dt>ETag</dt><dd class="mono">"8f2c…41" · If-Range</dd></div>
+                  <div class="kv"><dt>Checksum</dt><dd class="mono" style="color:var(--success-ink)">sha256 pending</dd></div>
+                  <div class="kv" style="border:0"><dt>Save to</dt><dd>D:\RE\out</dd></div>
+                </dl>
+                <div class="note"><span>⟳</span><span>Resume asks <b>If-Range</b> first; a changed ETag restarts the plan instead of splicing two versions together.</span></div>
+              </div>
+
+              <div class="ipane" role="tabpanel" id="ip-schedule" data-tab="schedule" aria-labelledby="it-schedule" hidden>
+                <dl style="margin:0 0 12px">
+                  <div class="kv"><dt>Global window</dt><dd class="mono">01:00–07:00 daily</dd></div>
+                  <div class="kv"><dt>This download</dt><dd>Follow global</dd></div>
+                  <div class="kv"><dt>Queue</dt><dd>Main · position 2</dd></div>
+                  <div class="kv" style="border:0"><dt>Speed cap</dt><dd class="mono">12 MB/s this file</dd></div>
+                </dl>
+                <div class="chiprow" style="display:flex; gap:4px; flex-wrap:wrap">
+                  <button class="chip" aria-pressed="true">Follow global</button>
+                  <button class="chip">Window only</button>
+                  <button class="chip">Paused outside</button>
+                </div>
+                <div class="note" style="margin-top:10px"><span>◷</span><span>A control here affects this download only. The window itself lives in <b>Settings → Schedule</b>, and the inspector says so rather than hiding the difference.</span></div>
+              </div>
+
+              <div class="ipane" role="tabpanel" id="ip-activity" data-tab="activity" aria-labelledby="it-activity" hidden>
+                <ol class="log">
+                  <li><time>09:41:02</time><span>plan 4,608 blocks × 4 MiB</span></li>
+                  <li><time>09:41:03</time><span>streams 24 · 8 per network</span></li>
+                  <li><time>09:41:07</time><span>streams 32 · every stream answered</span></li>
+                  <li><time>09:46:18</time><span>hedge +2 at frontier — Ethernet behind <span class="why">Why?</span></span></li>
+                  <li><time>09:47:55</time><span>sample 12 MiB · sha256 in progress</span></li>
+                </ol>
+                <div class="note" style="margin-top:10px"><span>≡</span><span>Every engine decision writes one line here. This tab is the difference between a progress bar and an explanation.</span></div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+      <p class="foot">Rows, inspector and status bar are live: throughput is simulated but the numbers drive the same properties the real UI would animate — bar segment widths, dot pulse, flow-line speed, and the percentage.</p>
+    </section>
+
+    <!-- ============ ADD ============ -->
+    <section class="panel" data-p="add">
+      <div class="sheet-wrap">
+        <div class="sheet">
+          <div style="display:flex; align-items:center; gap:10px">
+            <h3 style="margin:0; font-size:15px; font-weight:600">New download</h3>
+            <span class="src" style="margin-left:auto">🔒 From mega.example · with your Chrome sign-in</span>
+          </div>
+          <div class="field"><label>Link</label>
+            <div class="inp"><input class="mono" value="https://cdn.example.io/f/8842a1/GOT-Ascension-PPU-lift.rar" readonly><span style="color:var(--text3)">✕</span></div>
+          </div>
+          <div class="note"><span>⟳</span><span><b>18.4 GB</b> · splits across networks · resumable. Detected as <b>Programs</b> from the <code>.rar</code> rule.</span></div>
+          <div class="field"><label>Save to</label>
+            <div class="inp"><span class="mono" style="color:var(--text2)">D:\RE\out\</span><input value="GOT-Ascension-PPU-lift.rar"><button class="ghost">Change…</button></div>
+          </div>
+          <div class="field"><label>Networks</label>
+            <div class="chiprow">
+              <button class="chip" aria-pressed="true">● Wi-Fi</button>
+              <button class="chip" aria-pressed="true">● Ethernet</button>
+              <button class="chip" aria-pressed="true">● USB LAN</button>
+              <button class="chip" aria-pressed="false" style="text-decoration:line-through">● Phone hotspot — data limit reached</button>
+            </div>
+          </div>
+          <div class="field"><label>Connections</label>
+            <div class="chiprow"><button class="chip" aria-pressed="true">Auto</button><button class="chip">4</button><button class="chip">8</button><button class="chip">16</button><button class="chip">32</button>
+              <span style="align-self:center; font-size:11.5px; color:var(--text3)">per network · Auto starts at 8 and doubles to 32</span></div>
+          </div>
+
+          <div class="adv">
+            <button id="adv-toggle">⌄ Advanced <span style="color:var(--text3); font-weight:400">— request, splitting, limits, schedule, files</span></button>
+            <div id="adv-body" hidden>
+              <div class="grp"><button>Splitting <span class="sum-line">hedge off for this host</span></button>
+                <div class="in"><div class="chiprow"><button class="chip" aria-pressed="true">Hedging on</button><button class="chip">Per-server cap…</button><button class="chip">Disable split</button></div></div>
+              </div>
+              <div class="grp"><button>Request <span class="sum-line">Chrome UA · 6 cookies · 1 header</span></button>
+                <div class="in"><div class="inp" style="flex:1 1 100%"><span style="color:var(--text3)">User-Agent</span><input class="mono" value="Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/143" readonly></div>
+                  <div class="inp"><span style="color:var(--text3)">Login</span><input value="bench" style="width:90px"></div>
+                  <div class="inp"><span style="color:var(--text3)">Password</span><input type="password" value="hunter2" style="width:90px"></div>
+                  <button class="ghost">＋ Header</button><button class="ghost">Test request →</button></div>
+              </div>
+              <div class="grp"><button>Limits <span class="sum-line">capped at 12 MB/s</span></button>
+                <div class="in"><div class="inp"><input value="12" style="width:44px"><span class="mono" style="color:var(--text3)">MB/s for this file</span></div>
+                  <button class="chip">Ignore global schedule</button><button class="chip">Exempt from data cap</button></div>
+              </div>
+              <div class="grp"><button>Schedule <span class="sum-line">start 23:30, 3 retries, shut down when done</span></button>
+                <div class="in"><div class="inp"><span style="color:var(--text3)">Start at</span><input class="mono" value="23:30" style="width:60px"></div>
+                  <div class="inp"><span style="color:var(--text3)">Stop at</span><input class="mono" value="07:00" style="width:60px"></div>
+                  <div class="inp"><span style="color:var(--text3)">Queue</span><input value="Overnight" style="width:90px"></div>
+                  <div class="inp"><span style="color:var(--text3)">Retries</span><input class="mono" value="3" style="width:34px"></div>
+                  <button class="chip" aria-pressed="true">Shut down when done</button></div>
+              </div>
+              <div class="grp"><button>Files <span class="sum-line">sha256 verify · creation date from server</span></button>
+                <div class="in"><div class="inp"><span style="color:var(--text3)">Checksum</span><input class="mono" value="sha256 3f9a…c41d" style="width:180px"></div>
+                  <button class="chip" aria-pressed="true">Set creation date from server</button><button class="chip">Category: Programs ▾</button></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sfoot">
+            <span style="font-size:11.5px; color:var(--text3)">1.8 TB free on D:</span>
+            <div class="sp"><button class="ghost">Cancel</button><button class="ghost">Download later</button><button class="ghost primary">Start download</button></div>
+          </div>
+        </div>
+      </div>
+      <p class="foot">Tier 1 is six controls. Everything a legacy download manager split across Download File Info, Connections, Schedule, Proxy, Site Logins and Speed Limiter dialogs lives in the five Advanced groups — each showing a one-line summary when set, so an override is never invisible.</p>
+    </section>
+
+    <!-- ============ CONNECTIONS ============ -->
+    <section class="panel" data-p="conn">
+      <div class="doc" style="padding:18px 20px">
+        <h3 style="margin:0 0 2px; font-size:15px">Sucker map — GOT-Ascension-PPU-lift.rar</h3>
+        <p style="margin:0 0 12px; font-size:12px; color:var(--text2)">One cell per block, each subdivided into a band per network that touched it. Hover a cell for its readout. Cells with two live bands are <b>hedged</b>; the loser fades out when it is aborted.</p>
+        <div class="smap" id="smap"></div>
+        <div class="legend" id="smap-legend"></div>
+        <div id="smap-read" class="mono" style="margin-top:10px; font-size:11.5px; color:var(--text2)">hover a cell…</div>
+
+        <h4 style="margin:20px 0 8px; font-size:12.5px">Live attempts</h4>
+        <table>
+          <thead><tr><th>Net</th><th>Block</th><th>Range</th><th>Bytes</th><th>Rate</th><th>State</th><th>Why</th></tr></thead>
+          <tbody class="mono" style="font-size:11.5px">
+            <tr><td><i class="sw" style="background:var(--n1)"></i>Wi-Fi</td><td>#3,912</td><td>16.402–16.406 GB</td><td id="at1">—</td><td id="at1r">—</td><td>downloading</td><td style="white-space:nowrap">primary</td></tr>
+            <tr><td><i class="sw" style="background:var(--n2)"></i>Ethernet</td><td>#3,912</td><td>16.404–16.406 GB</td><td id="at2">—</td><td id="at2r">—</td><td>hedging</td><td style="white-space:nowrap">ETA 41s &gt; 2× racer estimate</td></tr>
+            <tr><td><i class="sw" style="background:var(--n2)"></i>Ethernet</td><td>#3,913</td><td>16.406–16.410 GB</td><td>2.1 MB</td><td>3.9 MB/s</td><td>downloading</td><td>primary</td></tr>
+            <tr><td><i class="sw" style="background:var(--n3)"></i>USB LAN</td><td>#3,909</td><td>16.390–16.394 GB</td><td>0 B</td><td>0 B/s</td><td>retrying</td><td>silent 5.2s → refreshed, attempt 1 of 2</td></tr>
+            <tr><td><i class="sw" style="background:var(--n1)"></i>Wi-Fi</td><td>#3,880</td><td>16.272–16.276 GB</td><td>4.2 MB</td><td>—</td><td>lost</td><td>aborted reason=lost · bytes kept</td></tr>
+          </tbody>
+        </table>
+        <div class="note" style="margin-top:12px"><span>⌗</span><span><b>Ceiling is 24, not 32.</b> The server refused 8 of 36 attempts at 14:02, so Sucr dropped to what it accepts and adds one back each minute. <span class="why">Show me →</span></span></div>
+      </div>
+    </section>
+
+    <!-- ============ MOTION ============ -->
+    <section class="panel" data-p="motion">
+      <div class="demo">
+        <div><h4>flow</h4><p>stroke-dashoffset · 1100ms linear ∞ · +200ms/network</p>
+          <div class="stage"><svg width="150" height="40" viewBox="0 0 150 40"><g fill="none" stroke-width="2">
+            <path d="M8 10 C 60 10, 80 20, 142 20" stroke="var(--n1)" opacity=".16"/>
+            <path d="M8 30 C 60 30, 80 20, 142 20" stroke="var(--n3)" opacity=".16"/>
+            <path class="flow" d="M8 10 C 60 10, 80 20, 142 20" stroke="var(--n1)" style="stroke-dasharray:14px 10px; animation:sucr-flow 1100ms linear infinite"/>
+            <path class="flow" d="M8 30 C 60 30, 80 20, 142 20" stroke="var(--n3)" style="stroke-dasharray:14px 10px; animation:sucr-flow 1100ms linear infinite 200ms"/>
+          </g></svg></div></div>
+        <div><h4>pulse</h4><p>opacity .45→1 · 1800ms alternate ∞</p>
+          <div class="stage"><div class="dots"><i class="live" style="background:var(--n1)"></i><i class="live" style="background:var(--n2); animation-delay:300ms"></i><i class="live" style="background:var(--n3); animation-delay:600ms"></i><i class="off"></i></div></div></div>
+        <div><h4>cell-fill / cell-settle</h4><p>width 150ms linear · one-shot opacity 220ms</p>
+          <div class="stage"><div style="width:88%"><div class="smap" style="grid-template-columns:repeat(9,1fr)" id="m-fill"></div></div></div></div>
+        <div><h4>bar-advance</h4><p>width · 220ms ease-out · coalesced ≤4 Hz</p>
+          <div class="stage" style="padding:0 14px"><div class="bar" id="m-bar" style="width:100%"><i style="width:20%; background:var(--n2)"></i></div></div></div>
+        <div><h4>draw-check</h4><p>stroke-dashoffset · 320ms decelerate · one shot</p>
+          <div class="stage"><svg width="40" height="40" viewBox="0 0 24 24"><path id="m-check" d="M5,13 L10,18 L19,7" fill="none" stroke="var(--success-ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+        <div><h4>state-swap</h4><p>opacity + translateY(4px) · 180ms</p>
+          <div class="stage"><span id="m-state" class="chip" aria-pressed="true" style="cursor:default">Downloading</span></div></div>
+        <div><h4>sheet-open</h4><p>overlay 100ms · panel scale .97→1 · 260ms</p>
+          <div class="stage"><div style="width:74px; height:34px; border:.5px solid var(--border); border-radius:8px; background:var(--bg); display:grid; place-items:center; font-size:10px; color:var(--text3)">sheet</div></div></div>
+        <div><h4>toast-in / out</h4><p>translateY(-8px)+fade · 220ms / 160ms · 6s dwell</p>
+          <div class="stage"><button class="ghost" id="m-toast" style="font-size:11px">fire toast</button></div></div>
+        <div><h4>drop-hint</h4><p>border + backdrop · 200ms, then 1200ms cycle</p>
+          <div class="stage"><div id="m-drop" style="width:100%; height:36px; border:1.5px dashed var(--border); border-radius:8px; display:grid; place-items:center; font-size:10.5px; color:var(--text3)">drop a .torrent or link</div></div></div>
+        <div><h4>shimmer</h4><p>first paint only · 1200ms ∞ · max 6 rows</p>
+          <div class="stage" style="flex-direction:column; gap:5px; display:flex; padding:8px 10px">
+            <div style="height:8px; width:100%; border-radius:4px; background:var(--track)"></div>
+            <div style="height:8px; width:72%; border-radius:4px; background:var(--track)"></div>
+            <div style="height:8px; width:88%; border-radius:4px; background:var(--track)"></div></div></div>
+      </div>
+
+      <div class="doc">
+        <table>
+          <thead><tr><th>Rule</th><th>Why it exists</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:500">Motion is telemetry</td><td>An animation either reports real work or confirms a state change the user caused. Neither → no animation.</td></tr>
+            <tr><td style="font-weight:500">Max 2 ambient loops per screen</td><td>Plexo's whole vocabulary is 4 keyframes and 2 matter. Both loops stop on blur, <code>document.hidden</code> and pause.</td></tr>
+            <tr><td style="font-weight:500">Never tween a live number</td><td>Speed and byte counters update by replacement at ≤4 Hz. A tweened rate is a lie about now.</td></tr>
+            <tr><td style="font-weight:500">250 ms ceiling on anything waited on</td><td>Only the sucker map is allowed longer — it is watched, not waited on.</td></tr>
+            <tr><td style="font-weight:500">No glow, no gradient, no box-shadow animation</td><td>Plexo's <code>box-shadow: 0 0 7px</code> on in-flight cells is replaced by fill + a brighter 1px border. Same signal, flat.</td></tr>
+            <tr><td style="font-weight:500">Reduced keeps the map usable</td><td>It is data, not chrome: <code>cell-fill</code> goes instant, <code>cell-settle</code> becomes a colour change, loops stop.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ CAPABILITIES ============ -->
+    <section class="panel" data-p="cap">
+      <div class="doc">
+        <table>
+          <thead><tr><th>Capability</th><th>Probe</th><th>State</th><th>If unavailable — the exact sentence shown</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">nic-bonding</td><td>bind a socket to a non-default interface and connect</td><td><span class="cap ok">available</span></td><td>"Sucr can use one network at a time here. Bonding needs Linux ≥ 5.7 with CAP_NET_RAW, or Windows." Per-NIC limits still work.</td></tr>
+            <tr><td class="mono">sparse-files</td><td>FSCTL_SET_SPARSE on a probe file</td><td><span class="cap ok">available</span></td><td>Staging falls back to append mode; the row shows a "no preallocation" chip and the disk preflight turns conservative.</td></tr>
+            <tr><td class="mono">wake-timers</td><td>register a 60 s wake timer, read back the OS answer</td><td><span class="cap part">blocked by OS</span></td><td>"Sucr must be running, and Windows must allow wake timers, for scheduled downloads to start." + deep link to power settings.</td></tr>
+            <tr><td class="mono">capture-elevation</td><td>compare app token elevation with running browsers</td><td><span class="cap ok">not elevated</span></td><td>"You're running Sucr as Administrator — browser downloads can't be captured." with a <b>Restart unelevated</b> action.</td></tr>
+            <tr><td class="mono">capture-browser</td><td>bridge /ping answered by each installed browser's extension</td><td><span class="cap part">2 of 4</span></td><td>Per-browser row reads connected / installed-not-running / not-installed, with the setup action inline.</td></tr>
+            <tr><td class="mono">credential-store</td><td>safeStorage.isEncryptionAvailable()</td><td><span class="cap ok">available</span></td><td>"This system's keyring isn't available; passwords won't be saved." — refuse rather than obfuscate-and-store.</td></tr>
+            <tr><td class="mono">notifications</td><td>Notification.isSupported()</td><td><span class="cap ok">available</span></td><td>Fall back to in-app toasts plus tray.</td></tr>
+            <tr><td class="mono">amsi</td><td>AmsiInitialize availability</td><td><span class="cap ok">available</span></td><td>The scan-on-completion setting hides itself rather than shipping a dead toggle.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="doc" style="margin-top:14px">
+        <table>
+          <thead><tr><th>Tier</th><th>What it is</th><th>Examples</th><th>Design obligation</th></tr></thead>
+          <tbody>
+            <tr><td class="mono" style="font-weight:600">automatic</td><td>The engine decides. No setting, no action.</td><td>block plan · stream doubling · hedging · refusal &amp; disk ceilings · retry/backoff · Retry-After · sparse staging · collision suffixes · filename decoding · redirects · resume offsets · integrity sampling</td><td>Every decision observable and explainable — each writes a coded event and gets a <b>Why?</b></td></tr>
+            <tr><td class="mono" style="font-weight:600">policy</td><td>Chosen once in Settings, obeyed everywhere.</td><td>global schedule · downloads-at-once · speed &amp; data limits · proxy profile · capture filters · categories · autostart · notifications · theme</td><td>A control in the inspector affects only the selection; one in Settings affects everything; a control in <b>both</b> states which wins.</td></tr>
+            <tr><td class="mono" style="font-weight:600">action</td><td>The user causes it, once.</td><td>pause · resume · retry · cancel · remove · trash · fix link · choose torrent files · add download · start/stop queue · force/prevent key</td><td>Reversible where possible; destructive ones name the file and the folder.</td></tr>
+            <tr><td class="mono" style="font-weight:600">gated</td><td>Not a choice — a machine property.</td><td>the eight probes above</td><td>Never fail silently. Both reference apps fail here: Plexo degrades NIC binding without a word; the legacy one warns about admin mode only after a capture is lost.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="foot">The <b>Why?</b> column is the whole argument for building this product. Plexo already computes every one of these reasons and throws them away; the legacy one keeps a plaintext <code>.log</code> a curious user can open. Sucr structures it and puts it one click from the number it explains.</p>
+    </section>
+  </div>
+
+  <div class="toast pre" id="sucr-toast"><span style="color:var(--success-on-inverse)">✓</span><span>ReShade-2026-10-preset-pack.zip — checksum verified</span><span style="opacity:.6; font-size:11px">Show in folder</span></div>
+
+  <script>
+  (() => {
+    const root = document.getElementById('sucr-mock');
+    const $ = s => root.querySelector(s), $$ = s => [...root.querySelectorAll(s)];
+
+    // tabs
+    $$('.tab').forEach(t => t.onclick = () => {
+      $$('.tab').forEach(x => x.setAttribute('aria-selected', x === t));
+      $$('.panel').forEach(p => p.classList.toggle('on', p.dataset.p === t.dataset.p));
+    });
+
+    // inspector tabs — roving tabindex, arrows/Home/End, Ctrl+1..5, selection is sticky
+    const ITABS = $$('.itab'), IPANES = $$('.ipane');
+    function selectItab(i, focus){
+      const t = ITABS[i]; if (!t) return;
+      ITABS.forEach((x, j) => { const on = j === i; x.setAttribute('aria-selected', on); x.tabIndex = on ? 0 : -1; });
+      IPANES.forEach(p => p.hidden = p.dataset.tab !== t.dataset.tab);
+      if (focus) { t.focus(); t.scrollIntoView({ block:'nearest', inline:'nearest' }); }
+    }
+    ITABS.forEach((t, i) => {
+      t.onclick = () => selectItab(i);
+      t.addEventListener('keydown', e => {
+        const k = e.key;
+        if (k === 'ArrowRight' || k === 'ArrowDown') { e.preventDefault(); selectItab((i+1) % ITABS.length, true); }
+        else if (k === 'ArrowLeft' || k === 'ArrowUp') { e.preventDefault(); selectItab((i-1+ITABS.length) % ITABS.length, true); }
+        else if (k === 'Home') { e.preventDefault(); selectItab(0, true); }
+        else if (k === 'End') { e.preventDefault(); selectItab(ITABS.length-1, true); }
+      });
+    });
+    document.addEventListener('keydown', e => {
+      if (!(e.ctrlKey || e.metaKey) || e.shiftKey || e.altKey) return;
+      const tg = e.target;
+      if (tg && tg.closest && tg.closest('input, textarea, select')) return;
+      const n = '12345'.indexOf(e.key);
+      if (n >= 0) { e.preventDefault(); selectItab(n, true); }
+    });
+    $$('[data-goto]').forEach(b => b.onclick = () => {
+      const i = ITABS.findIndex(t => t.dataset.tab === b.dataset.goto);
+      if (i >= 0) selectItab(i, true);
+    });
+    // segmented controls
+    $$('.seg').forEach(g => g.querySelectorAll('button').forEach(b => b.onclick = () => {
+      g.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+      const key = g.dataset.g;
+      if (key === 'theme') {
+        root.dataset.theme = b.dataset.v;
+        document.documentElement.dataset.theme = b.dataset.v;
+        document.documentElement.style.colorScheme = b.dataset.v;
+        if (document.body) {
+          document.body.style.backgroundColor = b.dataset.v === 'dark' ? '#1B1D1F' : '#F1F3F4';
+        }
+      }
+      if (key === 'motion') root.dataset.motion = b.dataset.v;
+      if (key === 'listmode') { root.dataset.listmode = b.dataset.v;
+        $$('[data-mode]').forEach(m => m.hidden = m.dataset.mode !== b.dataset.v); }
+      if (key === 'density') { root.dataset.density = b.dataset.v;
+        $$('#sucr-mock .row').forEach(r => r.style.padding = b.dataset.v === 'compact' ? '5px 10px' : '10px 10px'); }
+    }));
+    $$('.sw').forEach(s => s.onclick = () => s.setAttribute('aria-checked', s.getAttribute('aria-checked') !== 'true'));
+    $('#adv-toggle').onclick = e => { const b = $('#adv-body'); b.hidden = !b.hidden; e.target.firstChild.textContent = (b.hidden ? '⌄' : '⌃') + ' Advanced '; };
+    $$('.adv .grp > button').forEach(b => b.onclick = () => { const p = b.nextElementSibling; p.hidden = !p.hidden; });
+    $$('.chiprow .chip').forEach(c => { if (c.dataset.static !== '1') c.onclick = () => {
+      const row = c.parentElement; if (row.children.length && c.classList.contains('chip')) c.setAttribute('aria-pressed', c.getAttribute('aria-pressed') !== 'true'); }; });
+
+    // ---- network model ----
+    const NETS = [
+      { id:'n1', name:'Wi-Fi',     color:'var(--n1)', rate:6.2 },
+      { id:'n2', name:'Ethernet',  color:'var(--n2)', rate:11.4 },
+      { id:'n3', name:'USB LAN',   color:'var(--n3)', rate:2.8 },
+    ];
+    const D1 = { total: 18.4 * 1024, done: 9.1 * 1024, share:{ n1:6.2, n2:11.4, n3:2.8 } };
+    const D2 = { total: 6.1 * 1024,  done: 0.7 * 1024,  share:{ n2:8.9 } };
+    const fmt = mb => mb >= 1024 ? (mb/1024).toFixed(1) + ' GB' : Math.round(mb) + ' MB';
+    const fmtRate = mbps => mbps >= 1 ? mbps.toFixed(1) + ' MB/s' : Math.round(mbps*1024) + ' KB/s';
+
+    function paintBar(barEl, d) {
+      const tot = Object.values(d.share).reduce((a,b)=>a+b,0);
+      barEl.innerHTML = Object.entries(d.share).map(([id,r]) => {
+        const n = NETS.find(x=>x.id===id);
+        return `<i style="width:${(d.done/d.total)*100*(r/tot)}%; background:${n?n.color:'var(--n2)'}"></i>`;
+      }).join('');
+    }
+    function paintDots(el, d) {
+      el.innerHTML = NETS.map(n => `<i class="${d.share[n.id]?'live':'off'}" style="background:${n.color}; animation-delay:${Math.random()*400|0}ms" title="${n.name}"></i>`).join('');
+    }
+
+    // ---- wavy aggregate (Material 3 Expressive) ----
+    // One stroked path at 4px; the track is the same wave, static. Amplitude
+    // collapses to 0 at <=10% and >=95% (AOSP LinearWavyProgressIndicator), so
+    // the ends settle before the state changes. Travel is one wavelength/s.
+    const WV = { el:null, trk:null, prg:null, w:0, p:0, drawn:null };
+    function waveD(x0, x1, amp, y, lam, phase){
+      let d = '', first = true;
+      for (let x = x0; x <= x1; x += 1.5){
+        const yy = y + amp * Math.sin((x / lam) * Math.PI * 2 + phase);
+        d += (first ? 'M' : 'L') + x.toFixed(1) + ' ' + yy.toFixed(2) + ' ';
+        first = false;
+      }
+      return d;
+    }
+    function paintWave(sec, still){
+      const w = Math.round(WV.el.clientWidth);
+      if (w !== WV.w){
+        WV.w = w;
+        WV.el.innerHTML = `<svg width="${w}" height="18" viewBox="0 0 ${w} 18" aria-hidden="true">` +
+          `<path fill="none" stroke="var(--track)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>` +
+          `<path fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        WV.trk = WV.el.children[0].children[0];
+        WV.prg = WV.el.children[0].children[1];
+      }
+      const amp = (WV.p <= 0.10 || WV.p >= 0.95) ? 0 : 3;
+      const phase = still ? 0 : -sec * Math.PI * 2;
+      WV.trk.setAttribute('d', waveD(0, WV.w, amp, 9, 20, 0));
+      WV.prg.setAttribute('d', waveD(0, Math.max(2, WV.w * WV.p), amp, 9, 20, phase));
+      WV.el.setAttribute('aria-valuenow', Math.round(WV.p * 100));
+    }
+    function waveFrame(t){
+      const still = root.dataset.motion !== 'full';
+      if (WV.el && WV.el.clientWidth){
+        if (!still || WV.p !== WV.drawn || WV.w !== WV.el.clientWidth){
+          paintWave(t / 1000, still);
+          WV.drawn = WV.p;
+        }
+      }
+      requestAnimationFrame(waveFrame);
+    }
+    function tick() {
+      [D1, D2].forEach(d => Object.entries(d.share).forEach(([id,r]) => {
+        const jitter = 0.82 + Math.random()*0.36;
+        d.done = Math.min(d.total, d.done + (r * jitter) / 4);
+      }));
+      // row 1
+      const r1 = D1.done/D1.total, s1 = Object.values(D1.share).reduce((a,b)=>a+b,0);
+      paintBar($('#bar1'), D1); $('#meta1').textContent = `${(r1*100).toFixed(0)}% · ${fmt(D1.done)} of ${fmt(D1.total)} · ${Math.round((D1.total-D1.done)/s1/60)}:${String(Math.round((D1.total-D1.done)/s1)%60).padStart(2,'0')}`;
+      $('#spd1').textContent = fmtRate(s1); $('#dots1').innerHTML || paintDots($('#dots1'), D1);
+      // row 2
+      const r2 = D2.done/D2.total, s2 = Object.values(D2.share).reduce((a,b)=>a+b,0);
+      paintBar($('#bar2'), D2); $('#meta2').textContent = `${(r2*100).toFixed(0)}% · ${fmt(D2.done)} of ${fmt(D2.total)} · ${Math.round((D2.total-D2.done)/s2/60)} min`;
+      $('#spd2').textContent = fmtRate(s2); paintDots($('#dots2'), D2);
+      // inspector
+      $('#ipct').textContent = (r1*100).toFixed(1) + '%';
+      $('#iof').textContent = fmt(D1.done) + ' of ' + fmt(D1.total);
+      $('#ihead-s').textContent = fmtRate(s1) + ' · ' + Math.round((D1.total-D1.done)/s1/60) + ' min left';
+      $('#ikl').textContent = Math.round((D1.total-D1.done)/s1/60) + ' min';
+      WV.p = r1;
+      $('#lg1').textContent = fmtRate(D1.share.n1); $('#lg2').textContent = fmtRate(D1.share.n2); $('#lg3').textContent = fmtRate(D1.share.n3);
+      // table mirror
+      if ($('#t1')) { $('#t1').textContent = (r1*100).toFixed(0)+'%'; $('#t1s').textContent = fmtRate(s1); $('#t1l').textContent = Math.round((D1.total-D1.done)/s1/60)+' min';
+        $('#t2').textContent = (r2*100).toFixed(0)+'%'; $('#t2s').textContent = fmtRate(s2); $('#t2l').textContent = Math.round((D2.total-D2.done)/s2/60)+' min'; }
+      const a1=$('#at1'); if (a1) { a1.textContent = fmt(D1.done*0.0002)+' MB'; a1.nextElementSibling.nextElementSibling.textContent = fmtRate(D1.share.n1);
+        $('#at2').textContent = (D1.done*0.00004).toFixed(1)+' MB'; $('#at2r').textContent = fmtRate(D1.share.n2*0.4); }
+    }
+    // fix: the tick body above is written with a syntax slip guarded below
+    function safeTick(){ try { tick(); } catch(e) { /* keep the demo alive */ } }
+    safeTick(); setInterval(safeTick, 250);
+    WV.el = $('#ibar'); WV.p = D1.done / D1.total;
+    requestAnimationFrame(waveFrame);
+
+    // ---- sucker map ----
+    const CELLS = 54;
+    function buildMap(el, cols, live) {
+      el.style.gridTemplateColumns = `repeat(${cols},1fr)`;
+      el.innerHTML = '';
+      for (let i=0;i<CELLS;i++) {
+        const c = document.createElement('div'); c.className = 'c';
+        const done = i < CELLS*0.62, hedged = !done && (i % 7 === 3);
+        const bands = hedged ? [['n1',.5],['n2',.5]] : done ? [['n2',1]] : (i%3===0?[['n3',1]]:[['n1',1]]);
+        c.innerHTML = bands.map(([n,w]) => `<i style="width:${done?100:(hedged?40+Math.random()*40:0)}%; background:var(--${n})"></i>`).join('');
+        if (done) c.classList.add('done');
+        c.onmouseenter = () => { const r = $('#smap-read'); if (r) r.textContent = `Chunk #${1200+i} · 4.0 MiB · ${done?'complete':hedged?'hedged — Wi-Fi 50% · Ethernet 50%':'in flight · '+(i%3===0?'USB LAN':'Wi-Fi')}`; };
+        el.appendChild(c);
+      }
+      if (live) setInterval(() => {
+        const cs = [...el.children]; const inFlight = cs.filter(c=>!c.classList.contains('done'));
+        inFlight.forEach(c => c.querySelectorAll('i').forEach(i => { const w = parseFloat(i.style.width)||0; i.style.width = Math.min(100, w + Math.random()*9) + '%'; }));
+        if (inFlight.length && Math.random() > .82) { const c = inFlight[0]; c.classList.add('settle'); setTimeout(()=>{ c.classList.remove('settle'); c.classList.add('done'); c.querySelectorAll('i').forEach(i=>i.style.width='100%'); }, 220); }
+      }, 700);
+    }
+    if ($('#smap')) buildMap($('#smap'), 18, true);
+    if ($('#smap-legend')) $('#smap-legend').innerHTML = ['n1:Wi-Fi','n2:Ethernet','n3:USB LAN'].map(x=>{const[t,n]=x.split(':');return `<b style="color:var(--text2);font-weight:500"><i style="display:inline-block;width:9px;height:9px;border-radius:99px;background:var(--${t});margin-right:5px"></i>${n}</b>`;}).join('') + '<span style="color:var(--text3)">two bands in one cell = hedged</span>';
+    if ($('#m-fill')) buildMap($('#m-fill'), 9, true);
+
+    // ---- motion demos ----
+    if ($('#m-bar')) { let w = 20; setInterval(() => { w = w >= 96 ? 8 : w + 11; $('#m-bar').firstElementChild.style.width = w + '%'; }, 900); }
+    if ($('#m-state')) { const st = ['Downloading','Queued','Paused','Needs attention']; let i=0;
+      setInterval(() => { const e = $('#m-state'); e.style.opacity = 0; e.style.transform='translateY(4px)';
+        setTimeout(()=>{ i=(i+1)%st.length; e.textContent=st[i]; e.style.opacity=1; e.style.transform='none'; }, 180); }, 2200); }
+    if ($('#m-drop')) { let on=false; setInterval(()=>{ on=!on; const e=$('#m-drop');
+      e.style.borderColor = on ? 'var(--accent)' : 'var(--border)'; e.style.color = on ? 'var(--accent-ink)' : 'var(--text3)'; e.textContent = on ? 'release to add' : 'drop a .torrent or link'; }, 1200); }
+    if ($('#m-check')) { const p = $('#m-check'); p.style.strokeDasharray = 24; p.style.strokeDashoffset = 24;
+      setInterval(() => { p.style.transition='none'; p.style.strokeDashoffset=24; requestAnimationFrame(()=>{ p.style.transition='stroke-dashoffset 320ms cubic-bezier(.05,.7,.1,1)'; p.style.strokeDashoffset=0; }); }, 2600); }
+    const tb = $('#m-toast'); if (tb) tb.onclick = () => { const t = $('#sucr-toast'); t.classList.add('on'); setTimeout(()=>t.classList.remove('on'), 2600); };
+  })();
+  </script>
+</div>
+
+</body>
+</html>

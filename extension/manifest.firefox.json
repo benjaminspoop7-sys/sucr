@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "Sucr Capture",
+  "version": "0.1.3",
+  "description": "Hands a page's files to Sucr. Cancels nothing until Sucr has taken the file.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "capture@sucr.local",
+      "strict_min_version": "128.0"
+    }
+  },
+  "permissions": [
+    "downloads",
+    "nativeMessaging",
+    "storage",
+    "activeTab",
+    "scripting",
+    "alarms",
+    "webRequest"
+  ],
+  "host_permissions": ["http://127.0.0.1/*", "https://*.googlevideo.com/*", "https://www.youtube.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "action": {
+    "default_title": "Sucr",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

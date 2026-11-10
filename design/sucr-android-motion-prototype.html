@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-motion="full">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sucr for Android — motion graphics prototype (Jetpack Compose target)</title>
+<style>
+/* ==========================================================================
+   Sucr Android motion prototype
+   --------------------------------------------------------------------------
+   WHAT THIS IS. A browser-run stand-in for a Jetpack Compose app, so the
+   motion language can be reviewed before any Kotlin compiles. Same method as
+   sucr-motion-prototype.html, which was designed here and shipped in the app.
+
+   WHAT IS REAL. Every pattern name, duration, and spring maps to a rule in
+   the installed android-ux-skills pack (references/standards.md). The spring
+   numbers are androidx MotionScheme values. The reduced-motion behaviour is
+   O-001/O-003, which is why the switch exists as a control and not a media
+   query.
+
+   WHAT IS NOT REAL. This is CSS, not Compose: no recomposition phases (F-001,
+   F-008), no `MotionDurationScale` (F-005), no predictive-back framework
+   hookup (T-008). Frame feel here proves nothing about the release build
+   (F-009) — the on-device checklist lives at the bottom of this page.
+   ========================================================================== */
+
+:root, html[data-theme="light"] {
+  color-scheme: light;
+  --bg:#FFFFFF; --s1:#F8F9FA; --s2:#F1F3F4;
+  --text:#202124; --text-2:#5F6368; --text-3:#666D73;
+  --border:#DADCE0; --border-2:#E8EAED; --border-strong:#B4B9BE;
+  --track:#E8EAED;
+  --accent:#1A73E8; --accent-ink:#1765CC; --accent-tint:#E8F0FE; --accent-text:#FFFFFF;
+  --success:#188038; --success-ink:#146C2E; --success-tint:#E6F4EA;
+  --warning:#B63A0A; --warning-fill:#F9AB00; --warning-tint:#FEF7E0;
+  --danger:#D93025; --danger-ink:#A31515; --danger-tint:#FCE8E6;
+  --n1:#0E8D7F; --n2:#1A73E8; --n3:#D26A00; --n4:#6A52E8;
+  --bar-done:#A5C8ED; --scrim:rgb(0 0 0 / .32);
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg:#1B1D1F; --s1:#252729; --s2:#2D2F31;
+  --text:#E8EAED; --text-2:#A8ADB2; --text-3:#9AA0A6;
+  --border:#3C4043; --border-2:#303133; --border-strong:#5F6368;
+  --track:#3C4043;
+  --accent:#8AB4F8; --accent-ink:#A6C8FF; --accent-tint:#26344A; --accent-text:#0B1A33;
+  --success:#81C995; --success-ink:#81C995; --success-tint:#10331C;
+  --warning:#FDD663; --warning-fill:#B8860B; --warning-tint:#302A01;
+  --danger:#F28B82; --danger-ink:#F28B82; --danger-tint:#3C1F1E;
+  --n1:#4CC2B4; --n2:#8AB4F8; --n3:#F0955A; --n4:#B6A2FF;
+  --bar-done:#4A6FA5; --scrim:rgb(0 0 0 / .5);
+}
+
+/* --- motion: the web binding of the Compose tokens ------------------------
+   durations = Sucr's shipped --dur-* set (tokens.css), unchanged.
+   curves    = stand-ins for MotionScheme springs; the real app uses springs,
+               which have no duration to halve (T-010). --e-bounce exists so
+               the Expressive spatial spring stops being re-literalled in code
+               (T-002), and it is deliberately NOT applied to data geometry
+               (T-004).
+   The reduced-motion collapse below is what makes these tokens load-bearing:
+   a raw literal at a call site cannot be zeroed here, which is the exact
+   finding the Sucr web audit raised against app.css. */
+:root {
+  --dur-1:80ms; --dur-2:120ms; --dur-3:180ms; --dur-4:220ms; --dur-5:260ms; --dur-6:400ms;
+  --e-std:cubic-bezier(.2,0,0,1);
+  --e-dec:cubic-bezier(.05,.7,.1,1);
+  --e-acc:cubic-bezier(.3,0,.8,.15);
+  --e-bounce:cubic-bezier(.34,1.56,.64,1);
+  --stagger-total:300ms;   /* T-013 budget, not a per-item multiplier */
+  --stagger-step:40ms;     /* x 7 tail items = the whole window */
+}
+
+/* Android "Remove animations" is scale 0.0f and SNAPS to the end state — it is
+   not the gentler web substitute (O-001). So the reduced column below snaps:
+   durations go to 0, not to something small. */
+html[data-motion="reduced"] {
+  --dur-1:0ms; --dur-2:0ms; --dur-3:0ms; --dur-4:0ms; --dur-5:0ms; --dur-6:0ms;
+  --e-std:linear; --e-dec:linear; --e-acc:linear; --e-bounce:linear;
+}
+
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+body {
+  background:var(--bg); color:var(--text);
+  font:14px/1.45 "Inter","Segoe UI",system-ui,sans-serif;
+  display:flex; gap:24px; align-items:flex-start; justify-content:center;
+  min-height:100vh; padding:24px;
+}
+.mono { font-family:"Roboto Mono",ui-monospace,Consolas,monospace; }
+
+/* ===================== stage furniture (not the app) ===================== */
+.rail { width:340px; display:flex; flex-direction:column; gap:14px; position:sticky; top:24px; }
+.rail h1 { font-size:16px; letter-spacing:-.01em; }
+.rail p.lede { font-size:12px; color:var(--text-2); }
+.group { border:1px solid var(--border); border-radius:8px; background:var(--s1); padding:12px; }
+.group > .glabel { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-3); margin-bottom:8px; }
+.row { display:flex; gap:8px; align-items:center; justify-content:space-between; padding:5px 0; }
+.row .k { font-size:12px; color:var(--text-2); }
+.note { font-size:11px; color:var(--text-3); margin-top:6px; }
+
+.seg { display:inline-flex; border:1px solid var(--border-strong); border-radius:999px; overflow:hidden; }
+.seg button {
+  font:inherit; font-size:11px; padding:4px 10px; background:transparent; color:var(--text-2);
+  border:0; cursor:pointer; transition:background var(--dur-2) var(--e-std), color var(--dur-2) var(--e-std);
+}
+.seg button[aria-pressed="true"] { background:var(--accent); color:var(--accent-text); }
+.seg button:focus-visible { outline:2px solid var(--accent); outline-offset:-2px; }
+
+/* the annotation panel: every transition reports which rung answered it */
+#report { border:1px solid var(--accent); border-radius:8px; background:var(--s2); padding:10px 12px; font-size:11px; line-height:1.55; min-height:120px; }
+#report b { color:var(--accent-ink); }
+#report ul { list-style:none; margin-top:6px; display:flex; flex-direction:column; gap:4px; }
+#report li { padding-left:12px; position:relative; }
+#report li::before { content:"›"; position:absolute; left:0; color:var(--text-3); }
+
+/* ============================== the phone ============================== */
+.phone {
+  width:384px; height:780px; background:var(--s1); border:1px solid var(--border);
+  border-radius:32px; overflow:hidden; position:relative; flex:none;
+  box-shadow:0 8px 24px rgb(0 0 0 / .16);
+}
+html[data-theme="dark"] .phone { box-shadow:0 0 0 1px var(--border-strong); }
+.edge { /* the predictive-back scrub band */
+  position:absolute; left:0; top:0; bottom:0; width:22px; z-index:60;
+  cursor:ew-resize; touch-action:none;
+}
+.edge::after { content:""; position:absolute; inset:0; background:linear-gradient(90deg,var(--accent-tint),transparent); opacity:.6; }
+
+/* --- state layer: T-009 says a 100+/day surface gets state feedback and
+       nothing else, so this is the ONLY motion a download row gets. --- */
+.pressable { position:relative; isolation:isolate; -webkit-tap-highlight-color:transparent; }
+.pressable::after {
+  content:""; position:absolute; inset:0; border-radius:inherit; background:currentColor;
+  opacity:0; pointer-events:none;
+  transition:opacity var(--dur-1) var(--e-std), transform var(--dur-3) var(--e-std);
+}
+.pressable:hover::after { opacity:.08; }
+.pressable:active::after { opacity:.12; transform:scale(.99); }
+.pressable:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+
+/* --- app bar ------------------------------------------------------------- */
+.appbar { height:64px; display:flex; align-items:center; gap:12px; padding:0 16px; background:var(--s1); }
+.appbar .title { font-size:20px; letter-spacing:-.015em; }
+.navicon { width:40px; height:40px; border-radius:999px; display:grid; place-items:center; color:var(--text-2); }
+
+/* --- screens -------------------------------------------------------------
+   Three transition families, chosen by the RELATIONSHIP (T-011):
+     top-level tabs  → cross-fade (unordered peers; a slide would lie)
+     list → detail   → container transform
+     wizard steps    → lateral slide (ordered) + reverse on Back (T-024)
+   --- */
+#stack { position:absolute; top:64px; left:0; right:0; bottom:80px; }
+.screen { position:absolute; inset:0; overflow-y:auto; }
+.screen[hidden] { display:none; }
+.fade-in  { animation:fadeEnter var(--dur-4) var(--e-dec) both; }
+@keyframes fadeEnter { from { opacity:0 } to { opacity:1 } }
+
+.slide-fwd-in   { animation:fwdIn   var(--dur-6) var(--e-dec) both; }
+.slide-fwd-out  { animation:fwdOut  var(--dur-4) var(--e-acc) both; }
+.slide-back-in  { animation:backIn  var(--dur-6) var(--e-dec) both; }
+.slide-back-out { animation:backOut var(--dur-4) var(--e-acc) both; }
+@keyframes fwdIn   { from { transform:translateX(100%) } to { transform:none } }
+@keyframes fwdOut  { from { transform:translateX(-12%) } to { transform:none } }
+@keyframes backIn  { from { transform:translateX(-12%) } to { transform:none } }
+@keyframes backOut { from { transform:translateX(100%) } to { transform:none } }
+
+.lateral-in-right { animation:latInR var(--dur-5) var(--e-dec) both; }
+.lateral-out-right { animation:latOutR var(--dur-4) var(--e-acc) both; }
+.lateral-in-left { animation:latInL var(--dur-5) var(--e-dec) both; }
+.lateral-out-left { animation:latOutL var(--dur-4) var(--e-acc) both; }
+@keyframes latInR { from { transform:translateX(40%); opacity:0 } to { transform:none; opacity:1 } }
+@keyframes latOutR { from { transform:translateX(0); opacity:1 } to { transform:translateX(-40%); opacity:0 } }
+@keyframes latInL { from { transform:translateX(-40%); opacity:0 } to { transform:none; opacity:1 } }
+@keyframes latOutL { from { transform:translateX(0); opacity:1 } to { transform:translateX(40%); opacity:0 } }
+
+/* --- nav bar (NavigationRail sibling on a phone-width bar) ---------------- */
+.navbar { position:absolute; left:0; right:0; bottom:0; height:80px; display:flex; background:var(--s1); border-top:1px solid var(--border-2); }
+.nav-item { flex:1; display:grid; place-content:center; gap:4px; justify-items:center; color:var(--text-2); cursor:pointer; border:0; background:transparent; font:inherit; }
+.nav-pill { width:64px; height:32px; border-radius:999px; display:grid; place-items:center; background:transparent; transition:background var(--dur-2) var(--e-std); }
+.nav-pill svg { transition:transform var(--dur-3) var(--e-bounce); }
+.nav-item[aria-current="true"] .nav-pill { background:var(--accent-tint); color:var(--accent-ink); }
+.nav-item[aria-current="true"] .nav-pill svg { transform:scale(1.08); }
+.nav-item .lbl { font-size:12px; }
+
+/* --- hero card + wave ---------------------------------------------------- */
+.card { background:var(--s2); border-radius:12px; padding:14px; margin:12px 16px; }
+.hero-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; }
+.hero-head .lbl { font-size:12px; color:var(--text-2); text-transform:uppercase; letter-spacing:.05em; }
+.hero-head .rate { font-size:20px; color:var(--accent-ink); }
+.wave { display:block; width:100%; height:18px; color:var(--accent); }
+.wave path { fill:none; stroke:currentColor; stroke-width:4; stroke-linecap:round; }
+.wave-foot { display:flex; justify-content:space-between; font-size:12px; color:var(--text-2); margin-top:6px; }
+.wave-pause { border:1px solid var(--border-strong); background:transparent; color:var(--text-2); font:inherit; font-size:11px; padding:2px 8px; border-radius:999px; cursor:pointer; transition:background var(--dur-2) var(--e-std), color var(--dur-2) var(--e-std); }
+.wave-pause[aria-pressed="true"] { background:var(--accent); color:var(--accent-text); }
+
+/* --- download rows (the 100+/day surface) -------------------------------- */
+.list-title { padding:8px 16px 4px; font-size:12px; color:var(--text-3); text-transform:uppercase; letter-spacing:.06em; }
+.row-dl { display:flex; gap:12px; align-items:center; padding:10px 16px; cursor:pointer; border:0; background:transparent; width:100%; font:inherit; color:var(--text); text-align:left; }
+.row-dl + .row-dl { box-shadow:0 -.5px 0 var(--border-2); }
+.favicon { width:32px; height:32px; border-radius:8px; background:var(--s2); display:grid; place-items:center; font-size:12px; font-weight:600; color:var(--text-2); flex:none; }
+.row-body { flex:1; min-width:0; }
+.row-name { font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.row-meta { font-size:12px; color:var(--text-2); margin-top:2px; }
+.tbar { height:6px; border-radius:999px; background:var(--track); overflow:hidden; margin-top:6px; position:relative; }
+.tbar-fill { height:100%; width:0; border-radius:999px; background:var(--bar-fill);
+  /* T-004: the width IS the data. Standard effects/spatial, no overshoot. */
+  transition:width var(--dur-5) var(--e-std), background var(--dur-1) var(--e-std); }
+.tbar[data-state="done"] .tbar-fill { background:var(--success); }
+.tbar[data-state="error"] .tbar-fill { background:var(--danger); }
+/* O-003: a shimmer longer than 5 s beside readable content needs a stop on
+   THIS screen. So it is scoped to the hero (aggregate, work-blocking) and the
+   rows never get it. */
+.shimmer { position:absolute; inset:0; background:linear-gradient(100deg,transparent 25%,rgb(255 255 255 / .28) 50%,transparent 75%); transform:translateX(-100%); animation:shim 2.4s linear infinite; }
+@keyframes shim { to { transform:translateX(100%) } }
+
+/* --- entrance stagger (T-013): total budget, first paint only ------------- */
+.stagger > * { opacity:0; animation:rise var(--dur-4) var(--e-dec) forwards; }
+.stagger > *:nth-child(1) { animation-delay:0ms }
+.stagger > *:nth-child(2) { animation-delay:calc(var(--stagger-step) * 1) }
+.stagger > *:nth-child(3) { animation-delay:calc(var(--stagger-step) * 2) }
+.stagger > *:nth-child(4) { animation-delay:calc(var(--stagger-step) * 3) }
+.stagger > *:nth-child(5) { animation-delay:calc(var(--stagger-step) * 4) }
+.stagger > *:nth-child(6) { animation-delay:calc(var(--stagger-step) * 5) }
+.stagger > *:nth-child(n+7) { animation-delay:var(--stagger-total) }
+@keyframes rise { from { opacity:0; transform:translateY(8px) } to { opacity:1; transform:none } }
+html[data-motion="reduced"] .stagger > * { opacity:1; animation:none; }
+
+/* --- FAB ------------------------------------------------------------------ */
+.fab { position:absolute; right:16px; bottom:96px; width:56px; height:56px; border-radius:16px; background:var(--accent); color:var(--accent-text); border:0; display:grid; place-items:center; cursor:pointer; z-index:20;
+  transition:transform var(--dur-3) var(--e-std), border-radius var(--dur-5) var(--e-std), background var(--dur-2) var(--e-std), bottom var(--dur-5) var(--e-std); }
+.fab:active { transform:scale(.94); }
+.fab.open { border-radius:12px; }
+
+/* --- add bar (anchored enter/exit, T-010: exit is simpler + faster) ------- */
+.addbar { position:absolute; right:80px; bottom:100px; width:240px; background:var(--s2); border:1px solid var(--border); border-radius:12px; padding:10px; z-index:21; transform-origin:100% 100%; transition:bottom var(--dur-5) var(--e-std); }
+/* The IME is opaque and sits above everything (T-022). The bar must be inset
+   out of its way on the same duration and curve the strip rises on, or its own
+   action row lands underneath the keyboard and cannot be pressed. */
+.phone.kbd-up .addbar { bottom:332px; }
+.phone.kbd-up .fab { bottom:328px; }
+.addbar[hidden] { display:none; }
+.addbar.in  { animation:anchEnter var(--dur-4) var(--e-dec) both; }
+.addbar.out { animation:anchExit var(--dur-2) var(--e-acc) both; }
+@keyframes anchEnter { from { transform:scale(.8); opacity:0 } to { transform:none; opacity:1 } }
+@keyframes anchExit  { from { opacity:1 } to { opacity:0 } }
+.addbar input { width:100%; font:inherit; font-size:13px; padding:8px; border-radius:6px; border:1px solid var(--border-strong); background:var(--bg); color:var(--text); transition:border-color var(--dur-2) var(--e-std), box-shadow var(--dur-2) var(--e-std); }
+.addbar input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-tint); }
+
+/* --- bottom sheet: F-002 in Compose terms — finger drives the value,
+       release velocity carries into the settle ----------------------------- */
+.scrim { position:absolute; inset:0; background:var(--scrim); opacity:0; pointer-events:none; z-index:40; transition:opacity var(--dur-4) var(--e-std); }
+.scrim.show { opacity:1; pointer-events:auto; }
+.sheet { position:absolute; left:0; right:0; bottom:0; background:var(--s1); border-radius:28px 28px 0 0; padding:8px 16px 24px; z-index:41; transform:translateY(100%); touch-action:none; }
+.sheet .grab { width:32px; height:4px; border-radius:999px; background:var(--border-strong); margin:0 auto 12px; }
+.sheet h3 { font-size:16px; margin-bottom:10px; }
+.sheet-opt { display:flex; align-items:center; gap:12px; padding:12px 8px; border-radius:12px; cursor:pointer; color:var(--text); }
+.anchored { will-change:transform; }
+
+/* --- wizard (ordered peers) ---------------------------------------------- */
+.wiz { padding:16px; }
+.wiz-dots { display:flex; gap:6px; margin-bottom:14px; }
+.wiz-dot { height:4px; flex:1; border-radius:999px; background:var(--track); overflow:hidden; }
+.wiz-dot i { display:block; height:100%; width:0; background:var(--accent); transition:width var(--dur-5) var(--e-std); }
+.wiz-dot.done i { width:100%; }
+.wiz-dot.active i { width:50%; }
+.wiz h2 { font-size:20px; letter-spacing:-.015em; margin-bottom:6px; }
+.wiz p { font-size:13px; color:var(--text-2); margin-bottom:16px; }
+.wiz-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:20px; }
+.btn { font:inherit; font-size:14px; padding:10px 20px; border-radius:999px; border:1px solid var(--border-strong); background:transparent; color:var(--accent-ink); cursor:pointer; transition:background var(--dur-2) var(--e-std), transform var(--dur-3) var(--e-bounce); }
+.btn.filled { background:var(--accent); color:var(--accent-text); border-color:transparent; }
+.btn:active { transform:scale(.97); }
+.field { display:flex; align-items:center; gap:8px; }
+.field input { flex:1; font:inherit; font-size:14px; padding:10px; border-radius:8px 8px 0 0; border:0; border-bottom:1px solid var(--border-strong); background:var(--s2); color:var(--text); }
+/* T-022: the keyboard is a moving inset, not a boolean. Content tracks it. */
+.kbd-strip { position:absolute; left:0; right:0; bottom:0; height:0; background:var(--s2); border-top:1px solid var(--border); z-index:50; transition:height var(--dur-5) var(--e-std); }
+.kbd-strip.up { height:220px; }
+
+/* --- completion: the ONE hero moment per event (T-026) + rare delight ----- */
+.check { width:44px; height:44px; border-radius:999px; background:var(--success-tint); display:grid; place-items:center; color:var(--success-ink); flex:none; }
+.check svg { width:24px; height:24px; }
+.check svg path { stroke:currentColor; stroke-width:2.5; fill:none; stroke-linecap:round; stroke-dasharray:24; stroke-dashoffset:24; animation:draw var(--dur-4) var(--e-dec) forwards; }
+@keyframes draw { to { stroke-dashoffset:0 } }
+.snackbar { position:absolute; left:16px; right:16px; bottom:96px; background:var(--text); color:var(--bg); border-radius:8px; padding:12px 16px; display:flex; align-items:center; gap:12px; font-size:13px; z-index:30; }
+.snackbar[hidden] { display:none; }
+.snackbar.in  { animation:sbEnter var(--dur-4) var(--e-dec) both; }
+.snackbar.out { animation:sbExit var(--dur-2) var(--e-acc) both; }
+@keyframes sbEnter { from { transform:translateY(16px); opacity:0 } to { transform:none; opacity:1 } }
+@keyframes sbExit  { from { opacity:1 } to { opacity:0 } }
+
+/* the anti-pattern demo: celebratory motion on a RETRACTION (T-027).
+   Marked broken on purpose so the contrast is reviewable side by side. */
+.chip-fav { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:999px; border:1px solid var(--border-strong); background:transparent; color:var(--text-2); font:inherit; font-size:12px; cursor:pointer; }
+.chip-fav[aria-pressed="true"] { background:var(--accent-tint); color:var(--accent-ink); border-color:var(--accent); }
+.chip-fav.pop svg { animation:pop var(--dur-4) var(--e-bounce); }
+.chip-fav.pop-bad svg { animation:pop var(--dur-4) var(--e-bounce); } /* the defect */
+.chip-fav.pop-good svg { animation:pop var(--dur-4) var(--e-bounce); }
+.chip-fav.pop-good-off svg { animation:none; }
+@keyframes pop { 0%{transform:scale(1)} 40%{transform:scale(1.35)} 100%{transform:scale(1)} }
+
+/* T-019 four-step placeholder: wait 150ms → fade in → min hold → cross-fade */
+.skel { border-radius:8px; background:var(--track); opacity:0; animation:skel 2.4s linear infinite; }
+@keyframes skel { 0%,100%{opacity:.35} 50%{opacity:.6} }
+.skel-wrap { padding:10px 16px; display:flex; gap:12px; align-items:center; }
+.skel-wrap > div { flex:none; }
+.loaded-fade { animation:crossfade var(--dur-4) var(--e-std) both; }
+@keyframes crossfade { from { opacity:0 } to { opacity:1 } }
+
+/* container-transform ghost */
+#ghost { position:absolute; z-index:55; background:var(--s2); border-radius:12px; pointer-events:none; box-shadow:0 8px 24px rgb(0 0 0 / .16); }
+#ghost[hidden] { display:none; }
+
+.ondevice { border:1px dashed var(--border-strong); border-radius:8px; padding:12px; font-size:11px; color:var(--text-2); }
+.ondevice b { color:var(--text); }
+.ondevice ul { list-style:none; margin-top:6px; display:flex; flex-direction:column; gap:4px; }
+.ondevice li::before { content:"□ "; }
+</style>
+</head>
+<body>
+
+<!-- ========================= control rail ========================= -->
+<div class="rail">
+  <div>
+    <h1>Sucr for Android — motion graphics</h1>
+    <p class="lede">The app's motion language, reviewed before a line of Kotlin compiles. Tokens unchanged from <span class="mono">design/tokens.css</span>; patterns and rules from <span class="mono">android-ux-skills/references/standards.md</span>.</p>
+  </div>
+
+  <div class="group">
+    <div class="glabel">Motion scale — O-001 / O-003</div>
+    <div class="row"><span class="k">In-app <span class="mono">ui.motion</span></span>
+      <span class="seg" id="motion-seg">
+        <button data-v="full" aria-pressed="true">full</button>
+        <button data-v="reduced" aria-pressed="false">reduced</button>
+      </span>
+    </div>
+    <p class="note">Android's "Remove animations" writes <b>0.0f</b> to all three scales and <b>snaps</b> to the end state — it does not soften. Reduced here snaps too, so every state change must survive on its own.</p>
+  </div>
+
+  <div class="group">
+    <div class="glabel">Scheme — T-004 / T-009</div>
+    <div class="row"><span class="k">Spatial springs</span>
+      <span class="seg" id="scheme-seg">
+        <button data-v="standard" aria-pressed="true">Standard</button>
+        <button data-v="expressive" aria-pressed="false">Expressive</button>
+      </span>
+    </div>
+    <p class="note">Expressive fast spatial overshoots (<span class="mono">dampingRatio .6 / stiffness 800</span>). Watch it on the progress bars and the wizard fill — T-004 keeps it off geometry that encodes a value, which is why the shipped default is Standard.</p>
+  </div>
+
+  <div class="group">
+    <div class="glabel">Try the defects</div>
+    <div class="row"><span class="k">Wizard overshoot (T-004)</span>
+      <label class="seg"><button id="toggle-wizbad" aria-pressed="true">on</button></label>
+    </div>
+    <div class="row"><span class="k">Celebratory un-star (T-027)</span>
+      <label class="seg"><button id="toggle-favbad" aria-pressed="true">on</button></label>
+    </div>
+    <div class="row"><span class="k">Row shimmer (O-003)</span>
+      <label class="seg"><button id="toggle-rowshim" aria-pressed="false">off</button></label>
+    </div>
+    <p class="note">These three are the audit's live findings on the desktop app, reproduced so the fix can be judged against the defect rather than described.</p>
+  </div>
+
+  <div class="group">
+    <div class="glabel">Interactions worth doing</div>
+    <p class="note" style="line-height:1.7">
+      1. Tap a <b>download row</b> → container transform to the detail screen.<br>
+      2. Drag that <b>scrims &amp; sheet</b>: open the overflow sheet and <b>flick it</b> — release velocity carries the settle.<br>
+      3. On the detail screen, <b>press and drag the left edge</b> → predictive back scrubs the exit live.<br>
+      4. Tap <b>+ Add</b> → the FAB morphs into the anchored add bar (anchored, so scaling is allowed).<br>
+      5. Walk the <b>wizard</b>, then press Back — the reverse must retrace the path.<br>
+      6. Tap <b>Finish</b> → one hero moment. Then toggle <b>reduced</b> and repeat it.<br>
+      7. Scroll with <b>Simulate slow transfer</b> on to watch the skeleton's four-step sequence.
+    </p>
+    <div class="row"><span class="k">Simulate slow transfer</span>
+      <span class="seg" id="slow-seg"><button data-v="off" aria-pressed="true">off</button><button data-v="on" aria-pressed="false">on</button></span>
+    </div>
+  </div>
+
+  <div id="report" aria-live="polite"></div>
+
+  <div class="ondevice">
+    <b>Still requires a physical device (F-009)</b>
+    <ul>
+      <li>Spring feel at 120 Hz — CSS curves are stand-ins, not MotionScheme.</li>
+      <li>Real <span class="mono">MotionDurationScale</span> honouring inside the wave loop (F-005).</li>
+      <li>Predictive back wired to <span class="mono">SeekableTransitionState.seekTo</span>, not a hand-rolled edge.</li>
+      <li>Frame pacing under R8 release — no jank claim from this page.</li>
+      <li>Overscroll: the platform stretch is kept (T-018); it cannot be shown here.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- =========================== the phone =========================== -->
+<div class="phone" id="phone">
+  <div class="appbar">
+    <div class="navicon" id="up-btn" role="button" tabindex="0" hidden>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    </div>
+    <div class="title" id="appbar-title">Downloading</div>
+  </div>
+
+  <div id="stack">
+    <!-- Downloads -->
+    <section class="screen" id="scr-list" aria-label="Downloading">
+      <div class="card">
+        <div class="hero-head">
+          <span class="lbl">Aggregate</span>
+          <span class="rate mono" id="hero-rate">4.21 MB/s</span>
+        </div>
+        <svg class="wave" id="wave" viewBox="0 0 340 18" preserveAspectRatio="none" aria-label="Throughput wave, animated">
+          <path id="wave-path" d=""></path>
+        </svg>
+        <div class="wave-foot">
+          <span class="mono" id="hero-sub">3 of 5 active · 11 of 32 streams</span>
+          <button class="wave-pause" id="wave-pause" aria-pressed="false" aria-label="Pause">Pause</button>
+        </div>
+      </div>
+
+      <div class="list-title">Active · state layer only (T-009)</div>
+      <div class="stagger" id="row-host">
+        <button class="row-dl pressable" data-id="dl-gta" data-name="GT_Sport_League_v2.pkg" data-size="1.84 GiB" data-net="n2" data-pct="62">
+          <span class="favicon">PK</span>
+          <span class="row-body"><span class="row-name">GT_Sport_League_v2.pkg</span><span class="row-meta mono" data-meta>1.14 / 1.84 GiB · 4.21 MB/s</span><span class="tbar" data-state="live"><span class="tbar-fill" style="width:62%"></span></span></span>
+        </button>
+        <button class="row-dl pressable" data-id="dl-asc" data-name="GodOfWar_Ascention_PPU.elf" data-size="312 MiB" data-net="n1" data-pct="31">
+          <span class="favicon">ELF</span>
+          <span class="row-body"><span class="row-name">GodOfWar_Ascention_PPU.elf</span><span class="row-meta mono" data-meta>97 MiB / 312 MiB · 2.06 MB/s</span><span class="tbar" data-state="live"><span class="tbar-fill" style="width:31%"></span></span></span>
+        </button>
+        <button class="row-dl pressable" data-id="dl-dsp" data-name="shadGT_recompiled.zip" data-size="48.2 MiB" data-net="n4" data-pct="88">
+          <span class="favicon">ZIP</span>
+          <span class="row-body"><span class="row-name">shadGT_recompiled.zip</span><span class="row-meta mono" data-meta>42.4 / 48.2 MiB · 0.83 MB/s</span><span class="tbar" data-state="live"><span class="tbar-fill" style="width:88%"></span></span></span>
+        </button>
+        <button class="row-dl pressable" data-id="dl-tex" data-name="RSX_d3d12_capture.rar" data-size="2.1 GiB" data-net="n3" data-pct="12">
+          <span class="favicon">RAR</span>
+          <span class="row-body"><span class="row-name">RSX_d3d12_capture.rar</span><span class="row-meta mono" data-meta>258 MiB / 2.10 GiB · 1.14 MB/s</span><span class="tbar" data-state="live"><span class="tbar-fill" style="width:12%"></span></span></span>
+        </button>
+      </div>
+
+      <div class="list-title">Completed</div>
+      <button class="row-dl pressable" id="goto-wizard" data-id="dl-wiz" data-name="Add download wizard" data-size="—" data-net="n2" data-pct="0">
+        <span class="favicon">＋</span>
+        <span class="row-body"><span class="row-name">New download — ordered wizard</span><span class="row-meta mono">Tap for the lateral-step transitions (T-011 ordered peers)</span></span>
+      </button>
+      <button class="row-dl pressable" data-id="dl-done" data-name="ryGT_tools_1.4.exe" data-size="18.4 MiB" data-net="n2" data-pct="100">
+        <span class="favicon">EXE</span>
+        <span class="row-body"><span class="row-name">ryGT_tools_1.4.exe</span><span class="row-meta mono">Verified · 18.4 MiB · 8 streams</span><span class="tbar" data-state="done"><span class="tbar-fill" style="width:100%"></span></span></span>
+      </button>
+      <button class="row-dl pressable" data-id="dl-err" data-name="firmware_12.03.bin" data-size="760 MiB" data-net="n1" data-pct="44">
+        <span class="favicon">BIN</span>
+        <span class="row-body"><span class="row-name">firmware_12.03.bin</span><span class="row-meta mono">Needs attention · 429 ×4 · ceiling dropped</span><span class="tbar" data-state="error"><span class="tbar-fill" style="width:44%"></span></span></span>
+      </button>
+    </section>
+
+    <!-- Detail: the container-transform destination -->
+    <section class="screen" id="scr-detail" hidden aria-label="Download detail">
+      <div class="card" id="detail-hero" style="margin-top:8px">
+        <div class="hero-head"><span class="lbl" id="detail-name">—</span><span class="rate mono" id="detail-rate">—</span></div>
+        <div class="tbar" style="height:8px" data-state="live"><span class="tbar-fill" id="detail-bar" style="width:62%"></span></div>
+        <div class="wave-foot"><span class="mono" id="detail-size">—</span><span class="mono" id="detail-streams">11 of 32 streams</span></div>
+      </div>
+      <div class="card">
+        <div class="list-title" style="padding:0 0 8px">Stream band · adaptive</div>
+        <div class="mono" style="font-size:12px;color:var(--text-2);line-height:1.8">
+          Auto floor 8 → ceiling 32<br>
+          +1 per window, billed at ½ fair share<br>
+          refusal ⇒ drop ceiling, recover +1/60 s<br>
+          <span style="color:var(--success-ink)">measured +22% / +24% vs pinned 8</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="list-title" style="padding:0 0 8px">Actions</div>
+        <div class="field" style="margin-bottom:10px"><span class="chip-fav pressable" id="fav-chip" role="button" tabindex="0" aria-pressed="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17.3l-5.6 3.3 1.5-6.4L3 9.7l6.5-.6L12 3l2.5 6.1 6.5.6-4.9 4.5 1.5 6.4z"/></svg>Keep partial</span></div>
+        <button class="btn" id="open-sheet" style="width:100%">Overflow</button>
+      </div>
+    </section>
+
+    <!-- Map (top-level peer) -->
+    <section class="screen" id="scr-map" hidden aria-label="Sucker map">
+      <div class="card">
+        <div class="list-title" style="padding:0 0 8px">Chunk attempts · colour and shape both carry state</div>
+        <div id="map-grid" style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px"></div>
+        <p class="note">A cell never animates its own geometry — its shape already says which network owns it, so motion on top would fight the data (T-004).</p>
+      </div>
+    </section>
+
+    <!-- Settings (top-level peer) -->
+    <section class="screen" id="scr-settings" hidden aria-label="Settings">
+      <div class="card">
+        <div class="list-title" style="padding:0 0 8px">Appearance</div>
+        <div class="row"><span class="k">Interface motion</span><span class="seg"><button aria-pressed="true">system</button></span></div>
+        <div class="row"><span class="k">Theme</span><span class="seg" id="theme-seg"><button data-v="dark" aria-pressed="true">dark</button><button data-v="light" aria-pressed="false">light</button></span></div>
+        <p class="note">Theme recolour is a state tint at <span class="mono">--dur-2</span> and nothing else: no crossfade of the whole window, because the user is looking at it.</p>
+      </div>
+    </section>
+
+    <!-- Wizard (ordered peers → lateral) -->
+    <section class="screen" id="scr-wizard" hidden aria-label="Add download wizard">
+      <div class="wiz">
+        <div class="wiz-dots"><span class="wiz-dot done"><i></i></span><span class="wiz-dot active"><i></i></span><span class="wiz-dot"><i></i></span></div>
+        <div id="wiz-body"></div>
+        <div class="wiz-actions">
+          <button class="btn pressable" id="wiz-back">Back</button>
+          <button class="btn filled pressable" id="wiz-next">Next</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- nav bar -->
+  <nav class="navbar" aria-label="Destinations">
+    <button class="nav-item" data-dest="list" aria-current="true"><span class="nav-pill"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg></span><span class="lbl">Downloads</span></button>
+    <button class="nav-item" data-dest="map" aria-current="false"><span class="nav-pill"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h6v6H4zM14 4h6v6h-6zM14 14h6v6h-6zM4 16h6v4H4z"/></svg></span><span class="lbl">Map</span></button>
+    <button class="nav-item" data-dest="settings" aria-current="false"><span class="nav-pill"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></span><span class="lbl">Settings</span></button>
+  </nav>
+
+  <!-- FAB + anchored add bar -->
+  <button class="fab pressable" id="fab" aria-label="Add download"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+  <div class="addbar" id="addbar" hidden>
+    <input id="addbar-input" placeholder="Paste a link" aria-label="Link">
+    <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:8px"><button class="btn pressable" id="addbar-cancel">Cancel</button><button class="btn filled pressable" id="addbar-ok">Download</button></div>
+  </div>
+
+  <!-- sheet -->
+  <div class="scrim" id="scrim"></div>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Download actions" style="height:280px">
+    <div class="grab"></div>
+    <h3>GT_Sport_League_v2.pkg</h3>
+    <div class="sheet-opt pressable"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/></svg>Pause</div>
+    <div class="sheet-opt pressable"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/></svg>Open containing folder</div>
+    <div class="sheet-opt pressable" id="sheet-remove" style="color:var(--danger-ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>Hide from list</div>
+  </div>
+
+  <!-- snackbar: the completion moment, one hero motion per event (T-026) -->
+  <div class="snackbar" id="snackbar" hidden>
+    <span class="check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4 10-10"/></svg></span>
+    <span style="flex:1">Completed · verified <span class="mono">sha-256</span></span>
+    <button class="btn pressable" id="snack-open" style="padding:6px 14px;font-size:12px;color:var(--bg)">Open</button>
+  </div>
+
+  <div class="kbd-strip" id="kbd"></div>
+  <div class="edge" id="back-edge" title="Press and drag to preview the back gesture"></div>
+  <div id="ghost" hidden></div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+  const html = document.documentElement;
+  const report = $('#report');
+  const dur = (n) => getComputedStyle(html).getPropertyValue('--dur-' + n).trim() || '0ms';
+
+  /* ---- annotation: the skill requires naming the rung that answered ---- */
+  function say(lines, headline) {
+    report.innerHTML = '<b>' + headline + '</b><ul>' + lines.map(l => '<li>' + l + '</li>').join('') + '</ul>';
+  }
+  function motionReduced() { return html.dataset.motion === 'reduced'; }
+  function reducedNote() {
+    return motionReduced()
+      ? 'Motion scale ≈ 0 ⇒ this <b>snapped</b> to its end state (O-001). The static layout carries the meaning.'
+      : 'Motion scale 1.0 ⇒ tokens resolved from <span class="mono">AppMotion</span>.';
+  }
+
+  /* ---- screen router: the pattern is chosen by the RELATIONSHIP (T-011) -- */
+  const SCREENS = { list:'scr-list', map:'scr-map', settings:'scr-settings', detail:'scr-detail', wizard:'scr-wizard' };
+  const REL = { // from → to : relationship class
+    'list>detail':'hierarchy',   'detail>list':'hierarchy-back',
+    'list>map':'peers', 'map>list':'peers', 'list>settings':'peers', 'settings>list':'peers',
+    'map>settings':'peers', 'settings>map':'peers',
+    'list>wizard':'hierarchy', 'wizard>list':'hierarchy-back'
+  };
+  let current = 'list';
+  const TITLES = { list:'Downloading', map:'Sucker map', settings:'Settings', detail:'Download detail', wizard:'Add download' };
+
+  const sheet = $('#sheet'), scrim = $('#scrim');
+  /* Transient overlays are dismissed on route change, deterministically.
+     Leaving a sheet or scrim up while the user navigates is how an invisible
+     element ends up swallowing the next tap. */
+  function dismissOverlays() {
+    setSheet(1);
+    scrim.classList.remove('show');
+    if (!$('#addbar').hidden) closeBar();
+  }
+
+  function show(next, opts = {}) {
+    if (next === current) return;
+    const fromEl = $('#' + SCREENS[current]), toEl = $('#' + SCREENS[next]);
+    const rel = REL[current + '>' + next] || REL[next + '>' + current] || 'peers';
+    const dir = opts.dir || (rel === 'hierarchy-back' ? 'back' : 'fwd');
+    dismissOverlays();
+    fromEl.classList.remove('fade-in','slide-fwd-in','slide-fwd-out','slide-back-in','slide-back-out','lateral-in-left','lateral-in-right');
+    fromEl.style.animationDirection = '';
+    /* The incoming screen is stacked above the outgoing one (later in DOM
+       order), so it is revealed first and the source is unmounted after the
+       enter has taken over. */
+    toEl.hidden = false;
+
+    /* The outgoing screen is hidden outright rather than in an animationend
+       callback. O-001 is the reason: at scale 0.0f there is no animation and
+       therefore no animationend, so a route left waiting on that event stays
+       visible forever — and keeps eating hit-tests underneath the new one.
+       Compose has the same trap (F-005: self-timed code must read the scale
+       itself), so the Android port exits through the transition, never through
+       an unmount-wait. */
+    let pattern;
+    if (rel === 'peers') {
+      // unordered top-level destinations: a directional slide would imply an
+      // order that does not exist (T-011)
+      pattern = 'Top-level cross-fade';
+      toEl.classList.add('fade-in');
+      fromEl.style.animationDirection = 'reverse';
+    } else {
+      pattern = 'Forward / backward slide';
+      toEl.classList.add(dir === 'back' ? 'slide-back-in' : 'slide-fwd-in');
+      fromEl.classList.add(dir === 'back' ? 'slide-back-out' : 'slide-fwd-out');
+    }
+    setTimeout(() => { fromEl.hidden = true; fromEl.classList.remove('slide-fwd-out','slide-back-out'); fromEl.style.animationDirection = ''; }, motionReduced() ? 0 : 40);
+    $('#appbar-title').textContent = TITLES[next];
+    $('#up-btn').hidden = !(next === 'detail' || next === 'wizard');
+    const prev = current; current = next;
+    $$('.nav-item').forEach(b => b.setAttribute('aria-current', String(b.dataset.dest === next)));
+    say([
+      'Relationship <b>' + rel + '</b> ⇒ ' + pattern + ' (T-011).',
+      'Enter <span class="mono">--dur-6</span> (' + dur(6) + ') decelerate; exit <span class="mono">--dur-4</span> (' + dur(4) + ') accelerate — exit is <i>simpler and faster tiered</i>, not merely halved (T-010).',
+      (dir === 'back') ? 'Back retraces the entrance path in reverse (T-024).' : 'Controls stayed enabled through the transition (T-012).',
+      reducedNote()
+    ], prev + ' → ' + next);
+  }
+  $$('.nav-item').forEach(b => b.addEventListener('click', () => show(b.dataset.dest)));
+  $('#up-btn').addEventListener('click', () => show('list', { dir:'back' }));
+
+  /* ---- container transform: row expands into the detail card ----
+     F-010 in Compose terms: the endpoints are visually different (a row is
+     not the detail card), so this is sharedBOUNDS, not sharedElement. */
+  const ghost = $('#ghost'), phone = $('#phone');
+  /* Delegated on the whole list screen, not #row-host: the Completed group
+     lives outside #row-host, so a narrower scope silently leaves those rows
+     dead — including the wizard entry this demo exists to show. */
+  $('#scr-list').addEventListener('click', (e) => {
+    const row = e.target.closest('.row-dl'); if (!row) return;
+    openDetail(row);
+  });
+
+  function openDetail(row) {
+    if (row.id === 'goto-wizard') { show('wizard', { dir:'fwd' }); return; }
+    const src = row.getBoundingClientRect(), dst = $('#detail-hero').getBoundingClientRect();
+    const ps = phone.getBoundingClientRect();
+    $('#detail-name').textContent = row.dataset.name;
+    $('#detail-rate').textContent = (row.dataset.id === 'dl-done') ? 'done' : '4.21 MB/s';
+    $('#detail-size').textContent = row.dataset.size;
+    $('#detail-bar').style.width = row.dataset.pct + '%';
+
+    if (!motionReduced()) {
+      ghost.hidden = false;
+      ghost.style.transition = 'none';
+      ghost.style.left = (src.left - ps.left) + 'px'; ghost.style.top = (src.top - ps.top) + 'px';
+      ghost.style.width = src.width + 'px'; ghost.style.height = src.height + 'px';
+      ghost.style.borderRadius = '12px';
+      void ghost.offsetWidth;
+      ghost.style.transition = 'left ' + dur(6) + ' var(--e-dec), top ' + dur(6) + ' var(--e-dec), width ' + dur(6) + ' var(--e-dec), height ' + dur(6) + ' var(--e-dec), border-radius ' + dur(6) + ' var(--e-dec)';
+      ghost.style.left = (dst.left - ps.left) + 'px'; ghost.style.top = (dst.top - ps.top) + 'px';
+      ghost.style.width = dst.width + 'px'; ghost.style.height = dst.height + 'px';
+      ghost.style.borderRadius = '12px';
+      ghost.addEventListener('transitionend', () => { ghost.hidden = true; }, { once:true });
+      setTimeout(() => { ghost.hidden = true; }, 700);
+    }
+    const fromEl = $('#' + SCREENS[current]);
+    toDetail(fromEl);
+    say([
+      'One element expands into its detail screen ⇒ <b>container transform</b> (T-011).',
+      'Endpoints differ visually ⇒ <span class="mono">sharedBounds</span>, not <span class="mono">sharedElement</span> (F-010); <span class="mono">MaterialContainerTransform</span>, 0.6→large radius morph.',
+      'The row itself stays <b>static</b> on hover/press — it is a 100+/day surface, so the state layer is the ceiling (T-009).',
+      reducedNote()
+    ], 'list → detail');
+  }
+  function toDetail(fromEl) {
+    fromEl.hidden = true; $('#scr-detail').hidden = false;
+    $('#appbar-title').textContent = TITLES.detail; $('#up-btn').hidden = false; current = 'detail';
+  }
+
+  /* ---- predictive back: seekable, scrubbed by the finger (T-008) ----
+     In Compose this is PredictiveBackHandler + SeekableTransitionState.seekTo
+     (progress, previousEntry). Here the drag IS the progress. */
+  const edge = $('#back-edge'); let scrubbing = false, scrubX = 0, scrubStart = 0;
+  edge.addEventListener('pointerdown', (e) => {
+    if (current === 'list') { say(['Nothing to go back from — this is the start destination, so <b>no back affordance and no scrub</b> (T-024).'], 'Predictive back: no-op'); return; }
+    scrubbing = true; scrubStart = e.clientX; $('#scr-detail').classList.add('anchored');
+    edge.setPointerCapture(e.pointerId);
+  });
+  edge.addEventListener('pointermove', (e) => {
+    if (!scrubbing) return;
+    scrubX = Math.max(0, Math.min(1, (e.clientX - scrubStart) / 300));
+    const el = $('#' + SCREENS[current]);
+    el.style.transform = 'translateX(' + (scrubX * 100) + '%)';
+    el.style.opacity = String(1 - scrubX * 0.25);
+    $('#ghost').hidden = true;
+  });
+  const endScrub = (e) => {
+    if (!scrubbing) return; scrubbing = false;
+    const el = $('#' + SCREENS[current]);
+    el.style.transition = 'transform ' + dur(4) + ' var(--e-std), opacity ' + dur(4) + ' var(--e-std)';
+    const commit = scrubX > 0.34;
+    el.style.transform = commit ? 'translateX(100%)' : 'translateX(0)';
+    el.style.opacity = commit ? '0' : '1';
+    const vel = (e.clientX - scrubStart) / 160; /* px per ms, crude velocity */
+    setTimeout(() => {
+      el.style.transition = ''; el.style.transform = ''; el.style.opacity = '';
+      el.classList.remove('anchored');
+      if (commit) {
+        show('list', { dir:'back' });
+        say([
+          'Progress scrubbed to <b>' + Math.round(scrubX * 100) + '%</b> and committed — the exit is the <b>inverse</b> of the entrance, never a fade (T-024).',
+          'Release velocity ' + vel.toFixed(2) + ' px/ms carried into the settle ⇒ in Compose, <span class="mono">animateTo(..., initialVelocity = v)</span> (F-002).',
+          'Back is seekable, so the gesture preview works. A handler that waits for release before animating is the defect (T-008).',
+          reducedNote()
+        ], 'Predictive back → commit'); scrubX = 0;
+      } else { scrubX = 0; }
+    }, motionReduced() ? 0 : 260);
+  };
+  edge.addEventListener('pointerup', endScrub);
+  edge.addEventListener('pointercancel', endScrub);
+
+  /* ---- bottom sheet: dragged, with velocity handoff (T-025, F-002) ---- */
+  let sheetY = 1, drag = null;
+  function setSheet(t) { sheetY = t; sheet.style.transform = 'translateY(' + (t * 100) + '%)'; scrim.classList.toggle('show', t < 1); }
+  function animateSheet(target, velocity) {
+    /* Animatable semantics: retarget from current value AND velocity, and the
+       control stays live the whole time (T-012). No snapTo before animateTo. */
+    const from = sheetY, dist = target - from;
+    const budget = Math.max(120, Math.min(460, Math.abs(dist) * 520 - Math.abs(velocity) * 240));
+    const ms = motionReduced() ? 0 : (html.dataset.scheme === 'expressive' && !motionReduced() ? budget * 1.25 : budget);
+    const t0 = performance.now();
+    const v0 = Math.max(-3, Math.min(3, velocity)) * -0.0035;
+    function step(now) {
+      const p = ms === 0 ? 1 : Math.min(1, (now - t0) / ms);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setSheet(from + dist * eased + v0 * Math.sin(p * Math.PI) * (1 - p));
+      if (p < 1) requestAnimationFrame(step); else setSheet(target);
+    }
+    requestAnimationFrame(step);
+  }
+  setSheet(1);
+  $('#open-sheet').addEventListener('click', () => {
+    animateSheet(0, 0);
+    say([
+      'A hand-rolled surface must drag like the platform one it replaces (T-025): anchored 0 / partial / expanded.',
+      'The finger drives the offset; release velocity hands off to the settle ⇒ <span class="mono">Animatable</span> + <span class="mono">animateDecay</span> (F-002). <span class="mono">animateAsState</span> here would drop the velocity and stop dead.',
+      'Sheet enters along its origin edge and exits back down the same path (T-024).',
+      reducedNote()
+    ], 'Bottom sheet');
+  });
+  scrim.addEventListener('click', () => animateSheet(1, 0));
+  sheet.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('.sheet-opt') && sheetY < 1) return;
+    drag = { y0:e.clientY, t0:sheetY, last:e.clientY, lt:performance.now(), v:0 };
+    sheet.setPointerCapture(e.pointerId);
+  });
+  sheet.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const h = sheet.offsetHeight, dy = e.clientY - drag.y0;
+    setSheet(Math.max(0, Math.min(1, drag.t0 + dy / h)));
+    const now = performance.now(), dt = now - drag.lt;
+    if (dt > 0) { drag.v = (e.clientY - drag.last) / dt * 16; drag.last = e.clientY; drag.lt = now; }
+  });
+  const endDrag = () => {
+    if (!drag) return;
+    const v = drag.v; const t = sheetY;
+    const target = (v > 1.2 || t > 0.62) ? 1 : 0;
+    animateSheet(target, v);
+    say([
+      'Fling velocity <b>' + v.toFixed(1) + ' px/frame</b> ⇒ settled to <b>' + (target === 1 ? 'dismissed' : 'expanded') + '</b>.',
+      'That decision is the velocity handoff (F-002). Without it a flick and a slow drag look identical.',
+      reducedNote()
+    ], 'Sheet drag released');
+    drag = null;
+  };
+  sheet.addEventListener('pointerup', endDrag);
+  sheet.addEventListener('pointercancel', endDrag);
+  $('#sheet-remove').addEventListener('click', () => {
+    animateSheet(1, 0);
+    $('#snackbar').hidden = false; $('#snackbar').classList.remove('out'); $('#snackbar').classList.add('in');
+    setTimeout(() => { $('#snackbar').classList.remove('in'); $('#snackbar').classList.add('out'); setTimeout(() => { $('#snackbar').hidden = true; $('#snackbar').classList.remove('out'); }, motionReduced() ? 0 : 200); }, 2600);
+    say([
+      'A retraction is the <b>inverse</b> of its forward motion — same path, faster tier (T-024), and it is <b>not</b> a celebration (T-027).',
+      'The snackbar announces it non-modally and the sheet dismisses back down its origin edge.',
+      reducedNote()
+    ], 'Hide from list');
+  });
+
+  /* ---- FAB → anchored add bar (anchored ⇒ scale IS allowed, T-016) ---- */
+  const fab = $('#fab'), addbar = $('#addbar');
+  function setKbd(on) { $('#kbd').classList.toggle('up', on); phone.classList.toggle('kbd-up', on); }
+  fab.addEventListener('click', () => {
+    const open = addbar.hidden;
+    if (open) {
+      addbar.hidden = false; addbar.classList.remove('out'); addbar.classList.add('in');
+      fab.classList.add('open');
+      setTimeout(() => { setKbd(true); $('#addbar-input').focus(); }, motionReduced() ? 0 : 220);
+      say([
+        'This surface is <b>anchored to its trigger</b>, so scaling out of the FAB with an explicit origin is correct (T-016 scope).',
+        'Contrast: an <b>unanchored</b> dialog may NOT scale from centre — it expands along an axis or fades. That is the same rule, other half.',
+        'Enter = scale + fade (<span class="mono">--dur-4</span>); exit = fade only (<span class="mono">--dur-2</span>) ⇒ fewer properties on a faster tier (T-010).',
+        'Keyboard rises as an animated inset and the bar tracks it continuously — never toggled off a boolean (T-022).',
+        reducedNote()
+      ], 'FAB → anchored add bar');
+    } else { closeBar(); }
+  });
+  function closeBar() {
+    addbar.classList.remove('in'); addbar.classList.add('out');
+    setKbd(false);
+    const done = () => { addbar.hidden = true; addbar.classList.remove('out'); fab.classList.remove('open'); };
+    motionReduced() ? done() : setTimeout(done, 130);
+  }
+  $('#addbar-cancel').addEventListener('click', closeBar);
+  $('#addbar-ok').addEventListener('click', () => { closeBar(); });
+  $('#addbar-input').addEventListener('blur', () => setKbd(false));
+
+  /* ---- wizard: ordered peers ⇒ lateral slide, reversed on Back ---- */
+  const WIZ = [
+    { h:'Source', b:'<div class="field"><input value="https://download.example/GT_Sport_League_v2.pkg" readonly></div><p class="note" style="margin-top:10px">Next stays disabled until the link check resolves on disk — a gated primary action, not a decorative one.</p>' },
+    { h:'Streams', b:'<p class="note" style="margin-top:0">Band: Auto 8 → 32. Each +1 per window is priced at half a fair share; a refusal drops the ceiling and recovers one per 60 s.</p>', dots:[1,0.5,0] },
+    { h:'Save to', b:'<p class="note" style="margin-top:0">D:\\RE\\gtsport — resolved on disk. A missing folder gates both Download and Next.</p>' }
+  ];
+  let wizStep = 0;
+  function renderWiz(next, dir) {
+    const body = $('#wiz-body');
+    body.innerHTML = '<h2>' + WIZ[next].h + '</h2>' + WIZ[next].b;
+    $$('.wiz-dot').forEach((d, i) => { d.className = 'wiz-dot ' + (i < next ? 'done' : i === next ? 'active' : ''); });
+    $('#wiz-next').textContent = next === WIZ.length - 1 ? 'Finish' : 'Next';
+    if (motionReduced()) { say(['Step ' + (next + 1) + ' of 3 arrived at rest — the header and the dot rail say where you are without needing the slide (O-001).'], 'Wizard lateral: snapped'); return; }
+    body.classList.remove('lateral-in-left','lateral-in-right');
+    void body.offsetWidth;
+    body.classList.add(dir > 0 ? 'lateral-in-right' : 'lateral-in-left');
+  }
+  renderWiz(0, 1);
+  $('#wiz-next').addEventListener('click', () => {
+    if (wizStep < WIZ.length - 1) {
+      wizStep++; renderWiz(wizStep, 1);
+      say([
+        'Ordered steps ⇒ <b>lateral slide</b>, direction matching the reading order (T-011). A cross-fade here would hide the ordering that actually exists.',
+        'Same <span class="mono">--dur-5</span> + decelerate as every other entering element in this event ⇒ one scheme and one tier per perceived event (T-020).',
+        'No stagger on the wizard body: one content block, not a queue of arrivals (T-013 scope).'
+      ], 'Wizard → Next');
+    } else {
+      show('list', { dir:'back' }); wizStep = 0; renderWiz(0, 1);
+      $('#snackbar').hidden = false; $('#snackbar').classList.remove('out'); $('#snackbar').classList.add('in');
+      setTimeout(() => { $('#snackbar').classList.remove('in'); $('#snackbar').classList.add('out'); setTimeout(() => { $('#snackbar').hidden = true; $('#snackbar').classList.remove('out'); }, motionReduced() ? 0 : 200); }, 3200);
+      say([
+        'Completion is the <b>one hero motion</b> of this event: the checkmark draws, the snackbar rises, everything else holds still (T-026).',
+        'Allowed because it is <b>rare</b> — the frequency ceiling puts delight here, never on the row list (T-009).',
+        'The checkmark lands on a legible resting frame, so the meaning survives at scale 0 (O-001/O-002).',
+        reducedNote()
+      ], 'Finish → completion moment');
+    }
+  });
+  $('#wiz-back').addEventListener('click', () => {
+    if (wizStep > 0) { wizStep--; renderWiz(wizStep, -1);
+      say(['Back plays the <b>inverse</b> of forward — lateral the other way, not a fade (T-024).'], 'Wizard → Back');
+    } else show('list', { dir:'back' });
+  });
+
+  /* ---- frequency-gated row motion: the defect toggle ---- */
+  $('#toggle-rowshim').addEventListener('click', (e) => {
+    const on = e.currentTarget.getAttribute('aria-pressed') !== 'true';
+    e.currentTarget.setAttribute('aria-pressed', String(on)); e.currentTarget.textContent = on ? 'on' : 'off';
+    $$('#row-host .tbar').forEach((t, i) => {
+      const s = t.querySelector('.shimmer');
+      if (on && !s) { const el = document.createElement('span'); el.className = 'shimmer'; el.style.animationDelay = (i * 340) + 'ms'; t.appendChild(el); }
+      if (!on && s) s.remove();
+    });
+    say(on
+      ? ['<b>This is the defect.</b> Endless shimmer on a 100+/day list, running far past 5 s beside readable rows, with no stop on the row (O-003) and one <span class="mono">infiniteRepeatable</span> per row competing with the others (T-026).',
+         'Four delayed copies of the same loop is a <span class="mono">transition-delay</span> pile, not a coordinated sweep (T-013).']
+      : ['Rows carry <b>zero</b> self-starting motion. The only loop left is the aggregate hero meter, which has a Pause on its own surface (O-003 compliant).'],
+      'Row shimmer ' + (on ? 'ENABLED (anti-pattern)' : 'disabled (shipped)'));
+  });
+
+  /* ---- T-027: a correction is not a celebration ---- */
+  const fav = $('#fav-chip');
+  fav.addEventListener('click', () => {
+    const on = fav.getAttribute('aria-pressed') !== 'true';
+    fav.setAttribute('aria-pressed', String(on));
+    fav.classList.remove('pop','pop-bad','pop-good','pop-good-off');
+    const bad = $('#toggle-favbad').getAttribute('aria-pressed') === 'true';
+    if (on) fav.classList.add('pop-good');
+    else fav.classList.add(bad ? 'pop-bad' : 'pop-good-off');
+    say(on
+      ? ['Activation: pop + tint. Positive commitment is allowed the expressive beat.']
+      : bad
+        ? ['<b>Anti-pattern (T-027).</b> The un-star plays the same celebratory bounce as the star. A retraction reads like an achievement.']
+        : ['Retraction: colour only, faster tier, no bounce. Calmer than activation — the rule wants the asymmetry (T-027).'],
+      'Keep-partial toggle');
+  });
+  $('#toggle-favbad').addEventListener('click', (e) => { const on = e.currentTarget.getAttribute('aria-pressed') !== 'true'; e.currentTarget.setAttribute('aria-pressed', String(on)); e.currentTarget.textContent = on ? 'on' : 'off'; });
+
+  /* ---- T-004: Expressive spatial springs stay OFF data geometry ----
+     The scheme switch deliberately does NOT touch .tbar-fill or the wizard
+     dot: a width that encodes bytes must not overshoot it, in either scheme.
+     What Expressive is allowed to change is the containers — FAB, nav pill,
+     sheet. */
+  $('#scheme-seg').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    $$('#scheme-seg button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    html.dataset.scheme = b.dataset.v;
+    const exp = b.dataset.v === 'expressive';
+    $$('.fab, .nav-pill svg').forEach(el => {
+      el.style.transitionTimingFunction = exp ? 'var(--e-bounce)' : 'var(--e-std)';
+    });
+    say(exp ? [
+      '<b>Expressive</b> spatial fast spring (<span class="mono">.6 / 800</span>) now on the <i>containers</i>: the FAB press, the nav pill icon. Overshoot is welcome there.',
+      'The progress bars and the wizard dot were left alone on purpose. A width that encodes bytes must not overshoot it (T-004) — the containers <i>around</i> the data are the ones Expressive is for.',
+      'Effects springs are identical in both schemes (<span class="mono">1.0/3800 · 1.0/1600 · 1.0/800</span>), so no fade or colour change moved.'
+    ] : [
+      '<b>Standard</b> spatial (<span class="mono">1.0 / 400</span>) ⇒ no overshoot anywhere. This is the shipped default, and the reason the app ships a curve set rather than the framework default.'
+    ],
+    'Motion scheme → ' + b.dataset.v);
+  });
+  $('#toggle-wizbad').addEventListener('click', (e) => {
+    const on = e.currentTarget.getAttribute('aria-pressed') !== 'true';
+    e.currentTarget.setAttribute('aria-pressed', String(on)); e.currentTarget.textContent = on ? 'on' : 'off';
+    $$('.wiz-dot i').forEach(el => {
+      el.style.transitionTimingFunction = on ? 'var(--e-bounce)' : 'var(--e-std)';
+      el.style.transitionDuration = on ? '240ms' : dur(5);
+    });
+    say(on
+      ? ['<b>Anti-pattern, and it is a live desktop finding.</b> The wizard fill is <span class="mono">cubic-bezier(.34,1.56,.64,1)</span> on a value-bearing width: the step bar visibly overshoots past the real step, which reads as the wizard being unsure of itself (T-004).',
+         'Fix is a one-liner: copy the treatment the download bar already uses — <span class="mono">width var(--dur-5) var(--e-std)</span>.']
+      : ['Wizard fill now on the standard curve and a token duration (T-002, T-004 together).'],
+      'Wizard overshoot ' + (on ? 'ENABLED (anti-pattern)' : 'fixed'));
+  });
+  /* The control ships labelled "on", so the defect has to actually be live at
+     load — otherwise the panel misreports the state of the demo it controls. */
+  if ($('#toggle-wizbad').getAttribute('aria-pressed') === 'true') {
+    $$('.wiz-dot i').forEach(el => {
+      el.style.transitionTimingFunction = 'var(--e-bounce)';
+      el.style.transitionDuration = '240ms';
+    });
+  }
+
+  /* ---- O-003: the one loop that remains has a stop ON ITS SURFACE ---- */
+  const wavePath = $('#wave-path'), waveBtn = $('#wave-pause');
+  let waveOn = true, waveT = 0, rafId = null;
+  function drawWave() {
+    const W = 340, amp = 3, len = 20;
+    let d = '';
+    for (let x = 0; x <= W; x += 4) {
+      const y = 9 + Math.sin((x / len) * Math.PI * 2 + waveT) * amp;
+      d += (x === 0 ? 'M' : 'L') + x + ' ' + y.toFixed(2);
+    }
+    wavePath.setAttribute('d', d);
+  }
+  function loop(now) {
+    if (!waveOn || motionReduced()) { rafId = null; return; }
+    waveT = now / 1000 * (Math.PI * 2); /* one wavelength per second */
+    drawWave(); rafId = requestAnimationFrame(loop);
+  }
+  function syncWave() {
+    if (waveOn && !motionReduced()) { if (rafId === null) rafId = requestAnimationFrame(loop); }
+    else { if (rafId !== null) cancelAnimationFrame(rafId); rafId = null; drawWave(); }
+    waveBtn.setAttribute('aria-pressed', String(!waveOn));
+    waveBtn.textContent = waveOn ? 'Pause' : 'Resume';
+    waveBtn.setAttribute('aria-label', waveOn ? 'Pause' : 'Resume');
+  }
+  waveBtn.addEventListener('click', () => {
+    waveOn = !waveOn; syncWave();
+    say(waveOn
+      ? ['Crest running at one wavelength per second — an explicit in-app meter style, and it blocks the screen while bytes move.']
+      : ['<b>O-003 satisfied.</b> Motion that starts by itself and runs past 5 s beside other content needs a stop <i>on that screen</i>, not a setting somewhere else. This chip is that control; the label announces Pause/Resume to TalkBack.'],
+      'Hero meter ' + (waveOn ? 'running' : 'paused'));
+  });
+
+  /* ---- motion scale switch ---- */
+  $('#motion-seg').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    $$('#motion-seg button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    html.dataset.motion = b.dataset.v;
+    waveT = motionReduced() ? 0 : waveT; syncWave();
+    say(b.dataset.v === 'reduced'
+      ? ['Every token duration is now <b>0</b>, so all of it <b>snaps</b> — Android at scale 0.0f does not soften, it jumps to the end state (O-001).',
+         'Repeat the interactions: the meaning has to survive. The detail screen is still reachable, the wizard dots still say step 2 of 3, the checkmark still rests on a drawn tick, the paused row still reads Paused.',
+         'The wave loop stops requesting frames when the scale is 0 (F-005 reads <span class="mono">MotionDurationScale</span> each frame) and lands on a flat frontier instead of a mid-crest slice.']
+      : ['Scale back to 1.0 — springs and stagger restored.'],
+      'Motion scale → ' + b.dataset.v);
+  });
+  $('#theme-seg').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    $$('#theme-seg button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    html.dataset.theme = b.dataset.v;
+    say(['Theme swap is a <span class="mono">--dur-2</span> state tint. No window crossfade — the user is looking at this surface, and animating a whole-screen colour change reads as a reload (T-009 ceiling).'], 'Theme');
+  });
+
+  /* ---- T-019: the four-step placeholder sequence ---- */
+  let slowOn = false;
+  $('#slow-seg').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    $$('#slow-seg button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    slowOn = b.dataset.v === 'on';
+    if (!slowOn) { renderRows(); say(['Slow transfer off — rows restored.'], 'Loading sequence'); return; }
+    const host = $('#row-host'); const keep = host.innerHTML;
+    host.innerHTML = '';
+    /* 1. wait 150 ms before showing anything at all */
+    setTimeout(() => {
+      if (!slowOn) return;
+      /* 2. fade the skeleton in, matching the loaded geometry */
+      for (let i = 0; i < 3; i++) {
+        const w = document.createElement('div'); w.className = 'skel-wrap';
+        w.innerHTML = '<div class="skel" style="width:32px;height:32px;border-radius:8px"></div><div style="flex:1"><div class="skel" style="height:12px;width:' + (60 + i * 8) + '%"></div><div class="skel" style="height:10px;width:38%;margin-top:8px"></div><div class="skel" style="height:6px;width:100%;margin-top:8px;border-radius:999px"></div></div>';
+        w.style.animation = 'fadeEnter ' + (motionReduced() ? '0ms' : '180ms') + ' var(--e-dec) both';
+        host.appendChild(w);
+      }
+      /* 3. hold for a minimum visible time even if data lands now */
+      setTimeout(() => {
+        if (!slowOn) return;
+        host.innerHTML = keep;
+        $$('#row-host > *').forEach(el => el.classList.add('loaded-fade'));
+        slowOn = false;
+        $$('#slow-seg button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.v === 'off')));
+        /* 4. cross-fade to loaded content, never a hard cut */
+        say(['<b>Four-step anti-flicker sequence</b> (T-019): waited 150 ms before showing anything ⇒ faded the skeleton in ⇒ held it a minimum visible time even though the data was ready ⇒ cross-faded to the rows.',
+          'The skeleton mirrors the loaded geometry (favicon square, name line, meta line, bar), so nothing reflows when real content replaces it.',
+          'A placeholder that popped in and vanished in one frame is the defect this sequence exists to kill.'], 'Loaded from skeleton');
+      }, 900);
+    }, 150);
+    say(['Simulating a slow transfer: nothing on screen for the first 150 ms (step 1).'], 'Loading sequence started');
+  });
+  function renderRows() { /* restored by innerHTML above; no-op kept for clarity */ }
+
+  /* ---- map grid ---- */
+  const grid = $('#map-grid');
+  const states = ['done','done','active','active','hedge','pending','claimed','done','stalled','active','done','failed'];
+  for (let r = 0; r < 10; r++) for (let c = 0; c < 12; c++) {
+    const cell = document.createElement('span');
+    const st = states[(r * 12 + c) % states.length];
+    cell.style.cssText = 'height:16px;border-radius:2px;';
+    const col = st === 'done' ? 'var(--block-done)' : st === 'active' ? 'var(--block-active)' : st === 'hedge' ? 'var(--block-hedge)' : st === 'stalled' ? 'var(--block-stalled)' : st === 'failed' ? 'var(--block-failed)' : st === 'claimed' ? 'var(--block-claimed)' : 'transparent';
+    cell.style.background = col;
+    if (st === 'claimed') cell.style.border = '1px dashed var(--border-strong)';
+    if (st === 'pending') cell.style.border = '1px solid var(--border)';
+    grid.appendChild(cell);
+  }
+
+  /* ---- live progress ticks: state changes on the input/push frame, not
+          on a chain that waits for an animation (T-023) ---- */
+  setInterval(() => {
+    $$('#row-host .row-dl').forEach((row, i) => {
+      const bar = row.querySelector('.tbar-fill'); if (!bar || row.dataset.id === 'dl-done') return;
+      if (row.dataset.state === 'error') return;
+      let pct = parseFloat(bar.style.width) || 0;
+      pct = Math.min(99, pct + Math.random() * 1.4);
+      bar.style.width = pct.toFixed(1) + '%';
+      row.dataset.pct = String(Math.round(pct));
+      const meta = row.querySelector('[data-meta]');
+      if (meta) {
+        const size = row.dataset.size;
+        meta.textContent = (pct / 100 * parseFloat(size)).toFixed(2) + ' / ' + size + ' · ' + (2 + i * 1.1 + Math.random() * .6).toFixed(2) + ' MB/s';
+      }
+    });
+  }, 1400);
+
+  drawWave(); syncWave();
+  say(['<b>Start here.</b> Tap a download row for the container transform, then drag the left edge of the detail screen to scrub predictive back.',
+    'Every transition writes its rule citations into this panel, including which rung of the resolution ladder answered it.',
+    'No <span class="mono">MOTION.md</span> <span class="mono">DECIDED</span> entries exist yet, so every choice below resolved at <b>Rung 2</b> (craft defaults) — see <span class="mono">design/MOTION-draft-android.md</span> for the ratification list.'], 'Read me');
+})();
+</script>
+</body>
+</html>

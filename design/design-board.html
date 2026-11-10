@@ -1,0 +1,780 @@
+<style>
+/* ── Sucr tokens v2 — copied from design/tokens.css; every ratio in the
+   swatch labels is computed with WCAG 2.1 relative luminance, not asserted ── */
+:root{
+  --s-1:4px;--s-2:8px;--s-3:12px;--s-4:16px;--s-5:20px;--s-6:24px;--s-7:32px;--s-8:40px;--s-9:56px;
+  --r-control:6px;--r-card:8px;--r-sheet:12px;--r-window:16px;--r-round:999px;
+  --f-11:11px;--f-12:12px;--f-13:13px;--f-14:14px;--f-16:16px;--f-20:20px;--f-28:28px;--f-40:40px;
+  --mono:"Roboto Mono",ui-monospace,Consolas,monospace;--sans:"Inter","Segoe UI",system-ui,sans-serif;
+}
+.sucr-theme-light{
+  color-scheme:light;
+  --bg:#FFFFFF;--surface-1:#F8F9FA;--surface-2:#F1F3F4;
+  --text:#202124;--text-2:#5F6368;--text-3:#666D73;
+  --border:#DADCE0;--border-2:#E8EAED;--border-strong:#B4B9BE;--hairline:.5px;
+  --accent:#1A73E8;--accent-ink:#1765CC;--accent-hover:#1765CC;--accent-press:#1357B4;--accent-text:#FFFFFF;--accent-tint:#E8F0FE;
+  --success:#188038;--success-ink:#146C2E;--success-tint:#E6F4EA;
+  --warning:#B63A0A;--warning-fill:#F9AB00;--warning-ink:#B63A0A;--warning-tint:#FEF7E0;
+  --danger:#D93025;--danger-ink:#A31515;--danger-tint:#FCE8E6;
+  --info:#1A67D2;--info-ink:#1A67D2;--info-tint:#E8F0FE;
+  --net-teal:#0E8D7F;--net-blue:#1A73E8;--net-violet:#6A52E8;--net-magenta:#C81A70;
+  --net-amber:#D26A00;--net-lime:#5C9B28;--net-cyan:#008A99;--net-coral:#E0342A;
+  --cat-misc:#5F6368;
+  --track:#E8EAED;--block-claimed:#C2DBFF;--bar-done:#A5C8ED;--bar-fill:var(--accent);
+  --e-1:0 1px 2px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.06);
+  --e-2:0 8px 24px rgba(0,0,0,.16);
+}
+.sucr-theme-dark{
+  color-scheme:dark;
+  --bg:#1B1D1F;--surface-1:#252729;--surface-2:#2D2F31;
+  --text:#E8EAED;--text-2:#A8ADB2;--text-3:#959AA0;
+  --border:#3C4043;--border-2:#303133;--border-strong:#5F6368;--hairline:.5px;
+  --accent:#8AB4F8;--accent-ink:#A6C8FF;--accent-hover:#A6C8FF;--accent-press:#C2DBFF;--accent-text:#0B1A33;--accent-tint:#26344A;
+  --success:#81C995;--success-ink:#81C995;--success-tint:#10331C;
+  --warning:#FDD663;--warning-fill:#B8860B;--warning-ink:#FDD663;--warning-tint:#302A01;
+  --danger:#F28B82;--danger-ink:#F28B82;--danger-tint:#3C1F1E;
+  --info:#8AB4F8;--info-ink:#8AB4F8;--info-tint:#26344A;
+  --net-teal:#4CC2B4;--net-blue:#8AB4F8;--net-violet:#B6A2FF;--net-magenta:#F06BA8;
+  --net-amber:#F0955A;--net-lime:#A5D66F;--net-cyan:#4DD0E1;--net-coral:#F28B82;
+  --cat-misc:#9AA0A6;
+  --track:#3C4043;--block-claimed:#2C4A78;--bar-done:#4A6FA5;--bar-fill:var(--accent);
+  --e-1:0 0 0 1px #3C4043;
+  --e-2:0 0 0 1px #5F6368;
+}
+/* ── board chrome ── */
+.sucr-board{font-family:var(--sans);font-size:13px;line-height:1.45;color:var(--text);
+  background:var(--bg);padding:var(--s-6) var(--s-6) var(--s-9);border:var(--hairline) solid var(--border);}
+.sucr-board *{box-sizing:border-box}
+.b-h{font-size:var(--f-20);font-weight:600;line-height:1.2;margin:var(--s-8) 0 var(--s-2)}
+.b-h:first-child{margin-top:0}
+.b-sub{font-size:var(--f-13);color:var(--text-2);margin:0 0 var(--s-5);max-width:74ch}
+.b-note{font-size:var(--f-12);color:var(--text-3);margin:var(--s-3) 0 0}
+.b-label{font-size:var(--f-11);font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-3);margin:var(--s-5) 0 var(--s-2)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-4);align-items:start}
+@media (max-width:1000px){.pair{grid-template-columns:1fr}}
+.pane{background:var(--surface-1);border:var(--hairline) solid var(--border);border-radius:var(--r-card);padding:var(--s-4)}
+.pane h4{margin:0 0 var(--s-3);font-size:var(--f-12);font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-3)}
+.sw{display:flex;align-items:center;gap:var(--s-3);padding:var(--s-1) 0}
+.sw i{width:26px;height:26px;border-radius:var(--r-control);border:var(--hairline) solid var(--border-strong);flex:0 0 auto}
+.sw b{font-weight:500;font-size:var(--f-12);width:104px;flex:0 0 auto}
+.sw code{font-family:var(--mono);font-size:var(--f-11);color:var(--text-2);width:62px;flex:0 0 auto}
+.sw em{font-style:normal;font-family:var(--mono);font-size:var(--f-11);color:var(--text-3)}
+.sw em.pass{color:var(--success-ink)}
+.sw em.warn{color:var(--warning-ink)}
+hr.rule{border:0;border-top:var(--hairline) solid var(--border);margin:var(--s-6) 0}
+</style>
+
+<div class="sucr-board sucr-theme-light" style="margin:0 auto;max-width:1180px">
+
+  <div class="b-h" style="font-size:28px">Sucr — visual system, v2</div>
+  <p class="b-sub">Flat, Material-adjacent, matched to the accepted mark. No gradients, no glow, no shadows doing layout work.
+    Every number printed next to a swatch is <b>measured</b> — WCAG 2.1 relative luminance, foreground against the surface named in
+    its label. Gates: <code style="font-family:var(--mono)">≥4.5</code> body text,
+    <code style="font-family:var(--mono)">≥3.0</code> 20px+ display and meaningful non-text,
+    <code style="font-family:var(--mono)">≥1.5</code> adjacent fills — and where 1.5 is unreachable, a shape carries it instead (§Map).</p>
+  <p class="b-sub" style="color:var(--danger-ink)"><b>Four of v1's colour claims were false, and a fifth asserted they were all true.</b> Light <code style="font-family:var(--mono)">--text-3 #80868B</code> measured 3.31–3.68 and was used for row metadata;
+    <code style="font-family:var(--mono)">--warning #F9AB00</code> measured 1.93 and was printed as text; four network hues fell under 3.0 on the deepest light surface;
+    and status colours used as ink on their own tint measured 4.05–4.42. All fixed below, all with the old value shown.</p>
+
+  <div class="pair">
+    <div class="pane sucr-theme-light" style="background:var(--bg)">
+      <h4>Light</h4>
+      <div class="sw"><i style="background:#FFFFFF"></i><b>--bg</b><code>#FFFFFF</code><em class="pass">page</em></div>
+      <div class="sw"><i style="background:#F8F9FA"></i><b>--surface-1</b><code>#F8F9FA</code><em>1.05 on bg</em></div>
+      <div class="sw"><i style="background:#F1F3F4"></i><b>--surface-2</b><code>#F1F3F4</code><em>1.11 on bg</em></div>
+      <div class="sw"><i style="background:#202124"></i><b>--text</b><code>#202124</code><em class="pass">16.10 / 15.27 / 14.46</em></div>
+      <div class="sw"><i style="background:#5F6368"></i><b>--text-2</b><code>#5F6368</code><em class="pass">6.05 / 5.74 / 5.44</em></div>
+      <div class="sw"><i style="background:#666D73"></i><b>--text-3</b><code>#666D73</code><em class="pass">5.25 / 4.98 / 4.72</em></div>
+      <div class="sw"><i style="background:#80868B"></i><b>was --text-3</b><code>#80868B</code><em class="warn">3.68 / 3.49 / 3.31 ✗</em></div>
+      <div class="sw"><i style="background:#DADCE0"></i><b>--border</b><code>#DADCE0</code><em>1.37 — dividers</em></div>
+      <div class="sw"><i style="background:#E8EAED"></i><b>--border-2</b><code>#E8EAED</code><em>1.21 — cell rules</em></div>
+      <div class="sw"><i style="background:#B4B9BE"></i><b>--border-strong</b><code>#B4B9BE</code><em>1.98 / 1.88 — new</em></div>
+      <div class="sw"><i style="background:#1A73E8"></i><b>--accent</b><code>#1A73E8</code><em class="pass">4.51 on bg</em></div>
+      <div class="sw"><i style="background:#1765CC"></i><b>--accent-ink</b><code>#1765CC</code><em class="pass">5.57 / 5.28 / 5.00</em></div>
+      <div class="sw"><i style="background:#1357B4"></i><b>--accent-press</b><code>#1357B4</code><em class="pass">6.89 on bg</em></div>
+      <div class="sw"><i style="background:#E8F0FE"></i><b>--accent-tint</b><code>#E8F0FE</code><em>1.15 — selection</em></div>
+      <hr class="rule">
+      <div class="sw"><i style="background:#E6F4EA;border-color:#146C2E"></i><b>success badge</b><code>#146C2E</code><em class="pass">5.75 on tint</em></div>
+      <div class="sw"><i style="background:#FEF7E0;border-color:#B63A0A"></i><b>warning badge</b><code>#B63A0A</code><em class="pass">5.45 on tint</em></div>
+      <div class="sw"><i style="background:#FCE8E6;border-color:#A31515"></i><b>danger badge</b><code>#A31515</code><em class="pass">6.66 on tint</em></div>
+      <div class="sw"><i style="background:#F9AB00"></i><b>--warning-fill</b><code>#F9AB00</code><em class="warn">1.93 — FILL only</em></div>
+      <div class="sw"><i style="background:#188038"></i><b>was success ink</b><code>#188038</code><em class="warn">4.42 on own tint ✗</em></div>
+      <div class="sw"><i style="background:#D93025"></i><b>was danger ink</b><code>#D93025</code><em class="warn">4.05 on own tint ✗</em></div>
+    </div>
+
+    <div class="pane sucr-theme-dark" style="background:var(--bg)">
+      <h4>Dark</h4>
+      <div class="sw"><i style="background:#1B1D1F"></i><b>--bg</b><code>#1B1D1F</code><em class="pass">page</em></div>
+      <div class="sw"><i style="background:#252729"></i><b>--surface-1</b><code>#252729</code><em>1.13 on bg</em></div>
+      <div class="sw"><i style="background:#2D2F31"></i><b>--surface-2</b><code>#2D2F31</code><em>1.26 on bg</em></div>
+      <div class="sw"><i style="background:#E8EAED"></i><b>--text</b><code>#E8EAED</code><em class="pass">14.03 / 12.44 / 11.15</em></div>
+      <div class="sw"><i style="background:#A8ADB2"></i><b>--text-2</b><code>#A8ADB2</code><em class="pass">7.48 / 6.63 / 5.94</em></div>
+      <div class="sw"><i style="background:#959AA0"></i><b>--text-3</b><code>#959AA0</code><em class="pass">5.96 / 5.29 / 4.74</em></div>
+      <div class="sw"><i style="background:#7A7F85"></i><b>was --text-3</b><code>#7A7F85</code><em class="warn">4.19 / 3.71 / 3.33 ✗</em></div>
+      <div class="sw"><i style="background:#3C4043"></i><b>--border</b><code>#3C4043</code><em>1.62 on bg</em></div>
+      <div class="sw"><i style="background:#303133"></i><b>--border-2</b><code>#303133</code><em>1.30 on bg</em></div>
+      <div class="sw"><i style="background:#5F6368"></i><b>--border-strong</b><code>#5F6368</code><em>2.79 / 2.48 — new</em></div>
+      <div class="sw"><i style="background:#8AB4F8"></i><b>--accent</b><code>#8AB4F8</code><em>8.24 with --accent-text</em></div>
+      <div class="sw"><i style="background:#A6C8FF"></i><b>--accent-ink</b><code>#A6C8FF</code><em class="pass">9.92 on bg</em></div>
+      <div class="sw"><i style="background:#C2DBFF"></i><b>--accent-press</b><code>#C2DBFF</code><em class="pass">11.97 on bg</em></div>
+      <div class="sw"><i style="background:#26344A"></i><b>--accent-tint</b><code>#26344A</code><em>1.35 — selection</em></div>
+      <hr class="rule">
+      <div class="sw"><i style="background:#10331C;border-color:#81C995"></i><b>success badge</b><code>#81C995</code><em class="pass">7.09 on tint</em></div>
+      <div class="sw"><i style="background:#302A01;border-color:#FDD663"></i><b>warning badge</b><code>#FDD663</code><em class="pass">10.28 on tint</em></div>
+      <div class="sw"><i style="background:#3C1F1E;border-color:#F28B82"></i><b>danger badge</b><code>#F28B82</code><em class="pass">6.25 on tint</em></div>
+      <div class="sw"><i style="background:#B8860B"></i><b>--warning-fill</b><code>#B8860B</code><em class="pass">dark: fill is darker than ink</em></div>
+      <div class="note" style="font-size:12px;color:var(--text-3);margin-top:8px">Dark needs no ink split — every status hue already clears 6:1 on its own tint. The split is a light-theme repair.</div>
+    </div>
+  </div>
+  <div class="b-h">Network identity — eight hues, and never hue alone</div>
+  <p class="b-sub">These are <b>fill</b> values: dots, segmented bar spans, map cells. They are never ink for a network name —
+    a name prints in <b>--text-2</b> beside the dot, so no 4.5 gate applies to the fill itself. The gate that does apply is
+    <b>3.0 against the deepest surface</b>, which v1 missed for four of eight.</p>
+  <div class="pair">
+    <div class="pane sucr-theme-light" style="background:var(--bg)">
+      <h4>Light · ratio on --surface-2</h4>
+      <div class="sw"><i style="background:#0E8D7F;border-radius:999px"></i><b>teal · Wi-Fi</b><code>#0E8D7F</code><em class="pass">3.67 · was #12A594 = 2.76 ✗</em></div>
+      <div class="sw"><i style="background:#1A73E8;border-radius:999px"></i><b>blue · Ethernet</b><code>#1A73E8</code><em class="pass">4.05 · kept</em></div>
+      <div class="sw"><i style="background:#6A52E8;border-radius:999px"></i><b>violet</b><code>#6A52E8</code><em class="pass">4.73 · was #7B61FF = 3.78 ✓</em></div>
+      <div class="sw"><i style="background:#C81A70;border-radius:999px"></i><b>magenta</b><code>#C81A70</code><em class="pass">4.92 · was #D4237A = 4.37 ✓</em></div>
+      <div class="sw"><i style="background:#D26A00;border-radius:999px"></i><b>amber · USB</b><code>#D26A00</code><em class="pass">3.25 · was #E37400 = 2.79 ✗</em></div>
+      <div class="sw"><i style="background:#5C9B28;border-radius:999px"></i><b>lime</b><code>#5C9B28</code><em class="pass">3.06 · was #7CB342 = 2.25 ✗</em></div>
+      <div class="sw"><i style="background:#008A99;border-radius:999px"></i><b>cyan</b><code>#008A99</code><em class="pass">3.70 · was #0097A7 = 3.15 ✓</em></div>
+      <div class="sw"><i style="background:#E0342A;border-radius:999px"></i><b>coral</b><code>#E0342A</code><em class="pass">4.02 · was #EA4335 = 3.52 ✓</em></div>
+      <div class="b-label">How a network actually reads on screen</div>
+      <div style="display:flex;gap:var(--s-4);flex-wrap:wrap;font-size:var(--f-13)">
+        <span><i style="display:inline-block;width:9px;height:9px;border-radius:999px;background:var(--net-teal);margin-right:6px"></i><span style="color:var(--text-2)">Wi-Fi · 2 of 3 tentacles</span></span>
+        <span><i style="display:inline-block;width:9px;height:9px;border-radius:999px;background:var(--net-blue);margin-right:6px"></i><span style="color:var(--text-2)">Ethernet · 1 tentacle</span></span>
+      </div>
+      <p class="b-note">Position in the segmented bar is the second channel; colour is the third. A user who cannot separate
+        teal from cyan still knows which interface owns which span, because the spans are ordered by interface index.</p>
+    </div>
+    <div class="pane sucr-theme-dark" style="background:var(--bg)">
+      <h4>Dark · ratio on --surface-2</h4>
+      <div class="sw"><i style="background:#4CC2B4;border-radius:999px"></i><b>teal</b><code>#4CC2B4</code><em class="pass">6.20</em></div>
+      <div class="sw"><i style="background:#8AB4F8;border-radius:999px"></i><b>blue</b><code>#8AB4F8</code><em class="pass">6.38</em></div>
+      <div class="sw"><i style="background:#B6A2FF;border-radius:999px"></i><b>violet</b><code>#B6A2FF</code><em class="pass">6.14</em></div>
+      <div class="sw"><i style="background:#F06BA8;border-radius:999px"></i><b>magenta</b><code>#F06BA8</code><em class="pass">4.72 · lowest, still clears</em></div>
+      <div class="sw"><i style="background:#F0955A;border-radius:999px"></i><b>amber</b><code>#F0955A</code><em class="pass">5.86</em></div>
+      <div class="sw"><i style="background:#A5D66F;border-radius:999px"></i><b>lime</b><code>#A5D66F</code><em class="pass">7.97</em></div>
+      <div class="sw"><i style="background:#4DD0E1;border-radius:999px"></i><b>cyan</b><code>#4DD0E1</code><em class="pass">7.31</em></div>
+      <div class="sw"><i style="background:#F28B82;border-radius:999px"></i><b>coral</b><code>#F28B82</code><em class="pass">5.63</em></div>
+      <div class="b-label">File-type category dots (same eight, fixed meaning)</div>
+      <div style="display:flex;gap:var(--s-4);flex-wrap:wrap;font-size:var(--f-12);color:var(--text-2)">
+        <span><i style="display:inline-block;width:9px;height:9px;border-radius:999px;background:var(--net-blue);margin-right:5px"></i>Video</span>
+        <span><i style="display:inline-block;width:9px;height:9px;border-radius:999px;background:var(--net-violet);margin-right:5px"></i>Audio</span>
+        <span><i style="display:inline-block;width:9px;height:9px;border-radius:999px;background:var(--net-teal);margin-right:5px"></i>Archive</span>
+        <span><i style="display:inline-block;width:9px;height:9px;border-radius:999px;background:var(--net-magenta);margin-right:5px"></i>Document</span>
+        <span><i style="display:inline-block;width:9px;height:9px;border-radius:999px;background:var(--net-amber);margin-right:5px"></i>Image</span>
+        <span><i style="display:inline-block;width:9px;height:9px;border-radius:999px;background:var(--net-lime);margin-right:5px"></i>Program</span>
+        <span><i style="display:inline-block;width:9px;height:9px;border-radius:999px;background:var(--net-cyan);margin-right:5px"></i>Torrent</span>
+        <span><i style="display:inline-block;width:9px;height:9px;border-radius:999px;background:var(--cat-misc);margin-right:5px"></i>Misc</span>
+      </div>
+      <p class="b-note">A hue never means two things at once in the same view: network identity and category identity share the
+        palette but not a screen — the list shows category, the inspector shows network, and the map shows neither as a label.</p>
+    </div>
+  </div>
+
+  <div class="b-h">Type</div>
+  <p class="b-sub">UI is Inter 400/500/600. Every number that changes is Roboto Mono with
+    <code style="font-family:var(--mono)">font-variant-numeric: tabular-nums</code> — that is the difference between a live UI and a
+    jittery one. 40px exists only for the inspector's hero percentage; nothing else uses it. Rendered here with the system
+    fallback where Inter or Roboto Mono is not installed.</p>
+  <div class="pair">
+    <div class="pane sucr-theme-light" style="background:var(--bg)">
+      <h4>Ladder</h4>
+      <div style="font-size:40px;font-weight:600;line-height:1.2">84,3 %</div>
+      <div style="font-size:28px;font-weight:600;line-height:1.2;margin-top:6px">Grabber preview</div>
+      <div style="font-size:20px;font-weight:600;line-height:1.2;margin-top:6px">ubuntu-24.04-desktop-amd64.iso</div>
+      <div style="font-size:16px;font-weight:500;margin-top:6px">Add a download</div>
+      <div style="font-size:14px;margin-top:6px">Sucr splits this file across three connections and shows each byte range it holds.</div>
+      <div style="font-size:13px;margin-top:6px">Row body, control labels, sheet text — the working size.</div>
+      <div style="font-size:12px;margin-top:6px;color:var(--text-2)">Secondary line: 1.2 GiB of 4.7 GiB · 3 tentacles · 12.4 MiB/s</div>
+      <div style="font-size:11px;margin-top:6px;color:var(--text-3)">Metadata, badges, column headers, measurement captions.</div>
+    </div>
+    <div class="pane sucr-theme-dark" style="background:var(--bg)">
+      <h4>Tabular data — columns hold still while the values move</h4>
+      <table style="font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;border-collapse:collapse;color:var(--text)">
+        <tbody>
+          <tr><td style="padding:3px 14px 3px 0;color:var(--text-2)">eth0</td><td style="padding:3px 14px 3px 0;text-align:right">1.24 GiB</td><td style="padding:3px 14px 3px 0;text-align:right">8.12 MiB/s</td><td style="padding:3px 0;text-align:right;color:var(--success-ink)">200</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;color:var(--text-2)">eth0</td><td style="padding:3px 14px 3px 0;text-align:right">0.91 GiB</td><td style="padding:3px 14px 3px 0;text-align:right">6.04 MiB/s</td><td style="padding:3px 0;text-align:right;color:var(--success-ink)">206</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;color:var(--text-2)">wlan0</td><td style="padding:3px 14px 3px 0;text-align:right">0.11 GiB</td><td style="padding:3px 14px 3px 0;text-align:right">0.97 MiB/s</td><td style="padding:3px 0;text-align:right;color:var(--warning-ink)">hedge</td></tr>
+          <tr><td style="padding:3px 14px 3px 0;color:var(--text-2)">wlan0</td><td style="padding:3px 14px 3px 0;text-align:right">0.00 GiB</td><td style="padding:3px 14px 3px 0;text-align:right">0.00 MiB/s</td><td style="padding:3px 0;text-align:right;color:var(--danger-ink)">stalled</td></tr>
+        </tbody>
+      </table>
+      <p class="b-note">Status words in the last column are ink tokens, not fills — <code style="font-family:var(--mono)">200</code> and
+        <code style="font-family:var(--mono)">hedge</code> are the only place a hue is allowed to stand for a state, and each also reads as a word.</p>
+    </div>
+  </div>
+
+  <div class="b-h">Space, radius, elevation</div>
+  <div class="pair">
+    <div class="pane sucr-theme-light" style="background:var(--bg)">
+      <h4>4px scale</h4>
+      <div style="display:flex;align-items:flex-end;gap:6px;height:64px">
+        <div style="width:4px;height:4px;background:var(--accent)"></div><div style="width:4px;height:8px;background:var(--accent)"></div>
+        <div style="width:4px;height:12px;background:var(--accent)"></div><div style="width:4px;height:16px;background:var(--accent)"></div>
+        <div style="width:4px;height:20px;background:var(--accent)"></div><div style="width:4px;height:24px;background:var(--accent)"></div>
+        <div style="width:4px;height:32px;background:var(--accent)"></div><div style="width:4px;height:40px;background:var(--accent)"></div>
+        <div style="width:4px;height:56px;background:var(--accent)"></div>
+      </div>
+      <div style="display:flex;gap:6px;font-family:var(--mono);font-size:11px;color:var(--text-3)"><span>4</span><span>8</span><span>12</span><span>16</span><span>20</span><span>24</span><span>32</span><span>40</span><span>56</span></div>
+      <p class="b-note">Rows <code style="font-family:var(--mono)">gap-12</code> · panes <code style="font-family:var(--mono)">padding-16</code> · sheets <code style="font-family:var(--mono)">padding-24</code>.</p>
+      <div class="b-label">Radius</div>
+      <div style="display:flex;gap:var(--s-3);align-items:center">
+        <div style="width:34px;height:34px;background:var(--surface-2);border:var(--hairline) solid var(--border-strong);border-radius:6px"></div>
+        <div style="width:34px;height:34px;background:var(--surface-2);border:var(--hairline) solid var(--border-strong);border-radius:8px"></div>
+        <div style="width:34px;height:34px;background:var(--surface-2);border:var(--hairline) solid var(--border-strong);border-radius:12px"></div>
+        <div style="width:34px;height:34px;background:var(--surface-2);border:var(--hairline) solid var(--border-strong);border-radius:16px"></div>
+        <div style="width:34px;height:34px;background:var(--surface-2);border:var(--hairline) solid var(--border-strong);border-radius:999px"></div>
+      </div>
+      <div style="display:flex;gap:20px;font-family:var(--mono);font-size:11px;color:var(--text-3);margin-top:4px"><span>6 ctl</span><span>8 card</span><span>12 sheet</span><span>16 win</span><span>full</span></div>
+    </div>
+    <div class="pane sucr-theme-dark" style="background:var(--bg)">
+      <h4>Three levels and no more</h4>
+      <div style="display:flex;gap:var(--s-4);flex-wrap:wrap">
+        <div style="width:150px;padding:12px;background:var(--surface-1);border:var(--hairline) solid var(--border);border-radius:8px">
+          <div style="font-size:11px;color:var(--text-3)">ELEVATION 0</div><div style="font-size:13px">surface + hairline</div></div>
+        <div style="width:150px;padding:12px;background:var(--bg);border:var(--hairline) solid var(--border);border-radius:8px;box-shadow:var(--e-1)">
+          <div style="font-size:11px;color:var(--text-3)">ELEVATION 1</div><div style="font-size:13px">popover</div></div>
+        <div style="width:150px;padding:12px;background:var(--bg);border:var(--hairline) solid var(--border);border-radius:12px;box-shadow:var(--e-2)">
+          <div style="font-size:11px;color:var(--text-3)">ELEVATION 2</div><div style="font-size:13px">sheet</div></div>
+      </div>
+      <p class="b-note">On dark the shadow variables are <code style="font-family:var(--mono)">none</code> and a 1px lighter border carries the
+        level instead — shadows are invisible on a dark surface, so claiming three levels there without a substitute would be a lie in CSS.</p>
+      <div class="b-label">Hairline vs control edge</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div><div style="border-top:var(--hairline) solid var(--border);width:100%"></div><div style="font-family:var(--mono);font-size:11px;color:var(--text-3)">0.5px --border · house style, dividers and cell edges</div></div>
+        <div><div style="border-top:var(--hairline) solid var(--border-2);width:100%"></div><div style="font-family:var(--mono);font-size:11px;color:var(--text-3)">0.5px --border-2 · inside a dense table</div></div>
+        <div style="height:26px;border:1px solid var(--border-strong);border-radius:6px"></div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text-3)">1px --border-strong · the only place 1px is a line, not a ring</div>
+      </div>
+    </div>
+  </div>
+  <style>
+    .ic{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;width:24px;height:24px;display:block}
+    .icg{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:var(--s-2)}
+    .icg figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px;
+      background:var(--bg);border:var(--hairline) solid var(--border);border-radius:var(--r-control);color:var(--text-2)}
+    .icg figcaption{font-family:var(--mono);font-size:10px;color:var(--text-3);text-align:center}
+    .icg figure.custom{border-color:var(--border-strong)}
+    .icg figure.custom .ic{color:var(--accent-ink)}
+  </style>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.6 19 12 8 18.4Z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></symbol>
+    <symbol id="i-resume" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"/><path d="M21 3v5h-5"/></symbol>
+    <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 17.9V21h3.1l6.2-6.3a4 4 0 0 0 5.4-5.4l-2.9 2.9-2.5-2.5Z"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v11M7.5 10.5 12 15l4.5-4.5M4 19h16"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5H5V7h5"/></symbol>
+    <symbol id="i-folder-open" viewBox="0 0 24 24"><path d="M4 19h13l3-7H8l-4 7Zm0 0V7H9l2 2.5h7V14"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M4 19V6h5l2 2.5h7V19Z"/></symbol>
+    <symbol id="i-list-x" viewBox="0 0 24 24"><path d="M9 6h11M9 12h7M4 6h1M4 12h1M4 18h1M9 18h5M17.5 16.5 21 20M21 16.5 17.5 20"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6 18 18M18 6 6 18"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-ellipsis" viewBox="0 0 24 24"><path d="M5 12h.01M12 12h.01M19 12h.01"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 13l5 5L19 7"/></symbol>
+    <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+    <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+    <symbol id="i-chev-d" viewBox="0 0 24 24"><path d="M5 9l7 7 7-7"/></symbol>
+    <symbol id="i-alert-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5M12 16.5h.01"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></symbol>
+    <symbol id="i-loader" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" opacity=".25"/><path d="M12 3a9 9 0 0 1 9 9"/></symbol>
+    <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4ZM13 6.5 16.5 10"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18"/></symbol>
+    <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M12 20V5M6 11l6-6 6 6"/></symbol>
+    <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 4v15M6 13l6 6 6-6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.2 16.2 21 21"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5l1.6 2.2 2.6-.6.6 2.6L19 8.3l-1.4 2.2L19 12.7l-2.2 1.6-.6 2.6-2.6-.6L12 18.5l-1.6-2.2-2.6.6-.6-2.6L5 12.7l1.4-2.2L5 8.3l2.2-1.6.6-2.6 2.6.6Z"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 3h6l-1 6 3.5 3.5H6.5L10 9 9 3ZM12 12.5V21"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><path d="M4 4h7l9 9-7 7-9-9V4Z"/><circle cx="8" cy="8" r="1.2"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.4-3 7.3-7 9-4-1.7-7-4.6-7-9V6l7-3ZM9 12l2.2 2.2L15.5 10"/></symbol>
+    <symbol id="i-hdd" viewBox="0 0 24 24"><path d="M4.6 6.6h14.8L21 12v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4ZM3 12h18M7.5 15.5h.01"/></symbol>
+    <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2 9.5a14.5 14.5 0 0 1 20 0M5 12.6a10 10 0 0 1 14 0M8 15.7a6 6 0 0 1 8 0M12 19h.01"/></symbol>
+    <symbol id="i-usb" viewBox="0 0 24 24"><path d="M12 21V6M9.5 8.5 12 4.5l2.5 4M12 14 8.6 11.4M12 16.5l3.6-2.8"/><circle cx="7" cy="10.4" r="1.7"/><rect x="15.2" y="11.4" width="3.2" height="3.2"/></symbol>
+    <symbol id="i-cable" viewBox="0 0 24 24"><path d="M5 4h4v4H5zM15 16h4v4h-4zM9 6h3a3 3 0 0 1 3 3v7"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 5 13h6l-1 9 8-11h-6l1-8Z"/></symbol>
+    <!-- the eight custom marks: drawn on the same grid, so they cannot read as guests -->
+    <symbol id="i-sucr-map" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.4"/><circle cx="12" cy="6" r="1.6"/><circle cx="18" cy="6" r="2.4"/><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="2.4"/><circle cx="18" cy="12" r="1.6"/><circle cx="6" cy="18" r="2.4"/><circle cx="12" cy="18" r="1.6"/><circle cx="18" cy="18" r="2.4"/></symbol>
+    <symbol id="i-connection" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2.5"/><circle cx="19" cy="12" r="2.5"/><path d="M7.5 12h9M12 12V7"/></symbol>
+    <symbol id="i-proxy" viewBox="0 0 24 24"><path d="M2 12h5M17 12h5"/><rect x="8.5" y="5" width="7" height="14" rx="2"/><path d="M11 9.5h3M11 13h3"/></symbol>
+    <symbol id="i-checksum" viewBox="0 0 24 24"><path d="M7 3h7l4 4v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M9 13.5l2 2 4-4.5"/></symbol>
+    <symbol id="i-seed" viewBox="0 0 24 24"><circle cx="12" cy="5.5" r="2.4"/><circle cx="5" cy="18" r="2.4"/><circle cx="19" cy="18" r="2.4"/><path d="M10.6 7.4 6.4 15.8M13.4 7.4l4.2 8.4M7.4 18h9.2"/></symbol>
+    <symbol id="i-queue" viewBox="0 0 24 24"><path d="M3 6h11M3 11h11M3 16h7M16 16h5M19 13l3 3-3 3"/></symbol>
+    <symbol id="i-grabber" viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"/></symbol>
+    <symbol id="i-media" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M7 6v12M17 6v12M4.5 9.5h.8M4.5 14.5h.8M18.7 9.5h.8M18.7 14.5h.8"/></symbol>
+  </defs></svg>
+
+  <div class="b-h">SucrIcon — the bounded set</div>
+  <p class="b-sub">Lucide geometry, stroke 1.5, 24px grid, <code style="font-family:var(--mono)">currentColor</code>, flat.
+    <b>No filled variant shares a toolbar with a stroked one, and no gradient or glow touches any of them.</b> The eight outlined
+    heavier marks are custom and sit on the same grid — the discipline borrowed from XDM is that one exported enum of named
+    constants is a bounded set, so the set is reviewed when it passes 120 and anything unused for two releases is deleted rather
+    than left in an <code style="font-family:var(--mono)">icons/</code> folder.</p>
+  <div class="pair">
+    <div class="pane sucr-theme-light">
+      <h4>Light</h4>
+      <div class="icg">
+        <figure><svg class="ic"><use href="#i-play"/></svg><figcaption>play</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-pause"/></svg><figcaption>pause</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-resume"/></svg><figcaption>resume</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-download"/></svg><figcaption>download</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-wrench"/></svg><figcaption>wrench</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-external"/></svg><figcaption>external</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-folder-open"/></svg><figcaption>folder-open</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-list-x"/></svg><figcaption>list-x</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-trash"/></svg><figcaption>trash</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-copy"/></svg><figcaption>copy</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-check"/></svg><figcaption>check</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-x"/></svg><figcaption>x</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-plus"/></svg><figcaption>plus</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-ellipsis"/></svg><figcaption>ellipsis</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-chev-d"/></svg><figcaption>chevron</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-alert-circle"/></svg><figcaption>circle-alert</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-clock"/></svg><figcaption>clock</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-calendar"/></svg><figcaption>calendar</figcaption></figure>
+        <figure><svg class="ic" style="color:var(--accent-ink)"><use href="#i-loader"/></svg><figcaption>loader</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-pencil"/></svg><figcaption>pencil</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-lock"/></svg><figcaption>lock</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-globe"/></svg><figcaption>globe</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-search"/></svg><figcaption>search</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-settings"/></svg><figcaption>settings</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-filter"/></svg><figcaption>filter</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-pin"/></svg><figcaption>pin</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-tag"/></svg><figcaption>tag</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-shield"/></svg><figcaption>shield</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-hdd"/></svg><figcaption>hard-drive</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-wifi"/></svg><figcaption>wifi</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-usb"/></svg><figcaption>usb</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-cable"/></svg><figcaption>cable</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-zap"/></svg><figcaption>zap</figcaption></figure>
+        <figure class="custom"><svg class="ic"><use href="#i-sucr-map"/></svg><figcaption>sucr-map</figcaption></figure>
+        <figure class="custom"><svg class="ic"><use href="#i-connection"/></svg><figcaption>connection</figcaption></figure>
+        <figure class="custom"><svg class="ic"><use href="#i-proxy"/></svg><figcaption>proxy</figcaption></figure>
+        <figure class="custom"><svg class="ic"><use href="#i-checksum"/></svg><figcaption>checksum</figcaption></figure>
+        <figure class="custom"><svg class="ic"><use href="#i-seed"/></svg><figcaption>seed</figcaption></figure>
+        <figure class="custom"><svg class="ic"><use href="#i-queue"/></svg><figcaption>queue</figcaption></figure>
+        <figure class="custom"><svg class="ic"><use href="#i-grabber"/></svg><figcaption>grabber</figcaption></figure>
+        <figure class="custom"><svg class="ic"><use href="#i-media"/></svg><figcaption>media</figcaption></figure>
+      </div>
+      <p class="b-note">Custom marks wear the accent here only to be findable in this board; in the app they are
+        <code style="font-family:var(--mono)">currentColor</code> like every other glyph. The completion check is the single
+        exception drawn inline at runtime — <code style="font-family:var(--mono)">M5,13 L10,18 L19,7</code> with a dash-array
+        draw-on, because that one glyph animates (§6.3).</p>
+    </div>
+    <div class="pane sucr-theme-dark" style="background:var(--bg)">
+      <h4>Dark — same files, currentColor only</h4>
+      <div class="icg" style="grid-template-columns:repeat(auto-fill,minmax(72px,1fr))">
+        <figure><svg class="ic"><use href="#i-play"/></svg><figcaption>play</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-pause"/></svg><figcaption>pause</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-download"/></svg><figcaption>download</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-check"/></svg><figcaption>check</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-alert-circle"/></svg><figcaption>alert</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-shield"/></svg><figcaption>shield</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-search"/></svg><figcaption>search</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-settings"/></svg><figcaption>settings</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-wifi"/></svg><figcaption>wifi</figcaption></figure>
+        <figure><svg class="ic"><use href="#i-usb"/></svg><figcaption>usb</figcaption></figure>
+        <figure class="custom"><svg class="ic"><use href="#i-sucr-map"/></svg><figcaption>map</figcaption></figure>
+        <figure class="custom"><svg class="ic"><use href="#i-proxy"/></svg><figcaption>proxy</figcaption></figure>
+        <figure class="custom"><svg class="ic"><use href="#i-checksum"/></svg><figcaption>checksum</figcaption></figure>
+        <figure class="custom"><svg class="ic"><use href="#i-seed"/></svg><figcaption>seed</figcaption></figure>
+        <figure class="custom"><svg class="ic"><use href="#i-queue"/></svg><figcaption>queue</figcaption></figure>
+        <figure class="custom"><svg class="ic"><use href="#i-grabber"/></svg><figcaption>grabber</figcaption></figure>
+        <figure class="custom"><svg class="ic"><use href="#i-media"/></svg><figcaption>media</figcaption></figure>
+        <figure class="custom"><svg class="ic"><use href="#i-connection"/></svg><figcaption>connect</figcaption></figure>
+      </div>
+      <div class="b-label">Three sizes, no re-drawing</div>
+      <div style="display:flex;align-items:flex-end;gap:var(--s-5);color:var(--text-2)">
+        <svg class="ic" style="width:16px;height:16px"><use href="#i-download"/></svg>
+        <svg class="ic"><use href="#i-download"/></svg>
+        <svg class="ic" style="width:20px;height:20px"><use href="#i-download"/></svg>
+        <svg class="ic" style="width:24px;height:24px"><use href="#i-download"/></svg>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text-3)">16 toolbar · 20 row · 24 empty state</span>
+      </div>
+      <p class="b-note">At 16px the 1.5 stroke renders at ~1 device px on a 1× display and stays crisp because nothing in this set
+        depends on a sub-pixel detail; the sucker map's nine dots lose their smallest radius first, which is why the map's cells are
+        sized in tokens and not in glyph units.</p>
+    </div>
+  </div>
+  <style>
+    .badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.02em;
+      padding:3px 9px;border-radius:var(--r-round);border:var(--hairline) solid transparent}
+    .badge svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .b-q{background:var(--surface-2);color:var(--text-2);border-color:var(--border-strong)}
+    .b-dl{background:var(--accent-tint);color:var(--accent-ink)}
+    .b-pa{background:var(--surface-2);color:var(--text-3);border-color:var(--border-strong)}
+    .b-deg{background:var(--warning-tint);color:var(--warning-ink)}
+    .b-fi{background:var(--success-tint);color:var(--success-ink)}
+    .b-vf{background:var(--success-tint);color:var(--success-ink);border-color:var(--success-ink)}
+    .b-na{background:var(--danger-tint);color:var(--danger-ink)}
+    /* ── sucker map ── */
+    .map{display:grid;gap:2px;margin-top:var(--s-2)}
+    .map .lane{display:grid;grid-template-columns:52px 1fr;gap:8px;align-items:center}
+    .map .lane b{font-family:var(--mono);font-size:10px;font-weight:400;color:var(--text-2);text-align:right}
+    .cells{display:grid;grid-template-columns:repeat(28,1fr);gap:2px}
+    .cells span{height:13px;border-radius:2px;border:var(--hairline) solid var(--border-strong);background:transparent}
+    .cells span.claimed{background:var(--block-claimed);border-style:dashed;border-color:var(--accent-ink)}
+    .cells span.active{background:var(--accent);border-color:var(--accent)}
+    .cells span.done{background:var(--success);border-color:var(--success)}
+    .cells span.hedge{background-color:var(--net-violet);border-color:var(--net-violet);
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='5' height='5'%3E%3Cpath d='M-1 1 l2-2 M0 5 L5 0 M4 6 l2-2' stroke='%23fff' stroke-width='1.2' stroke-opacity='.55'/%3E%3C/svg%3E");
+      background-size:5px 5px}
+    .cells span.stalled{background:var(--warning-fill);border-color:var(--warning-ink);box-shadow:inset 0 -2px 0 var(--warning-ink)}
+    .cells span.failed{background:var(--danger);border-color:var(--danger);outline:1px solid var(--bg);outline-offset:-3px}
+    .legend{display:flex;flex-wrap:wrap;gap:var(--s-3);margin-top:var(--s-3);font-size:11px;color:var(--text-2)}
+    .legend i{display:inline-block;width:13px;height:13px;border-radius:2px;margin-right:5px;vertical-align:-2px;
+      border:var(--hairline) solid var(--border-strong)}
+    /* ── components ── */
+    .btn{font:500 13px/1 var(--sans);padding:8px 14px;border-radius:var(--r-control);cursor:default;
+      border:1px solid var(--border-strong);background:var(--bg);color:var(--text)}
+    .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-text);font-weight:600}
+    .btn.ghost{border-color:transparent;background:transparent;color:var(--accent-ink)}
+    .btn.danger{background:transparent;border-color:var(--danger-ink);color:var(--danger-ink)}
+    .fld{font:400 13px/1 var(--sans);padding:9px 10px;border-radius:var(--r-control);border:1px solid var(--border-strong);
+      background:var(--bg);color:var(--text);width:100%}
+    .fld.focus{outline:2px solid var(--accent);outline-offset:2px;border-color:var(--accent)}
+    .seg{display:inline-flex;background:var(--surface-2);border:var(--hairline) solid var(--border);border-radius:var(--r-control);padding:2px}
+    .seg b{font-weight:500;font-size:12px;padding:5px 12px;border-radius:4px;color:var(--text-2)}
+    .seg b[aria-pressed=true]{background:var(--bg);color:var(--text);box-shadow:var(--e-1);font-weight:600;border:var(--hairline) solid var(--border)}
+    .chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 10px;border-radius:var(--r-round);
+      border:1px solid var(--border-strong);color:var(--text-2);background:var(--bg)}
+    .chip[aria-pressed=true]{border-color:var(--accent-ink);color:var(--accent-ink);background:var(--accent-tint)}
+    .pb{height:8px;border-radius:var(--r-round);background:var(--track);overflow:hidden;border:var(--hairline) solid var(--border)}
+    .pb i{display:block;height:100%;background:var(--bar-fill)}
+    .pb.seg i{float:left}
+    .row{display:flex;gap:12px;align-items:center;padding:0 12px;background:var(--bg);border:var(--hairline) solid var(--border);
+      border-radius:var(--r-card)}
+    .row.sel{background:var(--accent-tint);border-color:var(--accent-ink)}
+    .row .nm{font-size:13px;font-weight:500;color:var(--text)}
+    .row .mt{font-family:var(--mono);font-size:11px;color:var(--text-3);font-variant-numeric:tabular-nums}
+  </style>
+
+  <div class="b-h">Status — six tiers, and one modifier</div>
+  <p class="b-sub">Colour is semantic and never decorative: <code style="font-family:var(--mono)">danger</code> only for needs-attention,
+    <code style="font-family:var(--mono)">warning</code> only for a degraded-but-working state, <code style="font-family:var(--mono)">success</code>
+    only for completed-and-verified. The plan said six tiers but never enumerated them; here they are, and the ink-on-tint pairs are the
+    measured ones — every badge below is ink <b>on its own tint</b>, which is where v1 silently failed.</p>
+  <div class="pair">
+    <div class="pane sucr-theme-light" style="background:var(--bg)">
+      <h4>Light · ink on tint</h4>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <span class="badge b-q"><svg><use href="#i-clock"/></svg>Queued</span>
+        <span class="badge b-dl"><svg><use href="#i-download"/></svg>Downloading</span>
+        <span class="badge b-pa"><svg><use href="#i-pause"/></svg>Paused</span>
+        <span class="badge b-fi"><svg><use href="#i-check"/></svg>Finished</span>
+        <span class="badge b-vf"><svg><use href="#i-shield"/></svg>Verified</span>
+        <span class="badge b-na"><svg><use href="#i-alert-circle"/></svg>Needs attention</span>
+      </div>
+      <div class="b-label">The modifier, not a seventh status</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <span class="badge b-deg"><svg><use href="#i-zap"/></svg>schedule ended — paused by policy</span>
+        <span class="badge b-deg"><svg><use href="#i-hdd"/></svg>disk-limited</span>
+        <span class="badge b-deg"><svg><use href="#i-wifi"/></svg>cap near</span>
+      </div>
+      <p class="b-note">Ratios: queued 5.44 · downloading <b>4.86</b> · paused 4.72 · finished 5.75 · verified 5.75 · needs-attention 6.66 · degraded 5.45.
+        <b>Verified is Finished plus an outline</b> — a distinct badge, not a distinct hue — because success-only-when-verified is the rule in §4.1,
+        and a plain completion must not borrow the ring. Degraded items keep their own underlying status underneath the chip.</p>
+    </div>
+    <div class="pane sucr-theme-dark" style="background:var(--bg)">
+      <h4>Dark · ink on tint</h4>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <span class="badge b-q"><svg><use href="#i-clock"/></svg>Queued</span>
+        <span class="badge b-dl"><svg><use href="#i-download"/></svg>Downloading</span>
+        <span class="badge b-pa"><svg><use href="#i-pause"/></svg>Paused</span>
+        <span class="badge b-fi"><svg><use href="#i-check"/></svg>Finished</span>
+        <span class="badge b-vf"><svg><use href="#i-shield"/></svg>Verified</span>
+        <span class="badge b-na"><svg><use href="#i-alert-circle"/></svg>Needs attention</span>
+      </div>
+      <div class="b-label">The modifier</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <span class="badge b-deg"><svg><use href="#i-zap"/></svg>schedule ended</span>
+        <span class="badge b-deg"><svg><use href="#i-hdd"/></svg>disk-limited</span>
+      </div>
+      <p class="b-note">Ratios: queued 5.94 · downloading 7.37 · paused 4.74 · finished 7.09 · verified 7.09 · needs-attention 6.25 · degraded 10.28.
+        Dark keeps its v1 hues — the tints are dark enough that the hue can double as the ink. Light could not, which is the whole reason
+        <code style="font-family:var(--mono)">-ink</code> tokens exist.</p>
+    </div>
+  </div>
+
+  <div class="b-h">The sucker map — and why colour alone cannot draw it</div>
+  <p class="b-sub">Rows are networks, columns are byte ranges in order, one cell per block. Measured adjacency, the gate being 1.5:
+    against the <b>track</b> every saturated state clears easily (light active 3.74, hedge 4.37, done 4.16, failed 3.96; dark 4.4–5.3).
+    Against <b>each other</b> they do not: light <code style="font-family:var(--mono)">active/hedge</code> 1.17,
+    <code style="font-family:var(--mono)">active/done</code> 1.11, <code style="font-family:var(--mono)">done/failed</code> 1.05;
+    dark has eight such pairs against light's seven, down to <code style="font-family:var(--mono)">active/hedge</code> 1.04
+    and <code style="font-family:var(--mono)">hedge/done</code> 1.12.
+    Whole families sit inside 1.2 of each other, so luminance cannot carry the distinction and the grid draws every state <b>twice</b>:
+    once in colour, once in shape.</p>
+  <div class="pair">
+    <div class="pane sucr-theme-light" style="background:var(--bg)">
+      <h4>Light · colour + shape</h4>
+      <div class="map">
+        <div class="lane"><b>eth0 · 8</b><div class="cells" id="m1a"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="active"></span><span class="active"></span><span class="active"></span><span class="active"></span><span class="claimed"></span><span class="claimed"></span><span class="claimed"></span><span></span><span></span><span></span><span></span><span></span></div></div>
+        <div class="lane"><b>eth0 · 5</b><div class="cells" id="m1b"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="claimed"></span><span class="claimed"></span><span class="claimed"></span><span class="claimed"></span><span class="active"></span><span class="active"></span><span class="active"></span><span class="active"></span><span class="active"></span><span class="hedge"></span><span class="hedge"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+        <div class="lane"><b>wlan0 · 3</b><div class="cells" id="m1c"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="hedge"></span><span class="hedge"></span><span class="hedge"></span><span class="stalled"></span><span class="failed"></span><span class="active"></span><span class="active"></span><span class="active"></span><span class="active"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+      </div>
+      <div class="legend">
+        <span><i></i>pending — outlined, not filled</span>
+        <span><i style="background:var(--block-claimed);border-style:dashed;border-color:var(--accent-ink)"></i>claimed — dashed edge</span>
+        <span><i style="background:var(--accent);border-color:var(--accent)"></i>active</span>
+        <span><i style="background:var(--success);border-color:var(--success)"></i>done</span>
+        <span><i style="background:var(--net-violet);border-color:var(--net-violet)"></i>hedge — hatch</span>
+        <span><i style="background:var(--warning-fill);box-shadow:inset 0 -2px 0 var(--warning-ink)"></i>stalled — 2px ledge</span>
+        <span><i style="background:var(--danger);box-shadow:inset 0 0 0 1px var(--bg)"></i>failed — inner ring</span>
+      </div>
+      <p class="b-note">Claimed is 1.17 against the track, which no hue fix reaches without breaking the palette — so it is dashed, and it is
+        the only dashed thing on the grid. A user with no colour perception at all still reads five distinguishable states.</p>
+    </div>
+    <div class="pane sucr-theme-dark" style="background:var(--bg)">
+      <h4>Dark · same data</h4>
+      <div class="map">
+        <div class="lane"><b>eth0 · 8</b><div class="cells" id="m2a"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="active"></span><span class="active"></span><span class="active"></span><span class="active"></span><span class="claimed"></span><span class="claimed"></span><span class="claimed"></span><span></span><span></span><span></span><span></span><span></span></div></div>
+        <div class="lane"><b>eth0 · 5</b><div class="cells" id="m2b"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="claimed"></span><span class="claimed"></span><span class="claimed"></span><span class="claimed"></span><span class="active"></span><span class="active"></span><span class="active"></span><span class="active"></span><span class="active"></span><span class="hedge"></span><span class="hedge"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+        <div class="lane"><b>wlan0 · 3</b><div class="cells" id="m2c"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="hedge"></span><span class="hedge"></span><span class="hedge"></span><span class="stalled"></span><span class="failed"></span><span class="active"></span><span class="active"></span><span class="active"></span><span class="active"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+      </div>
+      <div class="legend">
+        <span><i></i>pending</span><span><i style="background:var(--block-claimed);border-style:dashed;border-color:var(--accent-ink)"></i>claimed</span>
+        <span><i style="background:var(--accent)"></i>active</span><span><i style="background:var(--success)"></i>done</span>
+        <span><i style="background:var(--net-violet)"></i>hedge</span><span><i style="background:var(--warning-fill);box-shadow:inset 0 -2px 0 var(--warning-ink)"></i>stalled</span>
+        <span><i style="background:var(--danger)"></i>failed</span>
+      </div>
+      <p class="b-note">Stalled reuses the <b>fill</b> hue in both themes rather than an ink hue, and it was picked by measurement: against
+        the other five states dark <code style="font-family:var(--mono)">#B8860B</code> separates at <b>1.36–1.66</b>, while the obvious
+        "bright amber on dark" pick <code style="font-family:var(--mono)">--net-amber #F0955A</code> sits at <b>1.04–1.17</b> and would vanish
+        next to failed. Neither clears 1.5 — which is why the ledge on stalled is load-bearing, not decoration. The ledge is a 2px inset shadow rather than a
+        1.5px border because measuring this page at <code style="font-family:var(--mono)">devicePixelRatio 1</code> returned
+        <code style="font-family:var(--mono)">border-width: 1px</code> for a declared 1.5px: Chrome snaps border widths to device pixels, so a
+        half-pixel edge is not a heavier edge.</p>
+      <div class="b-label">Text alternative, because role=img is not an accessibility strategy</div>
+      <table style="font-family:var(--mono);font-size:11px;color:var(--text-2);border-collapse:collapse;font-variant-numeric:tabular-nums">
+        <tbody>
+          <tr><td style="padding:2px 12px 2px 0">eth0 · tentacle 2</td><td style="padding:2px 12px 2px 0">blocks 011–018</td><td style="padding:2px 0;color:var(--success-ink)">done, verified</td></tr>
+          <tr><td style="padding:2px 12px 2px 0">eth0 · tentacle 5</td><td style="padding:2px 12px 2px 0">blocks 019–024</td><td style="padding:2px 0;color:var(--accent-ink)">active, 61 %</td></tr>
+          <tr><td style="padding:2px 12px 2px 0">wlan0 · tentacle 9</td><td style="padding:2px 12px 2px 0">block 025</td><td style="padding:2px 0;color:var(--net-violet)">hedge — started 4 s ago, ETA test passed</td></tr>
+          <tr><td style="padding:2px 12px 2px 0">wlan0 · tentacle 7</td><td style="padding:2px 12px 2px 0">block 026</td><td style="padding:2px 0;color:var(--danger-ink)">stalled 22 s — will re-queue, not fail</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="b-h">Components</div>
+  <div class="pair">
+    <div class="pane sucr-theme-light" style="background:var(--bg)">
+      <h4>Controls</h4>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button class="btn primary">Download</button>
+        <button class="btn">Cancel</button>
+        <button class="btn ghost">Advanced</button>
+        <button class="btn danger">Delete file</button>
+      </div>
+      <div class="b-label">Field, idle then focused</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="fld" style="color:var(--text-3)">https://example.com/file.iso</div>
+        <div class="fld focus">https://example.com/file.iso<span style="float:right;color:var(--text-3);font-family:var(--mono);font-size:11px">:focus-visible</span></div>
+      </div>
+      <p class="b-note">Focus is <code style="font-family:var(--mono)">outline: 2px solid --accent; outline-offset: 2px</code> and never a
+        box-shadow ring — a ring shifts layout in dense tables, which is exactly where focus matters most.</p>
+      <div class="b-label">Segmented · chips</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <div class="seg"><b aria-pressed="true">Comfortable</b><b aria-pressed="false">Compact</b></div>
+        <div class="seg"><b aria-pressed="true">Light</b><b aria-pressed="false">Dark</b><b aria-pressed="false">System</b></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+        <span class="chip" aria-pressed="true"><svg style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.8"><use href="#i-wifi"/></svg>Wi-Fi</span>
+        <span class="chip" aria-pressed="true"><svg style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.8"><use href="#i-hdd"/></svg>Ethernet</span>
+        <span class="chip" aria-pressed="false"><svg style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.8"><use href="#i-usb"/></svg>USB</span>
+        <span class="chip" aria-pressed="false"><svg style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.8"><use href="#i-tag"/></svg>archive</span>
+      </div>
+      <div class="b-label">Bars — <code style="font-family:var(--mono)">role=progressbar</code>, never a width-styled div</div>
+      <div class="pb" role="progressbar" aria-valuenow="61" aria-valuemin="0" aria-valuemax="100"><i style="width:61%"></i></div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text-3);margin-top:4px">61 % · 2.9 GiB of 4.7 GiB · 1 h 04 m left</div>
+      <div class="pb seg" role="progressbar" aria-valuenow="61" style="margin-top:10px">
+        <i style="width:34%;background:var(--net-teal)"></i><i style="width:19%;background:var(--net-blue)"></i><i style="width:8%;background:var(--net-amber)"></i>
+      </div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text-3);margin-top:4px">one bar, one segment per network — width is its share of bytes</div>
+    </div>
+    <div class="pane sucr-theme-dark" style="background:var(--bg)">
+      <h4>Rows · density is a setting, scale is not</h4>
+      <div class="b-label">Comfortable — 68px</div>
+      <div class="row" style="height:68px;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px">
+        <div style="display:flex;align-items:center;gap:10px;width:100%">
+          <i style="width:9px;height:9px;border-radius:999px;background:var(--net-blue);flex:0 0 auto"></i>
+          <span class="nm">ubuntu-24.04-desktop-amd64.iso</span>
+          <span class="badge b-dl" style="margin-left:auto"><svg><use href="#i-download"/></svg>Downloading</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;width:100%">
+          <span class="mt" style="width:190px">61 % · 2.9 GiB of 4.7 GiB · 1 h 04 m</span>
+          <div class="pb" style="flex:1"><i style="width:61%"></i></div>
+        </div>
+      </div>
+      <div class="b-label">Compact — 44px, 12px type</div>
+      <div class="row sel" style="height:44px;gap:10px">
+        <i style="width:9px;height:9px;border-radius:999px;background:var(--net-teal);flex:0 0 auto"></i>
+        <span class="nm" style="font-size:12px;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">God_of_War_ASCENSION_PSNP-PSP00271_us_part1.7z</span>
+        <span class="mt">100 %</span>
+        <span class="badge b-vf" style="font-size:10px;padding:2px 7px"><svg><use href="#i-shield"/></svg>Verified</span>
+      </div>
+      <p class="b-note">The selected row uses <code style="font-family:var(--mono)">--accent-tint</code> plus a 1px
+        <code style="font-family:var(--mono)">--accent-ink</code> edge — 1.15 adjacency is not enough on its own, so selection is never hue-only.
+        Compact-mode users ask for it; neither Plexo nor XDM has it, which is a gap in both, not a signal the feature is unwanted.</p>
+      <div class="b-label">Sheet — elevation 2</div>
+      <div style="background:var(--bg);border-radius:var(--r-sheet);box-shadow:var(--e-2);border:var(--hairline) solid var(--border);padding:16px">
+        <div style="font-size:16px;font-weight:600">Add 12 files from this page</div>
+        <div style="font-size:13px;color:var(--text-2);margin-top:6px">One batch shares the connection budget across all twelve, so the
+          server's per-host cap applies to the set. One download per link gives each its own streams and is usually slower overall.</div>
+        <div style="display:flex;gap:8px;margin-top:14px"><button class="btn primary">One batch</button><button class="btn">One per link</button></div>
+      </div>
+      <p class="b-note">Consequence text is on the surface, not behind a tooltip — hover does not exist for keyboard or VoiceOver users (§4.5).</p>
+    </div>
+  </div>
+  <style>
+    .artgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s-3)}
+    @media (max-width:720px){.artgrid{grid-template-columns:1fr}}
+    .arttile{background:var(--surface-1);border:var(--hairline) solid var(--border);border-radius:var(--r-card);
+      padding:var(--s-3);color:var(--text-3)}
+    .arttile svg{width:100%;height:auto;display:block;color:var(--text-3)}
+    .arttile figcaption{font-family:var(--mono);font-size:10px;color:var(--text-3);margin-top:8px;line-height:1.35}
+    .arttile figcaption b{display:block;color:var(--text-2);font-weight:500}
+    .k{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .kd{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;opacity:.45}
+    .kz{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-dasharray:5 5;opacity:.5}
+    .ka{fill:none;stroke:var(--accent-ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .kdot{fill:var(--accent-tint);stroke:var(--accent-ink);stroke-width:1.5}
+    .kglass{fill:var(--bg);fill-opacity:.6;stroke:var(--accent-ink);stroke-width:2}
+    .kring,.kchk{fill:none;stroke:var(--success-ink);stroke-linecap:round;stroke-linejoin:round}
+    .kring{stroke-width:2}.kchk{stroke-width:2.5}
+    .kgdot{fill:var(--success-tint);stroke:var(--success-ink);stroke-width:1.5}
+    .kok{fill:var(--success-tint);stroke:var(--success-ink);stroke-width:1.5}
+    .kgap{fill:none;stroke:var(--border-strong);stroke-width:1.5;stroke-dasharray:4 3}
+    .kbad{fill:var(--danger-tint);stroke:var(--danger-ink);stroke-width:1.5}
+    .kmk{fill:none;stroke:var(--danger-ink);stroke-width:2;stroke-linecap:round}
+  </style>
+
+  <div class="b-h">Art — six states that would otherwise be a sentence</div>
+  <p class="b-sub">Flat inline SVG on a 160×120 grid, 2px stroke at that scale, one accented element per piece and it always carries the
+    meaning. Linework is <code style="font-family:var(--mono)">currentColor</code> at the <b>--text-3</b> weight, so the art is grey and quiet
+    in both themes and never competes with a status colour. The sucker-dot motif is the only brand carryover into the art; there are no faces,
+    no gradients, no glow, and no filled shapes mixed into a stroked composition. Files live in
+    <code style="font-family:var(--mono)">D:\RE\Sucr\design\art\</code>.</p>
+  <div class="pair">
+    <div class="pane sucr-theme-light" style="background:var(--bg)">
+      <h4>Light</h4>
+      <div class="artgrid">
+        <figure class="arttile" style="margin:0">
+          <svg viewBox="0 0 160 120" aria-hidden="true">
+            <path class="k" d="M42 82v8a10 10 0 0 0 10 10h56a10 10 0 0 0 10-10v-8"/>
+            <path class="k" d="M42 82h20l6 8h24l6-8h20"/>
+            <path class="ka" d="M80 18v38"/><path class="ka" d="M67 46 80 60l13-14"/>
+            <circle class="kdot" cx="52" cy="30" r="7"/><circle class="kdot" cx="108" cy="26" r="5"/><circle class="kdot" cx="118" cy="44" r="3.5"/>
+          </svg>
+          <figcaption><b>art/sucr-empty-first-run.svg</b>Library empty. Paired with the ⌘N affordance, not a tour.</figcaption>
+        </figure>
+        <figure class="arttile" style="margin:0">
+          <svg viewBox="0 0 160 120" aria-hidden="true">
+            <circle class="kd" cx="34" cy="38" r="5"/><path class="kd" d="M50 38h72"/>
+            <circle class="kd" cx="34" cy="60" r="5"/><path class="kd" d="M50 60h40"/>
+            <circle class="kz" cx="34" cy="82" r="5"/><path class="kz" d="M50 82h40"/>
+            <circle class="kglass" cx="106" cy="66" r="22"/><path class="ka" d="M121 81l15 15"/>
+          </svg>
+          <figcaption><b>art/sucr-empty-search.svg</b>No rows match. The rows stay dimmed — the filter is the state, not an error.</figcaption>
+        </figure>
+        <figure class="arttile" style="margin:0">
+          <svg viewBox="0 0 160 120" aria-hidden="true">
+            <circle class="kring" cx="80" cy="58" r="30"/>
+            <path class="kchk" d="M65 59 76 70 95 47"/>
+            <circle class="kgdot" cx="38" cy="42" r="6"/><circle class="kgdot" cx="122" cy="40" r="4"/><circle class="kgdot" cx="126" cy="76" r="3"/>
+          </svg>
+          <figcaption><b>art/sucr-state-complete.svg</b>Verified queue empty — the same polyline as the row badge, drawn on.</figcaption>
+        </figure>
+        <figure class="arttile" style="margin:0">
+          <svg viewBox="0 0 160 120" aria-hidden="true">
+            <rect class="kok" x="28" y="46" width="24" height="16" rx="3"/><rect class="kok" x="56" y="46" width="24" height="16" rx="3"/>
+            <rect class="kok" x="84" y="46" width="24" height="16" rx="3"/><rect class="kok" x="112" y="46" width="24" height="16" rx="3"/>
+            <rect class="kok" x="28" y="66" width="24" height="16" rx="3"/><rect class="kok" x="56" y="66" width="24" height="16" rx="3"/>
+            <rect class="kgap" x="84" y="66" width="24" height="16" rx="3"/>
+            <rect class="kbad" x="112" y="66" width="24" height="16" rx="3"/>
+            <path class="kmk" d="M117 70l14 8M131 70l-14 8"/>
+            <path class="kgap" d="M28 30h108"/>
+          </svg>
+          <figcaption><b>art/sucr-state-damaged.svg</b>A4 reopen check: six ranges good, one never fetched, one contradicting the hash.</figcaption>
+        </figure>
+        <figure class="arttile" style="margin:0">
+          <svg viewBox="0 0 160 120" aria-hidden="true">
+            <rect class="k" x="24" y="22" width="112" height="62" rx="8"/>
+            <circle class="kd" cx="42" cy="40" r="5"/><path class="kd" d="M56 40h54"/>
+            <circle class="kd" cx="42" cy="58" r="5"/><path class="kd" d="M56 58h38"/>
+            <circle class="kz" cx="42" cy="76" r="5"/><path class="kz" d="M56 76h46"/>
+            <circle class="ka" cx="118" cy="96" r="11"/><path class="ka" d="M110 104 126 88"/>
+          </svg>
+          <figcaption><b>art/sucr-empty-media.svg</b>Media panel found nothing — distinct from “no manifest answered”, which is an error.</figcaption>
+        </figure>
+        <figure class="arttile" style="margin:0">
+          <svg viewBox="0 0 160 120" aria-hidden="true">
+            <path class="k" d="M14 88h20"/><path class="k" d="M34 88V64"/>
+            <rect class="ka" x="26" y="44" width="20" height="24" rx="6"/><path class="ka" d="M46 52h16M46 60h16"/>
+            <rect class="kz" x="82" y="40" width="34" height="32" rx="6"/><path class="kz" d="M94 50v12M106 50v12"/>
+            <circle class="kdot" cx="60" cy="90" r="6"/><circle class="kdot" cx="78" cy="96" r="4"/><circle class="kdot" cx="94" cy="88" r="3"/>
+          </svg>
+          <figcaption><b>art/sucr-empty-connection.svg</b>Detached, not failed: the gap is the message. Also used for integration offline.</figcaption>
+        </figure>
+      </div>
+    </div>
+    <div class="pane sucr-theme-dark" style="background:var(--bg)">
+      <h4>Dark — identical files, tokens re-resolved</h4>
+      <div class="artgrid">
+        <figure class="arttile" style="margin:0"><svg viewBox="0 0 160 120" aria-hidden="true"><path class="k" d="M42 82v8a10 10 0 0 0 10 10h56a10 10 0 0 0 10-10v-8"/><path class="k" d="M42 82h20l6 8h24l6-8h20"/><path class="ka" d="M80 18v38"/><path class="ka" d="M67 46 80 60l13-14"/><circle class="kdot" cx="52" cy="30" r="7"/><circle class="kdot" cx="108" cy="26" r="5"/><circle class="kdot" cx="118" cy="44" r="3.5"/></svg><figcaption>first run</figcaption></figure>
+        <figure class="arttile" style="margin:0"><svg viewBox="0 0 160 120" aria-hidden="true"><circle class="kd" cx="34" cy="38" r="5"/><path class="kd" d="M50 38h72"/><circle class="kd" cx="34" cy="60" r="5"/><path class="kd" d="M50 60h40"/><circle class="kz" cx="34" cy="82" r="5"/><path class="kz" d="M50 82h40"/><circle class="kglass" cx="106" cy="66" r="22"/><path class="ka" d="M121 81l15 15"/></svg><figcaption>no search results</figcaption></figure>
+        <figure class="arttile" style="margin:0"><svg viewBox="0 0 160 120" aria-hidden="true"><circle class="kring" cx="80" cy="58" r="30"/><path class="kchk" d="M65 59 76 70 95 47"/><circle class="kgdot" cx="38" cy="42" r="6"/><circle class="kgdot" cx="122" cy="40" r="4"/><circle class="kgdot" cx="126" cy="76" r="3"/></svg><figcaption>verified</figcaption></figure>
+        <figure class="arttile" style="margin:0"><svg viewBox="0 0 160 120" aria-hidden="true"><rect class="kok" x="28" y="46" width="24" height="16" rx="3"/><rect class="kok" x="56" y="46" width="24" height="16" rx="3"/><rect class="kok" x="84" y="46" width="24" height="16" rx="3"/><rect class="kok" x="112" y="46" width="24" height="16" rx="3"/><rect class="kok" x="28" y="66" width="24" height="16" rx="3"/><rect class="kok" x="56" y="66" width="24" height="16" rx="3"/><rect class="kgap" x="84" y="66" width="24" height="16" rx="3"/><rect class="kbad" x="112" y="66" width="24" height="16" rx="3"/><path class="kmk" d="M117 70l14 8M131 70l-14 8"/><path class="kgap" d="M28 30h108"/></svg><figcaption>damaged partial</figcaption></figure>
+        <figure class="arttile" style="margin:0"><svg viewBox="0 0 160 120" aria-hidden="true"><rect class="k" x="24" y="22" width="112" height="62" rx="8"/><circle class="kd" cx="42" cy="40" r="5"/><path class="kd" d="M56 40h54"/><circle class="kd" cx="42" cy="58" r="5"/><path class="kd" d="M56 58h38"/><circle class="kz" cx="42" cy="76" r="5"/><path class="kz" d="M56 76h46"/><circle class="ka" cx="118" cy="96" r="11"/><path class="ka" d="M110 104 126 88"/></svg><figcaption>no streams</figcaption></figure>
+        <figure class="arttile" style="margin:0"><svg viewBox="0 0 160 120" aria-hidden="true"><path class="k" d="M14 88h20"/><path class="k" d="M34 88V64"/><rect class="ka" x="26" y="44" width="20" height="24" rx="6"/><path class="ka" d="M46 52h16M46 60h16"/><rect class="kz" x="82" y="40" width="34" height="32" rx="6"/><path class="kz" d="M94 50v12M106 50v12"/><circle class="kdot" cx="60" cy="90" r="6"/><circle class="kdot" cx="78" cy="96" r="4"/><circle class="kdot" cx="94" cy="88" r="3"/></svg><figcaption>detached</figcaption></figure>
+      </div>
+      <p class="b-note">Each piece ships one <code style="font-family:var(--mono)">.svg</code> file, not two: the standalone files carry a
+        <code style="font-family:var(--mono)">&lt;style&gt;</code> whose rules read
+        <code style="font-family:var(--mono)">var(--accent-ink, #1765CC)</code> — resolved from the cascade when inlined in the app, and falling
+        back to the light hex when opened alone. Zero art duplication, zero theme branches.</p>
+    </div>
+  </div>
+
+  <div class="b-h">What this replaces, and what is still a claim I have not earned</div>
+  <div class="pair">
+    <div class="pane sucr-theme-light" style="background:var(--bg)">
+      <h4>Five fixes, all measured</h4>
+      <ol style="font-size:13px;color:var(--text-2);padding-left:18px;margin:0;line-height:1.6">
+        <li><b>--text-3</b> was 3.31–3.68 (light) and 3.33–4.19 (dark) while carrying row metadata → now 4.72 / 4.74 on the deepest surface.</li>
+        <li><b>--warning #F9AB00</b> measured 1.93 and the plan printed it as text → split into <code style="font-family:var(--mono)">--warning</code> ink #B63A0A and <code style="font-family:var(--mono)">--warning-fill</code> #F9AB00.</li>
+        <li><b>Four of eight network hues</b> fell under 3.0 on <code style="font-family:var(--mono)">--surface-2</code> (lime 2.25, teal 2.76, amber 2.79, cyan 3.15) → all eight re-picked, all now 3.06–4.92.</li>
+        <li><b>Status ink on its own tint</b> — success 4.42, danger 4.05 — is exactly where a badge prints → an <code style="font-family:var(--mono)">-ink</code> token per status, 5.45–6.66 on tint.</li>
+        <li><b>Map-state adjacency</b> is 1.04–1.49 between states, unfixable by hue → shape/pattern is now part of the spec, not an accessibility add-on.</li>
+      </ol>
+    </div>
+    <div class="pane sucr-theme-dark" style="background:var(--bg)">
+      <h4>Not yet earned</h4>
+      <ul style="font-size:13px;color:var(--text-2);padding-left:18px;margin:0;line-height:1.6">
+        <li><b>Font availability.</b> Inter and Roboto Mono are declared, not vendored. On a machine without them this board renders in
+          Segoe UI and Consolas — the ladder is right, the colour of the type is not yet proven. Subsetting and shipping both is a build task
+          with a real KB cost nobody has measured.</li>
+        <li><b>No screenshot of the real app exists.</b> Every ratio here is arithmetic on hex pairs. Perceived contrast on a 75 Hz panel at
+          night, and hairline <code style="font-family:var(--mono)">0.5px</code> rendering on a 1× display at fractional Windows scale, are still
+          unverified. What <i>is</i> measured: on this machine at <code style="font-family:var(--mono)">dpr 1</code> a declared
+          <code style="font-family:var(--mono)">0.5px</code> border reports a used value of <b>1px</b>, so the house hairline is a
+          <i>2×-and-up</i> feature and the app must not encode a state as a 0.5px/1px difference. Fractional Windows scale (125 %, 150 %) is
+          still untested and could round the other way, to zero.</li>
+        <li><b>Colour-blind simulation has not been run.</b> The shape rule makes protan/deutan failure unlikely rather than impossible; the
+        hedge hatch at 5px and the 13px cells are the two places a simulation would most plausibly disagree with this page.</li>
+        <li><b>Provenance.</b> Ratios computed locally with WCAG 2.1 relative luminance; the gate thresholds are the WCAG numbers, not a
+        Sucr invention. No claim on this board is from a run of Plexo or XDM.</li>
+      </ul>
+      <p class="b-note">Single source of truth is <code style="font-family:var(--mono)">design/tokens.css</code>. This board copies it so the
+        file renders standalone; if the two ever disagree, the token file wins and this page is stale.</p>
+    </div>
+  </div>
+</div>

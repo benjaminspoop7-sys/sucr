@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sucr</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ui.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2 2 2 0 1 1-4 0 1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3 15a2 2 0 1 1 0-4 1.7 1.7 0 0 0 1.2-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 3a2 2 0 1 1 4 0 1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 21 11a2 2 0 1 1 0 4 1.7 1.7 0 0 0-1.6 0z"/>
+  </symbol>
+</svg>
+
+<main class="popup" id="popup">
+  <div class="pop-head">
+    <span class="pop-brand"><img src="icons/icon32.png" alt="" width="20" height="20">Sucr</span>
+    <span class="state-chip" id="chip">Connected</span>
+    <button class="icon-btn" type="button" id="gearBtn" title="How new downloads are handled" aria-label="Settings">
+      <svg width="16" height="16" aria-hidden="true"><use href="#i-gear"/></svg>
+    </button>
+  </div>
+
+  <div class="mode-row" id="modeRow" hidden>
+    <span class="mode-label">New downloads</span>
+    <button class="btn btn-quiet btn-sm" type="button" data-mode="take" aria-pressed="true">Take</button>
+    <button class="btn btn-quiet btn-sm" type="button" data-mode="adopt" aria-pressed="false">Adopt</button>
+    <button class="btn btn-quiet btn-sm" type="button" data-mode="import" aria-pressed="false">Import</button>
+  </div>
+
+  <div id="pageBlock" hidden>
+    <div class="page-line">
+      <span class="page-host" id="host">this page</span>
+      <span class="page-title" id="title"></span>
+    </div>
+    <label class="site-row" id="siteRow">
+      <span class="mode-label">Capture on this site</span>
+      <input type="checkbox" id="siteToggle" checked>
+    </label>
+  </div>
+
+  <section data-when="connected waking">
+    <div class="pop-foot">
+      <span class="foot-note" id="footNote">Looking for files</span>
+      <button class="btn btn-ghost btn-sm" type="button" id="openBtn" hidden>Open Sucr</button>
+    </div>
+  </section>
+
+  <section class="state" data-when="unregistered" hidden>
+    <h2>Sucr isn't registered here yet</h2>
+    <p>Registering writes one key under your account, so the browser can hand files over. No admin prompt.</p>
+    <div class="state-actions">
+      <button class="btn btn-primary btn-sm" type="button" id="registerBtn">Register this browser</button>
+    </div>
+  </section>
+
+  <section class="empty" data-when="empty" hidden>
+    <strong>Capture lives on the page</strong>
+    <span>Play a video and Sucr's download button appears over it.</span>
+  </section>
+</main>
+
+<script src="popup.js"></script>
+</body>
+</html>

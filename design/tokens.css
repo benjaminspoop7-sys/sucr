@@ -1,0 +1,331 @@
+/* ============================================================================
+   Sucr — design tokens, v2 (2026-10-31)
+   Every ratio in the comments is computed, not asserted: WCAG 2.1 relative
+   luminance, foreground against the surface named after the slash.
+   Gates used here:
+     body text            >= 4.5:1
+     20px+ / 14px bold    >= 3.0:1
+     meaningful non-text  >= 3.0:1 against its own surface
+     adjacent fills       >= 1.5:1, and never hue-only (see §4.5 map pattern rule)
+   Three surfaces per theme (bg / surface-1 / surface-2). Text is measured
+   against surface-2 because that is the deepest chip a label can land on.
+   ==========================================================================*/
+
+:root,
+.sucr-theme-light {
+  color-scheme: light;
+
+  /* --- surfaces ------------------------------------------------------- */
+  --bg:            #FFFFFF;
+  --surface-1:     #F8F9FA;
+  --surface-2:     #F1F3F4;
+
+  /* --- text ---------------------------------------------------------- */
+  --text:          #202124;  /* 16.10 / 15.27 / 14.46 */
+  --text-2:        #5F6368;  /*  6.05 /  5.74 /  5.44 */
+  --text-3:        #666D73;  /*  5.25 /  4.98 /  4.72 */  /* v1 was #80868B = 3.68 / 3.49 / 3.31 → failed AA, used for row meta */
+
+  /* --- lines --------------------------------------------------------- */
+  --border:        #DADCE0;  /* 1.37 on bg — dividers only, never a meaning carrier */
+  --border-2:      #E8EAED;  /* 1.21 on bg — internal cell rules */
+  --border-strong: #B4B9BE;  /* 1.98 on bg, 1.88 on surface-1 — control edges that must be findable */
+  --hairline:      0.5px;    /* house style: dividers and cell edges */
+
+  /* --- brand + interactive ------------------------------------------- */
+  --accent:         #1A73E8; /* 4.51 on bg — fills, focus, selected */
+  --accent-ink:     #1765CC; /* 5.57 / 5.28 / 5.00 on the three surfaces, 4.86 on --accent-tint */
+  --accent-hover:   #1765CC;
+  --accent-press:   #1357B4; /* 6.89 on bg */
+  --accent-text:    #FFFFFF; /* 4.51 on --accent */
+  --accent-tint:    #E8F0FE; /* selected row / chip fill, 1.15 adjacency on bg */
+  --selection:      #E8F0FE;
+  --hover:          #F1F3F4;
+
+  /* --- semantic status -----------------------------------------------
+     The base hue passes on the surfaces but NOT on its own tint
+     (success 4.42, danger 4.05), which is exactly where a badge prints.
+     So an ink token exists per status and badges must use it. */
+  --success:       #188038; /* 5.02 on bg */
+  --success-ink:   #146C2E; /* 5.75 on --success-tint */
+  --success-tint:  #E6F4EA;
+  --warning:       #B63A0A; /* 5.84 on bg — the INK. v1 shipped #F9AB00 = 1.93 → unusable as text */
+  --warning-fill:  #F9AB00; /* the same hue as a FILL/badge body only, never as ink */
+  --warning-ink:   #B63A0A; /* 5.45 on --warning-tint */
+  --warning-tint:  #FEF7E0;
+  --danger:        #D93025; /* 4.77 on bg */
+  --danger-ink:    #A31515; /* 6.66 on --danger-tint, 7.85 on bg */
+  --danger-tint:   #FCE8E6;
+  --info:          #1A67D2; /* 5.36 on bg */
+  --info-ink:      #1A67D2; /* 4.68 on --info-tint */
+  --info-tint:     #E8F0FE;
+
+  /* --- network palette: FILL values (dots, bars, map cells) -----------
+     All >= 3.0 on the deepest light surface. v1's teal/amber/lime/cyan
+     (2.76 / 2.79 / 2.25 / 3.15) failed there — lime by a fifth.
+     Hue is never the ink colour for a network name: names print in
+     --text-2 next to the dot (§4.5), so no 4.5 gate applies to these. */
+  --net-teal:    #0E8D7F; /* 3.67 on surface-2 */
+  --net-blue:    #1A73E8; /* 4.05 */
+  --net-violet:  #6A52E8; /* 4.73 */
+  --net-magenta: #C81A70; /* 4.92 */
+  --net-amber:   #D26A00; /* 3.25 */
+  --net-lime:    #5C9B28; /* 3.06 */
+  --net-cyan:    #008A99; /* 3.70 */
+  --net-coral:   #E0342A; /* 4.02 */
+
+  /* Network attribution aliases for engine IPC bindings. Six stripes for six
+     adapters; both values clear the >= 3.0 fill gate above (3.06 / 3.70). */
+  --n1: var(--net-teal);
+  --n2: var(--net-blue);
+  --n3: var(--net-amber);
+  --n4: var(--net-violet);
+  --n5: var(--net-lime);
+  --n6: var(--net-cyan);
+
+  /* --- file-type category dots (fixed, 8, distinct from network use) -- */
+  --cat-video:      var(--net-blue);
+  --cat-audio:      var(--net-violet);
+  --cat-archive:    var(--net-teal);
+  --cat-document:   var(--net-magenta);
+  --cat-image:      var(--net-amber);
+  --cat-program:    var(--net-lime);
+  --cat-torrent:    var(--net-cyan);
+  --cat-misc:       #5F6368; /* 5.44 */
+
+  /* --- progress + sucker map ----------------------------------------- */
+  --track:        #E8EAED;
+  --block-pending: transparent;                 /* outlined, not filled */
+  --block-claimed: #C2DBFF;                     /* 1.17 vs track → needs the dashed edge */
+  --block-active:  var(--accent);
+  --block-hedge:   var(--net-violet);
+  --block-done:    var(--success);
+  --block-stalled: var(--warning-fill);
+  --block-failed:  var(--danger);
+  --bar-fill:     var(--accent);
+  --bar-done:     #A5C8ED;
+
+  /* --- data type ----------------------------------------------------- */
+  --mono: "Roboto Mono", ui-monospace, Consolas, monospace;
+  --sans: "Inter", "Segoe UI", system-ui, sans-serif;
+}
+
+.sucr-theme-dark {
+  color-scheme: dark;
+
+  --bg:            #1B1D1F;
+  --surface-1:     #252729;
+  --surface-2:     #2D2F31;
+
+  --text:          #E8EAED; /* 14.03 / 12.44 / 11.15 */
+  --text-2:        #A8ADB2; /*  7.48 /  6.63 /  5.94 */
+  --text-3:        #959AA0; /*  5.96 /  5.29 /  4.74 */  /* v1 #7A7F85 = 4.19 / 3.71 / 3.33 → failed AA */
+
+  --border:        #3C4043; /* 1.62 on bg */
+  --border-2:      #303133;
+  --border-strong: #5F6368; /* 2.79 on bg, 2.48 on surface-1 */
+  --hairline:      0.5px;
+
+  --accent:         #8AB4F8;
+  --accent-ink:     #A6C8FF; /* 9.92 on bg, 7.37 on --accent-tint */
+  --accent-hover:   #A6C8FF;
+  --accent-press:   #C2DBFF; /* 11.97 on bg */
+  --accent-text:    #0B1A33; /* 8.24 on --accent */
+  --accent-tint:    #26344A; /* 1.35 adjacency on bg */
+  --selection:      #26344A;
+  --hover:          #2D2F31;
+
+  --success:       #81C995; /*  8.63 on bg */
+  --success-ink:   #81C995; /*  7.09 on --success-tint */
+  --success-tint:  #10331C;
+  --warning:       #FDD663; /* 12.06 on bg */
+  --warning-fill:  #B8860B;
+  --warning-ink:   #FDD663; /* 10.28 on --warning-tint */
+  --warning-tint:  #302A01;
+  --danger:        #F28B82; /*  7.08 on bg */
+  --danger-ink:    #F28B82; /*  6.25 on --danger-tint */
+  --danger-tint:   #3C1F1E;
+  --info:          #8AB4F8;
+  --info-tint:     #26344A;
+
+  /* dark fills clear 3.0 on the deepest dark surface by a wide margin —
+     measured: 4.72 lowest (magenta on surface-2), so no compensating
+     lightness shift is needed here unlike light mode */
+  --net-teal:    #4CC2B4; /* 6.20 on surface-2 */
+  --net-blue:    #8AB4F8; /* 6.38 */
+  --net-violet:  #B6A2FF; /* 6.14 */
+  --net-magenta: #F06BA8; /* 4.72 */
+  --net-amber:   #F0955A; /* 5.86 */
+  --net-lime:    #A5D66F; /* 7.97 */
+  --net-cyan:    #4DD0E1; /* 7.31 */
+  --net-coral:   #F28B82; /* 5.63 */
+
+  /* Network attribution aliases for engine IPC bindings */
+  --n1: var(--net-teal);
+  --n2: var(--net-blue);
+  --n3: var(--net-amber);
+  --n4: var(--net-violet);
+  --n5: var(--net-lime);
+  --n6: var(--net-cyan);
+
+  --cat-misc:      #9AA0A6;
+
+  --track:        #3C4043;
+  --block-pending: transparent;
+  --block-claimed: #2C4A78; /* 1.18 vs track → dashed edge required */
+  --block-active:  var(--accent);
+  --block-hedge:   var(--net-violet);
+  --block-done:    var(--success);
+  /* stalled deliberately reuses the FILL hue rather than an ink hue: measured
+     against the other five states #B8860B separates at 1.36–1.66, while
+     --net-amber #F0955A sits at 1.04–1.17. Neither clears 1.5, which is why
+     the heavy 1.5px edge below is not optional. */
+  --block-stalled: var(--warning-fill);
+  --block-failed:  var(--danger);
+  --bar-fill:     var(--accent);
+  --bar-done:     #4A6FA5;
+
+  --e-1: 0 0 0 1px #3C4043;   /* level 1 on dark = the lighter hairline */
+  --e-2: 0 0 0 1px #5F6368;   /* level 2 on dark = the strong hairline */
+}
+
+/* --- motion: six durations, five curves (plan §6.2) -----------------------
+   These are the base values the reduced-motion query below zeroes out. They
+   were defined only inside the mockup's scoped block until M0; the app reads
+   them from here, so they belong here. */
+:root {
+  --dur-1: 80ms;   /* state tint */
+  --dur-2: 120ms;  /* hover, tab switch */
+  --dur-3: 180ms;  /* chips, map cell */
+  --dur-4: 220ms;  /* entrance, overlay */
+  --dur-5: 260ms;  /* bar width, sheet */
+  --dur-6: 400ms;  /* large-surface transition */
+
+  --e-std:  cubic-bezier(.2, 0, 0, 1);    /* standard, symmetric in/out */
+  --e-dec:  cubic-bezier(.05, .7, .1, 1); /* decelerate: arriving motion */
+  --e-acc:  cubic-bezier(.3, 0, .8, .15); /* accelerate: leaving motion */
+  /* Not on the trio above: --e-back passes its target and settles (a control
+     the finger just moved), --e-out-quint leaves instantly and spends the rest
+     arriving (an element entering a place the eye already expects). */
+  --e-back:      cubic-bezier(.34, 1.56, .64, 1);
+  --e-out-quint: cubic-bezier(.16, 1, .3, 1);
+
+  /* The compact rail, timed the way Zen browser's compact sidebar is timed: it
+     leaves on 150ms ease, arrives on 250ms on a curve that overshoots its own
+     edge by ~1% (2px of a 186px travel) and settles. --e-rail-in is Zen's
+     101-stop linear() table sampled every 10% -- same shape, 11 stops. */
+  --dur-rail-out: 150ms;
+  --dur-rail-in:  250ms;
+  --e-rail-in: linear(0 0%, .189 10%, .497 20%, .743 30%, .895 40%, .971 50%,
+                      1.002 60%, 1.011 70%, 1.009 80%, 1.006 90%, 1.003 100%);
+  /* The hold on the way OUT, not a wait on the way in: Zen keeps the sidebar up
+     for 150ms after the pointer leaves (pref
+     zen.view.compact.sidebar-keep-hover.duration) while its entrance delay
+     (zen.view.compact.hover-hack-delay) is 0. A trip across the window then
+     does not close the panel mid-flight, and the reveal still answers at once. */
+  --dur-rail-hold: 150ms;
+
+  /* Rail widths, both from Zen: 186px is its default sidebar on Windows and
+     Linux (kDefaultSidebarWidth), 9px is what its compact mode leaves inside
+     the window (--zen-element-separation 8px + 1px). 60px is Zen's collapsed
+     icon rail: 48px tab + 6px padding either side. */
+  --rail-open: 186px;
+  --rail-strip: 9px;
+  --rail-icons: 60px;
+}
+
+/* --- space, radius, elevation, type ---------------------------------------*/
+:root {
+  --s-1: 4px;   --s-2: 8px;   --s-3: 12px;  --s-4: 16px;
+  --s-5: 20px;  --s-6: 24px;  --s-7: 32px;  --s-8: 40px;  --s-9: 56px;
+
+  --r-control: 6px;
+  --r-card:    8px;
+  --r-sheet:   12px;
+  --r-window:  16px;
+  --r-pill:         999px;
+  --r-round:   999px;
+
+  /* three levels and no more. Shadows are invisible on a dark surface, so the
+     dark theme REDEFINES these two with a 1px lighter border — one variable
+     per level, and a component never has to know which theme it is in. */
+  --e-0: none;
+  --e-1: 0 1px 2px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06);
+  --e-2: 0 8px 24px rgba(0,0,0,.16);
+
+  --f-11: 11px; --f-12: 12px; --f-13: 13px; --f-14: 14px;
+  --f-16: 16px; --f-20: 20px; --f-28: 28px; --f-40: 40px;
+  --lh-body: 1.4; --lh-display: 1.2;
+
+  --row-comfortable: 68px;
+  --row-compact:     44px;
+}
+
+/* --- wavy progress: M3 Expressive's parameter model, Sucr's numbers --------
+   A 4px stroked path, not a fill. Amplitude is a fraction of the container,
+   wavelength is a length, and the phase advances one wavelength per second.
+   M3 collapses amplitude to 0 at progress <= 10% and >= 95% (AOSP
+   LinearWavyProgressIndicator) — that is a state signal, so it is kept.
+   The wave means "alive", so it is drawn on aggregates only: never on a map
+   cell, whose shape already carries which network owns each block.
+   Stroke measures 4.51 / 8.02 on bg and 3.74 / 4.97 on --track. */
+:root {
+  --wave-h:            18px;
+  --wave-stroke:       4px;
+  --wave-amp:          3px;     /* 6px peak-to-peak in an 18px strip */
+  --wave-len:          20px;    /* twelve periods at 240px */
+  --wave-travel:       1s;      /* one wavelength per second */
+  --wave-indeterminate: 1.7s;   /* one traverse of the 35% segment */
+  --wave-ring-amp:     1.6px;   /* six periods around r 29 (72px ring) */
+}
+
+/* --- preference overrides, one media query each --------------------------- */
+@media (prefers-contrast: more) {
+  :root { --hairline: 1px; --border: #5F6368; --text-3: var(--text-2); }
+  .sucr-theme-dark { --border: #9AA0A6; --text-3: var(--text-2); }
+}
+
+/* Reduced motion is a behaviour contract, not a token — see plan §6.5.
+   Kept as a token so a component can test it in CSS without JS.
+   Two triggers, mirroring app.css: prefers-reduced-motion is the default and
+   covers the window before the renderer sets anything; html[data-motion] is
+   Sucr's own ui.motion resolved, and it outranks the OS. Zeroing the durations
+   here is the other half of the override — app.css alone would leave every
+   transition that reads --dur-* at 0ms whatever the switch says. */
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion]) { --dur-1: 0ms; --dur-2: 0ms; --dur-3: 0ms; --dur-4: 0ms; --dur-5: 0ms; --dur-6: 0ms;
+          --wave-travel: 0s; --wave-indeterminate: 0s; }
+}
+
+html[data-motion="reduced"] { --dur-1: 0ms; --dur-2: 0ms; --dur-3: 0ms; --dur-4: 0ms; --dur-5: 0ms; --dur-6: 0ms;
+        --wave-travel: 0s; --wave-indeterminate: 0s; }
+
+/* The map draws every state twice: colour and shape.
+   pattern fallback, required — not a courtesy for colour-blind users, a
+   correctness rule, because the seven states measure 1.04–1.49 against each
+   other in the two themes and luminance alone cannot separate them. */
+.sucr-block[data-state="claimed"]  { border-style: dashed; }
+.sucr-block[data-state="stalled"]  { box-shadow: inset 0 -2px 0 currentColor; }  /* not border-width: Chrome snaps a 1.5px border to 1px used value at dpr 1 */
+.sucr-block[data-state="hedge"]    { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='5' height='5'%3E%3Cpath d='M-1 1 l2-2 M0 5 L5 0 M4 6 l2-2' stroke='%23fff' stroke-width='1.2'/%3E%3C/svg%3E"); background-size: 5px 5px; }
+.sucr-block[data-state="failed"]   { outline: 1px solid currentColor; outline-offset: -3px; }
+
+
+/* --- speed limiter & capped badge ------------------------------------------ */
+.badge-capped {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  letter-spacing: 0.02em;
+}
+.badge-capped .cap-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--warning-fill);
+}

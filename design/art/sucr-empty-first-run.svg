@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" role="img" aria-labelledby="t1 d1">
+  <title id="t1">No downloads yet</title>
+  <desc id="d1">A downward arrow entering an open tray, with three sucker dots alongside.</desc>
+  <style>
+    .ln{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .ac{fill:none;stroke:var(--accent-ink,#1765CC);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .do{fill:var(--accent-tint,#E8F0FE);stroke:var(--accent-ink,#1765CC);stroke-width:1.5}
+  </style>
+  <!-- tray: open top, hairline-weight body -->
+  <path class="ln" d="M42 82v8a10 10 0 0 0 10 10h56a10 10 0 0 0 10-10v-8"/>
+  <path class="ln" d="M42 82h20l6 8h24l6-8h20"/>
+  <!-- the one accented element: the descending arrow -->
+  <path class="ac" d="M80 18v38"/>
+  <path class="ac" d="M67 46 80 60l13-14"/>
+  <!-- sucker vocabulary: three tapered dots, largest nearest the mark -->
+  <circle class="do" cx="52" cy="30" r="7"/>
+  <circle class="do" cx="108" cy="26" r="5"/>
+  <circle class="do" cx="118" cy="44" r="3.5"/>
+</svg>

@@ -1,0 +1,289 @@
+<title>Sucr — squiggle progress</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;padding:28px 22px 64px;background:#0E0F10;font-family:-apple-system,"Segoe UI",Roboto,Inter,sans-serif;
+       -webkit-font-smoothing:antialiased}
+  .doc{max-width:1180px;margin:0 auto;color:#B9BEC4;font-size:13px;line-height:1.5}
+  .doc h1{font-size:19px;font-weight:600;color:#EDEFF1;margin:0 0 6px;letter-spacing:-.2px}
+  .doc .sub{color:#8B9197;max-width:860px;margin:0 0 22px}
+  .doc h2{font-size:14px;font-weight:600;color:#EDEFF1;margin:34px 0 6px}
+  .doc h2 span{font-weight:400;color:#83898F;font-size:12px}
+  .doc p{margin:0 0 10px;max-width:880px}
+  .mono{font-family:"Cascadia Mono","Roboto Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+  code{font-family:"Cascadia Mono",Consolas,monospace;font-size:11.5px;color:#C9CED3}
+  .pane code{color:inherit;font-size:inherit}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0 6px}
+  @media (max-width:940px){.pair{grid-template-columns:1fr}}
+
+  .pane{border-radius:12px;overflow:hidden}
+  .t-light{--bg:#FFFFFF;--s1:#F8F9FA;--s2:#F1F3F4;--text:#202124;--text2:#5F6368;--t3:#666D73;
+    --border:#DADCE0;--bstrong:#B4B9BE;--track:#E8EAED;--accent:#1A73E8;--ink:#1765CC;--tint:#E8F0FE;
+    --n1:#0E8D7F;--n2:#1A73E8;--n3:#D26A00;--n4:#6A52E8;
+    background:var(--bg);color:var(--text);border:1px solid #DADCE0}
+  .t-dark{--bg:#1B1D1F;--s1:#252729;--s2:#2D2F31;--text:#E8EAED;--text2:#A8ADB2;--t3:#959AA0;
+    --border:#3C4043;--bstrong:#5F6368;--track:#3C4043;--accent:#8AB4F8;--ink:#A6C8FF;--tint:#26344A;
+    --n1:#4CC2B4;--n2:#8AB4F8;--n3:#F0955A;--n4:#B6A2FF;
+    background:var(--bg);color:var(--text);border:1px solid #3C4043}
+
+  .ttl{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);
+       font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;font-weight:600;color:var(--text2)}
+  .ttl .k{margin-left:auto;letter-spacing:0;text-transform:none;font-weight:400;font-size:11px;color:var(--t3)}
+  .body{padding:14px 12px}
+
+  /* the indicator: a stroked wave, no fill, no gradient */
+  .wv{display:block;position:relative;height:18px;width:100%}
+  .wv svg{display:block;overflow:visible}
+  .item{display:flex;align-items:center;gap:12px;margin:0 0 13px}
+  .item:last-child{margin-bottom:0}
+  .item .lab{flex:none;width:64px;font-size:11px;color:var(--text2);font-variant-numeric:tabular-nums}
+  .item .grow{flex:1;min-width:0}
+  .item .val{flex:none;width:52px;text-align:right;font-size:11px;color:var(--text2);font-variant-numeric:tabular-nums}
+  .cap{font-size:10.5px;color:var(--text2);margin:8px 0 0}
+
+  /* applied: inspector strip */
+  .insp{display:flex;gap:16px;align-items:flex-start}
+  .insp .l{flex:1;min-width:0}
+  .pct{font-size:21px;font-weight:500;letter-spacing:-.3px}
+  .of{font-size:11.5px;color:var(--text2);margin-left:6px}
+  .sub2{font-size:11px;color:var(--text2);margin:2px 0 0}
+  .segbar{display:flex;gap:2px;height:8px;margin-top:10px;max-width:238px}
+  .segbar i{flex:1 1 0;min-width:8px;border-radius:1px;background:var(--track)}
+  .segbar .d1{background:var(--n1)}.segbar .d2{background:var(--n2)}.segbar .d3{background:var(--n3)}
+  .segbar .p1{background:linear-gradient(90deg,var(--n1) 0 62.5%,var(--track) 62.5% 100%)}
+  .segbar .hg{background:linear-gradient(90deg,var(--n1) 0 37.5%,var(--track) 37.5% 50%,var(--n2) 50% 75%,var(--track) 75% 100%)}
+
+  .rej{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media (max-width:940px){.rej{grid-template-columns:1fr}}
+  .rc{background:#17191B;border:1px solid #2B2E31;border-radius:10px;padding:12px;color:#B9BEC4;font-size:12px}
+  .rc b{display:block;color:#EDEFF1;font-size:12.5px;font-weight:600;margin-bottom:6px}
+  .doc table{border-collapse:collapse;font-family:"Cascadia Mono",Consolas,monospace;font-size:11.5px;margin-top:8px}
+  .doc th,.doc td{text-align:left;padding:5px 14px 5px 0;color:#9AA0A6;border-bottom:1px solid #232629;font-weight:400}
+  .doc th{color:#7E858B;font-size:10.5px;letter-spacing:.5px;text-transform:uppercase}
+  .doc td b{color:#DDE1E5;font-weight:500}
+</style>
+
+<div class="doc">
+  <h1>Squiggle progress — Material 3 Expressive, on Sucr's surfaces</h1>
+  <p class="sub">M3 Expressive's wavy indicator is a <b>stroked path</b>, not a filled bar: amplitude is exposed as a fraction of height,
+  the wave is parameterised by wavelength, and it travels one wavelength per second by default. Two behaviours matter more than the shape:
+  the amplitude collapses to zero at <b>≤ 10 %</b> and <b>≥ 95 %</b> (Compose source), and the track is drawn with the same wave as the fill.
+  Adopted with Sucr's numbers; refused wherever a wave would claim data it does not have.</p>
+
+  <h2>1 — The rule <span>one element may move on its own; it is the only one that encodes nothing but time</span></h2>
+  <p>The wave says <i>alive</i>. It is therefore only allowed on aggregates — the things you watch — and never on the map, whose cells encode
+  which block has which network's bytes. Length still encodes exactly the percentage, so the wave argues with nothing. The amplitude flattening at the
+  ends is not a decoration: a download at 8 % and one at 97 % are both about to change state, and the indicator settles before it does.
+  Our defaults: <b>3 px amplitude at 18 px height, 20 px wavelength, 4 px stroke, one wavelength per second</b>. At 240 px wide the bar holds twelve periods.</p>
+
+  <h2>2 — Linear, at the ends and in the middle <span>8 % and 97 % are flat by design, not by defect</span></h2>
+  <div class="pair">
+    <div class="pane t-light">
+      <div class="ttl">Light <span class="k">track static · fill travels</span></div>
+      <div class="body" id="linL">
+        <div class="item"><span class="lab mono">8 %</span><span class="grow"><span class="wv" data-p="0.08"></span></span><span class="val mono">flat</span></div>
+        <div class="item"><span class="lab mono">52 %</span><span class="grow"><span class="wv" data-p="0.52"></span></span><span class="val mono">wavy</span></div>
+        <div class="item"><span class="lab mono">97 %</span><span class="grow"><span class="wv" data-p="0.97"></span></span><span class="val mono">flat</span></div>
+      </div>
+    </div>
+    <div class="pane t-dark">
+      <div class="ttl">Dark <span class="k">same three states</span></div>
+      <div class="body" id="linD">
+        <div class="item"><span class="lab mono">8 %</span><span class="grow"><span class="wv" data-p="0.08"></span></span><span class="val mono">flat</span></div>
+        <div class="item"><span class="lab mono">52 %</span><span class="grow"><span class="wv" data-p="0.52"></span></span><span class="val mono">wavy</span></div>
+        <div class="item"><span class="lab mono">97 %</span><span class="grow"><span class="wv" data-p="0.97"></span></span><span class="val mono">flat</span></div>
+      </div>
+    </div>
+  </div>
+  <p class="cap">The <code>flat</code> rows keep the same 4 px stroke and round caps, so the change is amplitude only — nothing jumps sideways when a
+  download leaves 10 % or passes 95 %.</p>
+
+  <h2>3 — Indeterminate <span>probing, resolving, waiting for a token — the one state with no number</span></h2>
+  <div class="pair">
+    <div class="pane t-light">
+      <div class="ttl">Light <span class="k">35 % segment · 1.7 s traverse</span></div>
+      <div class="body">
+        <div class="item"><span class="lab">Probing</span><span class="grow"><span class="wv ind" data-p="0"></span></span><span class="val"></span></div>
+      </div>
+    </div>
+    <div class="pane t-dark">
+      <div class="ttl">Dark <span class="k">the wave is the only motion</span></div>
+      <div class="body">
+        <div class="item"><span class="lab">Probing</span><span class="grow"><span class="wv ind" data-p="0"></span></span><span class="val"></span></div>
+      </div>
+    </div>
+  </div>
+  <p class="cap">No percentage is printed next to it, because there is none to print. That is also why this is the only place a wave is allowed to move
+  without a number attached. Under <code>prefers-reduced-motion</code> the segment parks at the centre and the wave holds still — the segment is shown
+  parked here, because this browser reports the preference.</p>
+
+  <h2>4 — Circular <span>the watched ring; six periods at 72 px, not nine</span></h2>
+  <div class="pair">
+    <div class="pane t-light">
+      <div class="ttl">Light <span class="k">r 29 · 4 px stroke · 1.6 px amplitude</span></div>
+      <div class="body" style="display:flex;gap:26px;align-items:center;justify-content:center;padding:18px 12px">
+        <div style="text-align:center">
+          <div class="ring" data-p="0.52" data-size="72"></div>
+          <div class="cap">wavy · 52 %</div>
+        </div>
+        <div style="text-align:center">
+          <div class="ring" data-p="0.52" data-size="72" data-amp="0"></div>
+          <div class="cap">flat · same length</div>
+        </div>
+      </div>
+    </div>
+    <div class="pane t-dark">
+      <div class="ttl">Dark <span class="k">the arc and the data agree</span></div>
+      <div class="body" style="display:flex;gap:26px;align-items:center;justify-content:center;padding:18px 12px">
+        <div style="text-align:center">
+          <div class="ring" data-p="0.52" data-size="72"></div>
+          <div class="cap">wavy · 52 %</div>
+        </div>
+        <div style="text-align:center">
+          <div class="ring" data-p="0.52" data-size="72" data-amp="0"></div>
+          <div class="cap">flat · same length</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p>A 72 px ring (r 29) has a 182 px circumference; at M3's ~20 dp wavelength that is nine periods, which reads as noise at this diameter. Six periods
+  (30 px of arc) keep the ripple legible and keep the arc's endpoints where the percentage says they are. The ring travels at the same one wavelength
+  per second; it is shown still here because this page is a specimen sheet, not the app.</p>
+
+  <h2>5 — In place <span>wavy aggregate above, rigid map below — two encodings, no overlap</span></h2>
+  <div class="pair">
+    <div class="pane t-light">
+      <div class="ttl">Light · inspector <span class="k">the number, the wave, the blocks</span></div>
+      <div class="body">
+        <div class="pct">52.4 %<span class="of mono">9.1 GB of 18.4 GB</span></div>
+        <div class="sub2 mono">14.2 MB/s · 11 min left</div>
+        <div class="wv" data-p="0.524" style="margin:10px 0 12px"></div>
+        <div class="segbar"><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d1"></i><i class="d1"></i><i class="d1"></i><i class="d3"></i><i class="d3"></i><i class="d3"></i><i class="p1"></i><i class="hg"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="cap">24-cell map sample · the wave above never replaces these cells</div>
+      </div>
+    </div>
+    <div class="pane t-dark">
+      <div class="ttl">Dark · inspector <span class="k">same pairing</span></div>
+      <div class="body">
+        <div class="pct">52.4 %<span class="of mono">9.1 GB of 18.4 GB</span></div>
+        <div class="sub2 mono">14.2 MB/s · 11 min left</div>
+        <div class="wv" data-p="0.524" style="margin:10px 0 12px"></div>
+        <div class="segbar"><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d1"></i><i class="d1"></i><i class="d1"></i><i class="d3"></i><i class="d3"></i><i class="d3"></i><i class="p1"></i><i class="hg"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="cap">24-cell map sample · the wave above never replaces these cells</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>6 — Measured <span>the wave is a non-text graphic: 3.0 against its surface</span></h2>
+  <table>
+    <tr><th>Pair</th><th>Light</th><th>Dark</th><th>Gate</th></tr>
+    <tr><td>wave stroke <b>--accent</b> / bg</td><td>4.51</td><td>8.02</td><td>3.0 ✓</td></tr>
+    <tr><td>wave stroke <b>--accent</b> / track</td><td>3.74</td><td>4.97</td><td>3.0 ✓</td></tr>
+    <tr><td>track / bg <span style="color:#7E858B">(not a data carrier)</span></td><td>1.21</td><td>1.62</td><td>—</td></tr>
+    <tr><td>percentage text <b>--text</b> / bg</td><td>16.10</td><td>14.03</td><td>4.5 ✓</td></tr>
+    <tr><td>sub-line <b>--text-2</b> / bg</td><td>6.05</td><td>7.48</td><td>4.5 ✓</td></tr>
+  </table>
+  <p class="sub" style="margin-top:14px">The track sits at 1.21 / 1.62 and is not gated: it delimits 100 % the way a slider's groove does, while the number
+  above the bar states the value in text. What is gated is the stroke that carries the value — 4.51 / 8.02 on the surface, 3.74 / 4.97 against the track
+  it runs inside. Measured in-browser on this render.</p>
+
+  <h2>7 — Not taken <span>three places the squiggle would lie</span></h2>
+  <div class="rej">
+    <div class="rc"><b>Wave on the map cells</b>
+      A cell means "this block, these networks, this share". At 8 px a 3 px amplitude eats most of the edge, and the hedge notch — the one shape that
+      separates two racing bands at 1.10 — would disappear into the ripple. The map stays rigid.</div>
+    <div class="rc"><b>Wave on the track</b>
+      If the empty part moves too, the ruler moves with the thing being measured. The track is a fixed reference; only the filled length travels.</div>
+    <div class="rc"><b>Wave plus shimmer plus gradient</b>
+      One moving element per surface. The wave already says "alive"; a shimmer on top of it says it twice, and the motion budget in §6.3 has no room
+      for two cues competing over the same pixels.</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var items = [], t0 = performance.now();
+  var STEP = 1.5;
+
+  function waveD(x0, x1, amp, y, lam, phase){
+    var d = '', first = true;
+    for (var x = x0; x <= x1; x += STEP){
+      var yy = y + amp * Math.sin((x / lam) * Math.PI * 2 + phase);
+      d += (first ? 'M' : 'L') + x.toFixed(1) + ' ' + yy.toFixed(2) + ' ';
+      first = false;
+    }
+    return d;
+  }
+
+  function build(el){
+    var w = Math.max(60, Math.round(el.clientWidth || 240));
+    var ind = el.classList.contains('ind');
+    var p = parseFloat(el.dataset.p || '0');
+    el.innerHTML = '<svg width="' + w + '" height="18" viewBox="0 0 ' + w + ' 18" aria-hidden="true">' +
+      '<path class="trk" fill="none" stroke="var(--track)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<path class="prg" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '</svg>';
+    var svg = el.firstChild;
+    items.push({ el:el, w:w, p:p, ind:ind, trk:svg.children[0], prg:svg.children[1] });
+  }
+
+  function ringD(cx, cy, R, amp, k, phase, a0, a1){
+    var steps = Math.max(48, Math.ceil(Math.abs(a1 - a0) / (Math.PI * 2) * 180));
+    var d = '';
+    for (var i = 0; i <= steps; i++){
+      var th = a0 + (a1 - a0) * i / steps;
+      var r = R + amp * Math.sin(k * th + phase);
+      var x = cx + r * Math.cos(th), y = cy + r * Math.sin(th);
+      d += (i ? 'L' : 'M') + x.toFixed(2) + ' ' + y.toFixed(2) + ' ';
+    }
+    return d;
+  }
+
+  function buildRing(el){
+    var s = +el.dataset.size || 72, p = parseFloat(el.dataset.p || '0');
+    var amp = el.dataset.amp !== undefined ? +el.dataset.amp : 1.6;
+    var cx = s / 2, cy = s / 2, R = s / 2 - 7, k = 6;
+    el.innerHTML = '<svg width="' + s + '" height="' + s + '" viewBox="0 0 ' + s + ' ' + s + '" aria-hidden="true">' +
+      '<path fill="none" stroke="var(--track)" stroke-width="4" stroke-linecap="round" d="' + ringD(cx, cy, R, amp, k, 0, -Math.PI/2, -Math.PI/2 + Math.PI*2) + '"/>' +
+      '<path fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" d="' + ringD(cx, cy, R, amp, k, 0, -Math.PI/2, -Math.PI/2 + Math.PI*2*p) + '"/>' +
+      '</svg>';
+  }
+
+  function draw(t){
+    var sec = reduced ? 0 : (t - t0) / 1000;
+    for (var i = 0; i < items.length; i++){
+      var o = items[i];
+      var amp = o.ind ? 3 : ((o.p <= 0.10 || o.p >= 0.95) ? 0 : 3);
+      o.trk.setAttribute('d', waveD(0, o.w, amp, 9, 20, 0));
+      if (o.ind){
+        var segW = o.w * 0.35;
+        var span = o.w + segW;
+        var x0 = reduced ? (o.w - segW) / 2 : ((sec / 1.7) % 1) * span - segW;
+        o.prg.setAttribute('d', waveD(x0, x0 + segW, 3, 9, 20, 0));
+        o.prg.style.opacity = 1;
+      } else {
+        o.prg.setAttribute('d', waveD(0, Math.max(2, o.w * o.p), amp, 9, 20, -sec * Math.PI * 2));
+      }
+    }
+  }
+
+  var nodes = document.querySelectorAll('.wv');
+  for (var i = 0; i < nodes.length; i++) build(nodes[i]);
+  var rn = document.querySelectorAll('.ring');
+  for (var j = 0; j < rn.length; j++) buildRing(rn[j]);
+
+  draw(performance.now());
+  if (!reduced) (function loop(t){ draw(t); requestAnimationFrame(loop); })(performance.now());
+
+  var rt;
+  addEventListener('resize', function(){
+    clearTimeout(rt);
+    rt = setTimeout(function(){
+      items = [];
+      var ns = document.querySelectorAll('.wv');
+      for (var i = 0; i < ns.length; i++) build(ns[i]);
+      draw(performance.now());
+    }, 120);
+  });
+})();
+</script>

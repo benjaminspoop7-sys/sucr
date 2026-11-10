@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" role="img" aria-labelledby="t3 d3">
+  <title id="t3">All done</title>
+  <desc id="d3">A ring containing the Sucr completion check — the same three-point polyline the row badge uses. Plain completion does not get this; checksum-verified completion does.</desc>
+  <style>
+    .ring{fill:none;stroke:var(--success-ink,#146C2E);stroke-width:2}
+    .chk{fill:none;stroke:var(--success-ink,#146C2E);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+    .do{fill:var(--success-tint,#E6F4EA);stroke:var(--success-ink,#146C2E);stroke-width:1.5}
+  </style>
+  <circle class="ring" cx="80" cy="58" r="30"/>
+  <!-- plan §4.4: this glyph is hand-drawn, not lucide, so it can animate draw-on -->
+  <path class="chk" d="M65 59 76 70 95 47"/>
+  <circle class="do" cx="38" cy="42" r="6"/>
+  <circle class="do" cx="122" cy="40" r="4"/>
+  <circle class="do" cx="126" cy="76" r="3"/>
+  <path class="do" d="M56 100h48" stroke-linecap="round"/>
+</svg>

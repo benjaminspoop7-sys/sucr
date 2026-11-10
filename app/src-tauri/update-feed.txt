@@ -1,0 +1,1 @@
+https://api.github.com/repos/benjaminspoop7-sys/sucr/releases/latest

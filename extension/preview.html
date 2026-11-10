@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sucr Capture — surfaces at real size</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ui.css">
+<style>
+  :root { --stage-light: #E9EDF2; --stage-dark: #101418; }
+  body { width: auto; padding: 32px; background: var(--surface-1); }
+  h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
+  p.lede { margin: 0 0 28px; color: var(--text-2); font-size: 13px; }
+  h2 { font-size: 13px; font-weight: 600; margin: 0 0 10px; color: var(--text-2); }
+  .strip { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 40px; }
+  .frame { display: grid; gap: 8px; justify-items: start; }
+  .frame > span { font-size: 12px; color: var(--text-3); }
+  iframe { border: var(--hairline) solid var(--border); border-radius: var(--r-card); background: var(--bg); display: block; }
+  .sheet { display: grid; gap: 24px; padding: 28px; border-radius: var(--r-sheet); background: var(--stage-light); }
+  .sheet.dark { background: var(--stage-dark); }
+  .sheet .panel, .sheet .panel-mini, .sheet .notice { box-shadow: var(--e-2); }
+  .notice { box-shadow: none; }
+  .mini-row { display: flex; gap: 16px; align-items: center; }
+</style>
+</head>
+<body>
+
+<h1>Sucr Capture</h1>
+<p class="lede">The popup at its real 360 px, the in-page panel, and the refusal notice. Light and dark, nothing scaled.</p>
+
+<div class="strip">
+  <div class="frame"><span>Popup, connected</span><iframe src="popup.html?state=connected&theme=light" width="360" height="310" title="Popup, connected"></iframe></div>
+  <div class="frame"><span>Popup, starting Sucr</span><iframe src="popup.html?state=waking&theme=light" width="360" height="310" title="Popup, starting Sucr"></iframe></div>
+  <div class="frame"><span>Popup, not registered</span><iframe src="popup.html?state=unregistered&theme=light" width="360" height="182" title="Popup, not registered"></iframe></div>
+  <div class="frame"><span>Popup, nothing to take</span><iframe src="popup.html?state=empty&theme=light" width="360" height="127" title="Popup, empty"></iframe></div>
+</div>
+
+<div class="strip">
+  <div class="frame"><span>Popup, connected, dark</span><iframe src="popup.html?state=connected&theme=dark" width="360" height="310" title="Popup, connected, dark"></iframe></div>
+  <div class="frame"><span>Popup, starting Sucr, dark</span><iframe src="popup.html?state=waking&theme=dark" width="360" height="310" title="Popup, starting Sucr, dark"></iframe></div>
+  <div class="frame"><span>Popup, not registered, dark</span><iframe src="popup.html?state=unregistered&theme=dark" width="360" height="182" title="Popup, not registered, dark"></iframe></div>
+  <div class="frame"><span>Popup, nothing to take, dark</span><iframe src="popup.html?state=empty&theme=dark" width="360" height="127" title="Popup, empty, dark"></iframe></div>
+</div>
+
+<div class="strip">
+  <div class="frame">
+    <span>In-page panel, light page</span>
+    <div class="sheet">
+      <div class="panel">
+        <div class="panel-head">
+          <svg class="glyph" aria-hidden="true"><use href="#i-video"/></svg>
+          <span class="row-text">
+            <span class="panel-name">lecture-04-1080p.mp4</span>
+            <span class="panel-meta">812 MB, media.example.com</span>
+          </span>
+          <button class="icon-btn" type="button" aria-label="Keep in the browser">
+            <svg width="14" height="14" aria-hidden="true"><use href="#i-close"/></svg>
+          </button>
+        </div>
+        <div class="panel-body">
+          <div class="chips">
+            <button class="chip" type="button" aria-pressed="true">1080p</button>
+            <button class="chip" type="button" aria-pressed="false">720p</button>
+            <button class="chip" type="button" aria-pressed="false">Audio</button>
+          </div>
+          <div class="panel-foot">
+            <div class="panel-actions">
+              <button class="btn btn-primary btn-sm" type="button">Take with Sucr</button>
+              <button class="btn btn-quiet btn-sm" type="button">Keep in browser</button>
+            </div>
+            <span class="panel-status">Sucr is ready.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-mini">
+        <svg class="glyph" aria-hidden="true"><use href="#i-file"/></svg>
+        <span class="row-text">
+          <span class="panel-name">slides-week-04.pdf</span>
+          <span class="panel-meta">3.4 MB</span>
+        </span>
+        <button class="btn btn-primary btn-sm" type="button">Take</button>
+        <button class="icon-btn" type="button" aria-label="Keep in the browser">
+          <svg width="14" height="14" aria-hidden="true"><use href="#i-close"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <span>In-page panel, dark page</span>
+    <div class="sheet dark sucr-theme-dark">
+      <div class="panel">
+        <div class="panel-head">
+          <svg class="glyph" aria-hidden="true"><use href="#i-video"/></svg>
+          <span class="row-text">
+            <span class="panel-name">lecture-04-1080p.mp4</span>
+            <span class="panel-meta">812 MB, media.example.com</span>
+          </span>
+          <button class="icon-btn" type="button" aria-label="Keep in the browser">
+            <svg width="14" height="14" aria-hidden="true"><use href="#i-close"/></svg>
+          </button>
+        </div>
+        <div class="panel-body">
+          <div class="chips">
+            <button class="chip" type="button" aria-pressed="true">1080p</button>
+            <button class="chip" type="button" aria-pressed="false">720p</button>
+            <button class="chip" type="button" aria-pressed="false">Audio</button>
+          </div>
+          <div class="panel-foot">
+            <div class="panel-actions">
+              <button class="btn btn-primary btn-sm" type="button">Take with Sucr</button>
+              <button class="btn btn-quiet btn-sm" type="button">Keep in browser</button>
+            </div>
+            <span class="panel-status">Sucr is ready.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-mini">
+        <svg class="glyph" aria-hidden="true"><use href="#i-file"/></svg>
+        <span class="row-text">
+          <span class="panel-name">slides-week-04.pdf</span>
+          <span class="panel-meta">3.4 MB</span>
+        </span>
+        <button class="btn btn-primary btn-sm" type="button">Take</button>
+        <button class="icon-btn" type="button" aria-label="Keep in the browser">
+          <svg width="14" height="14" aria-hidden="true"><use href="#i-close"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <span>Refusal notice</span>
+    <div class="notice">
+      <div class="notice-head">
+        <svg width="18" height="18" aria-hidden="true"><use href="#i-file"/></svg>
+        Kept in the browser
+      </div>
+      <p>The link is signed and expires in 12 seconds. A second copy would fail.</p>
+      <div class="notice-rule"></div>
+      <p class="notice-rule-line">Sucr cancels nothing until it has said yes.</p>
+    </div>
+  </div>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-video" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10.5l5-3v9l-5-3z"/>
+  </symbol>
+  <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>
+  </symbol>
+  <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+    <path d="M6 6l12 12M18 6L6 18"/>
+  </symbol>
+</svg>
+
+</body>
+</html>

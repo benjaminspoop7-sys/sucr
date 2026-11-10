@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sucr Capture: the add-on’s surfaces</title>
+<meta name="description" content="The Sucr browser add-on: a floating capture panel, a three-state popup, and a refusal you can read.">
+<style>
+/* Hallmark · v2.0.0 · theme: Sucr house system (by project) · genre: app screen · scope: component board · hero: Stage, copy left · surface: absolute */
+/* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V3 · weakest: V, a board of surfaces is a common shape; made the Take button the only moving part */
+/* Hallmark · waive 1 · the Sucr app ships Inter · the add-on panel must read as the app it talks to */
+/* Hallmark · waive 84 · the add-on does not exist yet · this board is its design, not a screenshot */
+/* Hallmark · waive 22 · these greys are the Sucr app's measured palette · the panel must read as the app */
+/* Hallmark · hero-review: not run separately · the finish review graded the hero with the page */
+/* Hallmark · finish-review: subagent · 3 findings, 1 clarity note · 4 resolved · gap: none */
+
+:root {
+  color-scheme: light;
+  --bg:#FFFFFF; --surface-1:#F8F9FA; --surface-2:#F1F3F4;
+  --text:#202124; --text-2:#5F6368; --text-3:#666D73;
+  --border:#DADCE0; --border-2:#E8EAED; --border-strong:#B4B9BE;
+  --hairline:0.5px;
+  --accent:#1A73E8; --accent-hover:#1765CC; --accent-press:#1357B4; --accent-text:#FFFFFF;
+  --accent-tint:#E8F0FE; --hover:#F1F3F4;
+  --success:#188038; --success-tint:#E6F4EA; --success-ink:#146C2E;
+  --warning:#B63A0A; --warning-tint:#FEF7E0; --warning-fill:#F9AB00;
+  --danger:#D93025; --danger-tint:#FCE8E6;
+  --stage:#202124; --stage-ink:#F1F3F4;
+  --stage-raise:rgba(255,255,255,.14); --stage-line:rgba(255,255,255,.24); --stage-fill:rgba(255,255,255,.86);
+  --seg-track:var(--surface-2); --seg-thumb:var(--bg); --seg-ring:var(--e-1);
+  --mono:"Roboto Mono",ui-monospace,Consolas,monospace;
+  --sans:"Inter","Segoe UI",system-ui,sans-serif;
+  --font-display:var(--sans);
+  --font-body:var(--sans);
+  --font-mono:var(--mono);
+
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:20px; --s-6:24px; --s-7:32px; --s-8:40px; --s-9:56px;
+  --r-control:6px; --r-card:8px; --r-sheet:12px; --r-window:16px; --r-pill:999px;
+  --e-1:0 1px 2px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06);
+  --e-2:0 8px 24px rgba(0,0,0,.16);
+
+  --f-11:11px; --f-12:12px; --f-13:13px; --f-14:14px; --f-16:16px; --f-20:20px; --f-28:28px; --f-40:40px;
+  --lh:1.5;
+
+  --dur-1:80ms; --dur-2:120ms; --dur-3:180ms; --dur-4:220ms; --dur-5:260ms; --dur-6:400ms;
+  --e-std:cubic-bezier(.2,0,0,1);
+  --e-dec:cubic-bezier(.05,.7,.1,1);
+  --e-acc:cubic-bezier(.3,0,.8,.15);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg:#1B1D1F; --surface-1:#252729; --surface-2:#2D2F31;
+    --text:#E8EAED; --text-2:#A8ADB2; --text-3:#959AA0;
+    --border:#3C4043; --border-2:#303133; --border-strong:#5F6368;
+    --accent:#8AB4F8; --accent-hover:#A6C8FF; --accent-press:#C2DBFF; --accent-text:#0B1A33;
+    --accent-tint:#26344A; --hover:#2D2F31;
+    --success:#81C995; --success-tint:#10331C; --success-ink:#81C995;
+    --warning:#FDD663; --warning-tint:#302A01; --warning-fill:#B8860B;
+    --danger:#F28B82; --danger-tint:#3C1F1E;
+    --stage:#111315; --stage-ink:#E8EAED;
+    --e-2:0 0 0 1px #5F6368;
+    --seg-track:var(--surface-1); --seg-thumb:var(--surface-2); --seg-ring:var(--e-2);
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { overflow-x: clip; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: var(--f-14)/var(--lh) var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -.025em; text-wrap: balance; }
+p { margin: 0; text-wrap: pretty; }
+button { font: inherit; color: inherit; }
+svg { display: block; flex-shrink: 0; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+::selection { background: var(--accent-tint); }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: clamp(var(--s-5), 4vw, var(--s-8)); }
+
+/* --- top bar ------------------------------------------------------------ */
+.topbar {
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s-4);
+  border-bottom: var(--hairline) solid var(--border);
+}
+.brand { display: flex; align-items: center; gap: var(--s-2); font-size: var(--f-14); font-weight: 600; }
+.brand svg { color: var(--accent); }
+.board-note { font-size: var(--f-12); color: var(--text-3); }
+
+/* --- hero --------------------------------------------------------------- */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr);
+  gap: clamp(var(--s-6), 5vw, var(--s-9));
+  align-items: center;
+  padding-block: clamp(48px, 7vw, 88px);
+}
+.hero-copy { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-4); }
+.hero h1 { font-size: clamp(40px, 5.4vw, 76px); line-height: 1.03; max-width: 12ch; }
+.lede { font-size: var(--f-16); line-height: 1.55; color: var(--text-2); max-width: 42ch; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-1); }
+.hero-meta { font-size: var(--f-12); color: var(--text-3); }
+
+/* --- controls ----------------------------------------------------------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+  height: 44px; padding: 0 var(--s-4); text-decoration: none;
+  border-radius: var(--r-control);
+  border: 1px solid transparent;
+  background: transparent;
+  font-size: var(--f-14); font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--dur-2) var(--e-std), border-color var(--dur-2) var(--e-std),
+              color var(--dur-2) var(--e-std), transform var(--dur-1) var(--e-std);
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--accent); color: var(--accent-text); }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-primary:active { background: var(--accent-press); }
+.btn-primary:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+.btn-quiet { border-color: var(--border-strong); color: var(--text); background: transparent; }
+.btn-quiet:hover { background: var(--hover); }
+.text-link {
+  color: var(--accent); font-size: var(--f-14); font-weight: 500;
+  text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;
+  border-radius: 2px; padding-block: var(--s-2);
+  transition: color var(--dur-2) var(--e-std);
+}
+.text-link:hover { color: var(--accent-hover); }
+.btn-ghost { color: var(--text-2); padding: 0 var(--s-2); }
+.btn-ghost:hover { color: var(--text); background: var(--hover); }
+.btn-sm { position: relative; height: 36px; padding: 0 var(--s-3); font-size: var(--f-12); }
+.btn-sm::before { content: ""; position: absolute; inset: -4px 0; }
+.icon-btn {
+  width: 32px; height: 32px; padding: 0; border-radius: var(--r-control);
+  display: grid; place-items: center; border: 1px solid transparent; background: transparent;
+  color: var(--text-3); cursor: pointer;
+  transition: background-color var(--dur-2) var(--e-std), color var(--dur-2) var(--e-std);
+}
+.icon-btn:hover { background: var(--hover); color: var(--text); }
+
+/* --- stage (a video surface, no browser chrome) ------------------------- */
+.stage {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--r-card);
+  background: var(--stage);
+  color: var(--stage-ink);
+  overflow: hidden;
+}
+.stage-media {
+  position: absolute; inset: 0; display: grid; place-items: center start;
+  padding-left: clamp(var(--s-6), 8%, var(--s-9));
+}
+.stage-play-btn {
+  width: 72px; height: 72px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--stage-raise); color: var(--stage-ink);
+}
+.stage-rail {
+  position: absolute; left: var(--s-4); right: var(--s-4); bottom: var(--s-3);
+  display: flex; align-items: center; gap: var(--s-3);
+  font-size: var(--f-12); color: var(--stage-ink); font-variant-numeric: tabular-nums;
+}
+.rail-track { position: relative; flex: 1; height: 3px; border-radius: 2px; background: var(--stage-line); }
+.rail-fill { position: absolute; inset: 0 auto 0 0; width: 38%; border-radius: 2px; background: var(--stage-fill); }
+.rail-time { opacity: .75; font-family: var(--mono); }
+.hero-panel {
+  position: absolute; top: var(--s-4); right: var(--s-4);
+  width: min(342px, calc(100% - var(--s-7)));
+}
+.stage-caption {
+  position: absolute; left: var(--s-4); bottom: var(--s-7);
+  font-size: var(--f-12); color: var(--stage-ink); opacity: .62;
+}
+
+/* --- the capture panel -------------------------------------------------- */
+.panel {
+  border-radius: var(--r-sheet);
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: var(--e-2);
+  padding: var(--s-3);
+  display: grid; gap: var(--s-3);
+  transform-origin: top right;
+  animation: panel-in var(--dur-4) var(--e-dec) both;
+}
+@keyframes panel-in { from { opacity: 0; transform: translateY(-6px) scale(.985); } }
+.panel-head { display: flex; align-items: flex-start; gap: var(--s-2); }
+.panel-glyph { color: var(--accent); margin-top: 1px; }
+.panel-titles { min-width: 0; flex: 1; display: grid; gap: 1px; }
+.panel-name {
+  font-size: var(--f-13); font-weight: 600; line-height: 1.3;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.panel-meta { font-size: var(--f-12); color: var(--text-3); font-variant-numeric: tabular-nums; }
+.panel-formats { display: flex; flex-wrap: wrap; gap: var(--s-1); }
+.chip {
+  height: 32px; padding: 0 var(--s-3); border-radius: var(--r-pill);
+  border: 1px solid var(--border); background: var(--bg);
+  font-size: var(--f-12); color: var(--text-2); cursor: pointer;
+  transition: background-color var(--dur-2) var(--e-std), border-color var(--dur-2) var(--e-std),
+              color var(--dur-2) var(--e-std);
+}
+.chip:hover { background: var(--hover); }
+.chip[aria-pressed="true"] { background: var(--accent-tint); border-color: var(--accent); color: var(--accent-press); }
+.panel-actions { display: flex; gap: var(--s-2); }
+.panel-actions .btn-primary { flex: 1; }
+.panel-status { font-size: var(--f-12); color: var(--text-2); min-height: 1.5em; }
+.panel[data-phase="taken"] .panel-status { color: var(--success-ink); }
+.panel[data-phase="taken"] .panel-actions .btn-primary { background: var(--success); }
+.panel[data-phase="asking"] .panel-actions .btn-primary { background: var(--accent-press); }
+
+.spinner {
+  width: 13px; height: 13px; border-radius: 50%;
+  border: 2px solid var(--accent-text); border-top-color: transparent;
+  animation: spin 700ms linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* mini mode */
+.panel-mini {
+  display: inline-flex; align-items: center; gap: var(--s-2);
+  padding: var(--s-2) var(--s-2) var(--s-2) var(--s-3);
+  border-radius: var(--r-pill);
+  background: var(--bg); color: var(--text);
+  box-shadow: var(--e-2);
+  animation: panel-in var(--dur-4) var(--e-dec) both;
+}
+.panel-mini .panel-glyph { color: var(--accent); }
+.mini-size { font: var(--f-12)/1 var(--mono); color: var(--text-2); }
+
+/* --- sections ----------------------------------------------------------- */
+.section { padding-block: clamp(56px, 8vw, 72px); border-top: var(--hairline) solid var(--border); }
+#decline { padding-block-start: clamp(72px, 10vw, 96px); }
+.section-head { display: grid; gap: var(--s-3); max-width: 720px; margin-bottom: var(--s-7); }
+.section h2 { font-size: clamp(30px, 3.6vw, 52px); line-height: 1.08; }
+.section-intro { font-size: var(--f-16); color: var(--text-2); max-width: 52ch; }
+
+.panel-lab { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s-6); align-items: start; }
+.demo-box {
+  border-radius: var(--r-card);
+  background: var(--surface-1);
+  padding: var(--s-6);
+  display: grid; place-items: center;
+  min-height: 240px;
+}
+.demo-box--stage { background: var(--stage); }
+.demo-box--sizes { min-height: 320px; }
+.size-stack { display: grid; gap: var(--s-4); justify-items: start; max-width: 100%; }
+.panel--specimen { width: 300px; max-width: 100%; }
+.shot { margin: 0; display: grid; gap: var(--s-3); }
+.shot img {
+  display: block; width: 100%; height: auto;
+  border-radius: var(--r-card); border: var(--hairline) solid var(--border-strong);
+}
+.demo-caption { font-size: var(--f-12); color: var(--text-3); margin-top: var(--s-2); }
+.demo-copy { display: grid; gap: var(--s-3); align-content: start; padding-top: var(--s-2); }
+.demo-copy h3 { font-size: var(--f-20); }
+.demo-copy p { color: var(--text-2); max-width: 40ch; }
+.keys { display: flex; align-items: center; gap: var(--s-2); flex-wrap: wrap; font-size: var(--f-12); color: var(--text-2); }
+kbd {
+  font: 500 var(--f-12)/1 var(--mono);
+  padding: var(--s-1) var(--s-2); border-radius: var(--r-control);
+  border: 1px solid var(--border-strong); background: var(--bg); color: var(--text);
+}
+
+/* --- popup -------------------------------------------------------------- */
+.popup-lab { display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: clamp(var(--s-6), 5vw, var(--s-8)); align-items: start; }
+.popup-wrap { display: grid; gap: var(--s-3); justify-items: start; }
+.seg {
+  display: inline-flex; padding: var(--s-1); gap: 2px;
+  background: var(--seg-track); border-radius: var(--r-pill);
+}
+.seg button {
+  height: 32px; padding: 0 var(--s-3); border: 0; border-radius: var(--r-pill);
+  background: transparent; color: var(--text-2); font-size: var(--f-12); font-weight: 500; cursor: pointer;
+  transition: background-color var(--dur-2) var(--e-std), color var(--dur-2) var(--e-std);
+}
+.seg button:hover { color: var(--text); }
+.seg button[aria-pressed="true"] { background: var(--seg-thumb); color: var(--text); box-shadow: var(--seg-ring); }
+
+.popup {
+  width: 100%; border-radius: var(--r-sheet); background: var(--bg); box-shadow: var(--e-2);
+  overflow: hidden;
+}
+.popup-head {
+  display: flex; align-items: center; gap: var(--s-2);
+  padding: var(--s-3) var(--s-3) var(--s-2);
+}
+.popup-head .brand { font-size: var(--f-13); }
+.state-chip {
+  margin-left: auto; font-size: var(--f-12); font-weight: 500;
+  padding: var(--s-1) var(--s-2); border-radius: var(--r-pill);
+  background: var(--success-tint); color: var(--success-ink);
+  transition: background-color var(--dur-2) var(--e-std), color var(--dur-2) var(--e-std);
+}
+.popup[data-state="waking"] .state-chip { background: var(--warning-tint); color: var(--warning); }
+.popup[data-state="unregistered"] .state-chip { background: var(--surface-2); color: var(--text-2); }
+
+.capture-list { list-style: none; margin: 0; padding: 0 var(--s-1) var(--s-1); }
+.capture-row {
+  display: flex; align-items: center; gap: var(--s-2);
+  min-height: 48px; padding: var(--s-2);
+  border-radius: var(--r-control);
+}
+.capture-row + .capture-row { box-shadow: inset 0 var(--hairline) 0 var(--border-2); }
+.capture-row .panel-glyph { color: var(--text-3); }
+.capture-titles { flex: 1; min-width: 0; display: grid; gap: 1px; }
+.capture-name { font-size: var(--f-13); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.capture-meta { font-size: var(--f-12); color: var(--text-3); font-variant-numeric: tabular-nums; }
+.popup[data-state="waking"] .capture-row { opacity: .55; }
+.popup[data-state="waking"] .capture-row:first-child { opacity: 1; }
+
+.popup-foot {
+  display: flex; align-items: center; gap: var(--s-2);
+  padding: var(--s-2) var(--s-3);
+  background: var(--surface-1);
+  font-size: var(--f-12); color: var(--text-2);
+}
+.popup-foot .btn-ghost { margin-left: auto; }
+
+.state-block { padding: var(--s-3); display: grid; gap: var(--s-3); }
+.state-block p { font-size: var(--f-13); color: var(--text-2); }
+.state-actions { display: flex; gap: var(--s-2); flex-wrap: wrap; }
+
+.state-notes { display: grid; gap: 0; }
+.state-note {
+  display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: var(--s-4);
+  padding: var(--s-4) 0;
+  border-top: var(--hairline) solid var(--border-2);
+}
+.state-note:first-child { border-top: 0; padding-top: 0; }
+.state-note dt { font-size: var(--f-13); font-weight: 600; }
+.state-note dd { margin: 0; font-size: var(--f-13); color: var(--text-2); max-width: 48ch; }
+
+/* --- badges + decline --------------------------------------------------- */
+.toolrow { display: flex; flex-wrap: wrap; gap: var(--s-9); align-items: flex-end; }
+.tool { display: grid; gap: var(--s-3); justify-items: center; }
+.tool-mark {
+  position: relative; width: 56px; height: 56px; border-radius: var(--r-sheet);
+  display: grid; place-items: center;
+  background: var(--surface-1); color: var(--text-2);
+}
+.tool-mark svg { width: 28px; height: 28px; }
+.tool-badge {
+  position: absolute; top: -6px; right: -6px; min-width: 20px; height: 20px; padding: 0 var(--s-1);
+  border-radius: var(--r-pill); background: var(--accent); color: var(--accent-text);
+  font: 600 var(--f-12)/20px var(--sans); text-align: center;
+}
+.tool-badge--warn { background: var(--warning-tint); color: var(--warning); }
+.tool-caption { font-size: var(--f-13); color: var(--text-3); text-align: center; max-width: 18ch; }
+
+.decline-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(var(--s-6), 5vw, var(--s-8)); align-items: start; }
+.notice {
+  border-radius: var(--r-sheet); background: var(--surface-1);
+  padding: var(--s-4);
+  display: grid; gap: var(--s-2);
+  animation: notice-in var(--dur-4) var(--e-dec) both;
+}
+@keyframes notice-in { from { opacity: 0; transform: translateY(6px); } }
+.notice-head { display: flex; align-items: center; gap: var(--s-2); font-size: var(--f-14); font-weight: 600; }
+.notice-head svg { color: var(--text-2); }
+.notice p { font-size: var(--f-13); color: var(--text-2); }
+.notice-rule { height: var(--hairline); background: var(--border-2); margin-block: var(--s-1); }
+.decline-list { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--s-2); }
+.decline-list li { font-size: var(--f-13); color: var(--text-2); padding-left: var(--s-4); position: relative; }
+.decline-list li::before { content: ""; position: absolute; left: 3px; top: .58em; width: 5px; height: 5px; border-radius: 50%; background: var(--border-strong); }
+.decline-rule { font-size: var(--f-13); color: var(--text); font-weight: 500; }
+
+/* --- footer ------------------------------------------------------------- */
+.foot {
+  border-top: var(--hairline) solid var(--border);
+  padding-block: var(--s-9) var(--s-6);
+  display: flex; flex-wrap: wrap; gap: var(--s-3) var(--s-6);
+  justify-content: space-between;
+  font-size: var(--f-12); color: var(--text-3);
+}
+.foot p { max-width: 72ch; }
+
+/* --- responsive + motion ------------------------------------------------ */
+@media (max-width: 900px) {
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .hero h1 { max-width: 16ch; }
+  .panel-lab, .decline-grid { grid-template-columns: minmax(0, 1fr); }
+  .popup-lab { grid-template-columns: minmax(0, 1fr); }
+  .stage { aspect-ratio: 16 / 9; }
+}
+@media (max-width: 560px) {
+  .stage { aspect-ratio: 4 / 5; }
+  .hero-panel { width: calc(100% - var(--s-6)); top: auto; bottom: var(--s-8); right: var(--s-3); }
+  .stage-media { place-items: start start; padding: var(--s-3); }
+  .stage-play-btn { width: 48px; height: 48px; }
+  .stage-caption { bottom: var(--s-8); }
+  .state-note { grid-template-columns: minmax(0, 1fr); gap: var(--s-1); }
+  .shot { overflow-x: auto; }
+  .shot img { min-width: 620px; }
+  .board-note { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-1:0ms; --dur-2:0ms; --dur-3:0ms; --dur-4:0ms; --dur-5:0ms; --dur-6:0ms; }
+  .panel, .panel-mini, .notice, .spinner { animation: none !important; }
+  .btn, .chip, .icon-btn, .seg button, .state-chip { transition: none !important; }
+}
+html[data-motion="reduced"] { --dur-1:0ms; --dur-2:0ms; --dur-3:0ms; --dur-4:0ms; --dur-5:0ms; --dur-6:0ms; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <defs>
+    <symbol id="i-octo" viewBox="0 0 24 24" fill="currentColor">
+      <circle cx="12" cy="7" r="5"/>
+      <path d="M7 11c-2 2-3 5-1 7s4 1 5-2c1 3 3 4 5 2s1-5-1-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="6" cy="18" r="1.5"/><circle cx="12" cy="19" r="1.5"/><circle cx="18" cy="18" r="1.5"/>
+    </symbol>
+    <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 20h16"/>
+    </symbol>
+    <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M6 18L18 6M6 6l12 12"/>
+    </symbol>
+    <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M8 5.5v13l11-6.5z"/>
+    </symbol>
+    <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><circle cx="12" cy="7.6" r="1.1" fill="currentColor" stroke="none"/>
+    </symbol>
+    <symbol id="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="topbar wrap">
+  <span class="brand"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-octo"/></svg>Sucr Capture</span>
+  <span class="board-note">design board, surfaces only, no product bytes</span>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <div class="hero-copy">
+      <h1>Capture that asks first.</h1>
+      <p class="lede">The add-on cancels nothing until Sucr has taken the file.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" id="tryTake" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-download"/></svg>
+          Try a take
+        </button>
+        <a class="btn btn-quiet" href="#answers">See the three answers</a>
+      </div>
+      <p class="hero-meta">Nothing leaves the browser in this demo.</p>
+    </div>
+
+    <div class="stage">
+      <div class="stage-media" aria-hidden="true">
+        <span class="stage-play-btn"><svg width="28" height="28" viewBox="0 0 24 24"><use href="#i-play"/></svg></span>
+      </div>
+      <span class="stage-caption">a page’s video player</span>
+      <div class="stage-rail" aria-hidden="true">
+        <span class="rail-track"><span class="rail-fill"></span></span>
+        <span class="rail-time">12:04 / 31:48</span>
+      </div>
+
+      <div class="hero-panel">
+        <div class="panel" id="heroPanel" data-phase="idle">
+          <div class="panel-head">
+            <svg class="panel-glyph" width="20" height="20" aria-hidden="true"><use href="#i-octo"/></svg>
+            <div class="panel-titles">
+              <span class="panel-name">lecture-04.mp4</span>
+              <span class="panel-meta">812 MB, media.example.com</span>
+            </div>
+            <button class="icon-btn" type="button" aria-label="Dismiss this panel">
+              <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg>
+            </button>
+          </div>
+          <div class="panel-formats" role="group" aria-label="Format">
+            <button class="chip" type="button" aria-pressed="true">1080p</button>
+            <button class="chip" type="button" aria-pressed="false">720p</button>
+            <button class="chip" type="button" aria-pressed="false">Audio</button>
+          </div>
+          <div class="panel-actions">
+            <button class="btn btn-primary btn-sm" id="takeBtn" type="button">Take with Sucr</button>
+            <button class="btn btn-quiet btn-sm" type="button">Keep in browser</button>
+          </div>
+          <p class="panel-status" id="panelStatus" aria-live="polite">Sucr is ready.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap" id="panel">
+    <div class="section-head">
+      <h2>One panel, two sizes</h2>
+      <p class="section-intro">Full for media, a pill for a link.</p>
+    </div>
+
+    <div class="panel-lab">
+      <div>
+        <div class="demo-box demo-box--stage demo-box--sizes">
+          <div class="size-stack">
+            <div class="panel panel--specimen">
+              <div class="panel-head">
+                <svg class="panel-glyph" width="20" height="20" aria-hidden="true"><use href="#i-octo"/></svg>
+                <div class="panel-titles">
+                  <span class="panel-name">podcast-ep-118.mp3</span>
+                  <span class="panel-meta">64 MB, audio.example.com</span>
+                </div>
+              </div>
+              <div class="panel-formats" role="group" aria-label="Format">
+                <button class="chip" type="button" aria-pressed="true">Original</button>
+                <button class="chip" type="button" aria-pressed="false">Mono</button>
+              </div>
+              <div class="panel-actions">
+                <button class="btn btn-primary btn-sm" type="button">Take with Sucr</button>
+                <button class="btn btn-quiet btn-sm" type="button">Keep</button>
+              </div>
+            </div>
+            <div class="panel-mini" aria-hidden="true">
+              <svg class="panel-glyph" width="18" height="18" aria-hidden="true"><use href="#i-octo"/></svg>
+              <span class="mini-size">64 MB</span>
+              <span class="btn btn-primary btn-sm">Take</span>
+              <span class="icon-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg>
+              </span>
+            </div>
+          </div>
+        </div>
+        <p class="demo-caption">The panel moves; it never covers the player’s controls.</p>
+      </div>
+
+      <div class="demo-copy">
+        <h3>What the panel carries</h3>
+        <p>Name, size, host, formats, two answers. No progress bar: progress belongs in Sucr.</p>
+        <p>Two keys. Their defaults are still open.</p>
+        <div class="keys">
+          <kbd>Insert</kbd><span>takes</span>
+          <kbd>Delete</kbd><span>keeps it in the browser, for this site</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap" id="answers">
+    <div class="section-head">
+      <h2>One popup, three answers</h2>
+      <p class="section-intro">It says which of the three is true, and stops there.</p>
+    </div>
+
+    <div class="popup-lab">
+      <div class="popup-wrap">
+        <div class="seg" role="group" aria-label="Popup state">
+          <button type="button" data-state="connected" aria-pressed="true">Connected</button>
+          <button type="button" data-state="waking" aria-pressed="false">Waking</button>
+          <button type="button" data-state="unregistered" aria-pressed="false">Not registered</button>
+        </div>
+
+        <div class="popup" id="popup" data-state="connected">
+          <div class="popup-head">
+            <span class="brand"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-octo"/></svg>Sucr</span>
+            <span class="state-chip" id="stateChip">Connected</span>
+          </div>
+
+          <ul class="capture-list" id="captureList">
+            <li class="capture-row">
+              <svg class="panel-glyph" width="17" height="17" aria-hidden="true"><use href="#i-download"/></svg>
+              <span class="capture-titles">
+                <span class="capture-name">lecture-04.mp4</span>
+                <span class="capture-meta">812 MB, media.example.com</span>
+              </span>
+              <button class="btn btn-primary btn-sm" type="button">Take</button>
+            </li>
+            <li class="capture-row">
+              <svg class="panel-glyph" width="17" height="17" aria-hidden="true"><use href="#i-download"/></svg>
+              <span class="capture-titles">
+                <span class="capture-name">slides-week-04.pdf</span>
+                <span class="capture-meta">3.4 MB, files.example.com</span>
+              </span>
+              <button class="btn btn-primary btn-sm" type="button">Take</button>
+            </li>
+            <li class="capture-row">
+              <svg class="panel-glyph" width="17" height="17" aria-hidden="true"><use href="#i-download"/></svg>
+              <span class="capture-titles">
+                <span class="capture-name">session-3.crdownload</span>
+                <span class="capture-meta">42 MB of 210 MB, paused in the browser</span>
+              </span>
+              <button class="btn btn-primary btn-sm" type="button">Import</button>
+            </li>
+          </ul>
+
+          <div class="state-block" id="stateBlock" hidden>
+            <p>Chrome has nothing to call yet. Registering writes one key under your account; no admin prompt.</p>
+            <div class="state-actions">
+              <button class="btn btn-primary btn-sm" type="button">Register Chrome</button>
+              <button class="btn btn-quiet btn-sm" type="button">How it works</button>
+            </div>
+          </div>
+
+          <div class="popup-foot" id="popupFoot">
+            <span id="footText">This tab: 3 links found</span>
+            <button class="btn btn-ghost btn-sm" type="button">
+              Open Sucr
+              <svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-open"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <dl class="state-notes">
+        <div class="state-note">
+          <dt>Connected</dt>
+          <dd>A one-shot token comes back from Sucr; only then does the browser let go.</dd>
+        </div>
+        <div class="state-note">
+          <dt>Waking</dt>
+          <dd>The host started the app. About a second, and the row says so.</dd>
+        </div>
+        <div class="state-note">
+          <dt>Not registered</dt>
+          <dd>One HKCU key per browser, no elevation, re-checked at boot.</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section wrap" id="library">
+    <div class="section-head">
+      <h2>Where the take lands</h2>
+      <p class="section-intro">The real app, on this machine, with the library it already has.</p>
+    </div>
+    <figure class="shot">
+      <img src="art/sucr-library.png" width="1776" height="610"
+           alt="Sucr’s All downloads view: one finished ZIP, DaVinci_Resolve_21.2_Windows.zip, 3.5 GB, 449 chunks of 8 MB, finished at 100 percent.">
+      <figcaption>Sucr v0.1.0 at 1280 × 820, dark. The row is the library’s own, not a mock: one 3.5 GB file, done.</figcaption>
+    </figure>
+  </section>
+
+  <section class="section wrap" id="decline">
+    <div class="section-head">
+      <h2>When the answer is no</h2>
+      <p class="section-intro">A refusal the user can read.</p>
+    </div>
+
+    <div class="decline-grid">
+      <div style="display:grid; gap:12px; justify-items:start">
+        <div class="notice" id="notice">
+          <div class="notice-head">
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-info"/></svg>
+            Kept in the browser
+          </div>
+          <p>The link is signed and expires in 12 seconds. A second copy would fail.</p>
+          <div class="notice-rule"></div>
+          <p class="decline-rule">Sucr cancels nothing until it has said yes.</p>
+        </div>
+        <button class="btn btn-quiet btn-sm" id="replay" type="button">Replay the notice</button>
+      </div>
+
+      <div class="demo-copy">
+        <h3>What Sucr declines</h3>
+        <ul class="decline-list">
+          <li>Signed links that expire mid-transfer.</li>
+          <li>POST forms and blobs.</li>
+          <li>Hosts that refuse Sucr.</li>
+        </ul>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="section wrap" id="badge">
+    <div class="section-head">
+      <h2>The toolbar badge</h2>
+    </div>
+    <div class="toolrow">
+        <div class="tool">
+          <div class="tool-mark">
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-octo"/></svg>
+          </div>
+          <span class="tool-caption">Quiet: nothing on this page</span>
+        </div>
+        <div class="tool">
+          <div class="tool-mark">
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-octo"/></svg>
+            <span class="tool-badge">3</span>
+          </div>
+          <span class="tool-caption">Three captures found</span>
+        </div>
+        <div class="tool">
+          <div class="tool-mark">
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-octo"/></svg>
+            <span class="tool-badge tool-badge--warn">!</span>
+          </div>
+          <span class="tool-caption">Not registered, open the popup</span>
+        </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot wrap">
+  <p>Reference: the floating panel pattern common to desktop download managers. The floating panel is the idea worth keeping.</p>
+  <p>Design only. Chrome and Firefox halves stay parked until you rule.</p>
+</footer>
+
+<script>
+(function () {
+  const panel = document.getElementById('heroPanel');
+  const takeBtn = document.getElementById('takeBtn');
+  const status = document.getElementById('panelStatus');
+  const tryBtn = document.getElementById('tryTake');
+  let timer = null;
+
+  function resetPanel() {
+    if (timer) { clearTimeout(timer); timer = null; }
+    panel.dataset.phase = 'idle';
+    takeBtn.disabled = false;
+    takeBtn.textContent = 'Take with Sucr';
+    status.textContent = 'Sucr is ready.';
+  }
+
+  function take() {
+    if (takeBtn.disabled) return;
+    panel.dataset.phase = 'asking';
+    takeBtn.disabled = true;
+    takeBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> Asking Sucr';
+    status.textContent = 'Waiting for the app to answer.';
+    timer = setTimeout(function () {
+      panel.dataset.phase = 'taken';
+      takeBtn.textContent = 'Taken';
+      status.textContent = 'Added to the library.';
+      timer = setTimeout(resetPanel, 2600);
+    }, 700);
+  }
+
+  takeBtn.addEventListener('click', take);
+  tryBtn.addEventListener('click', function () {
+    resetPanel();
+    take();
+  });
+
+  // chips: one chosen per group
+  document.querySelectorAll('.panel-formats').forEach(function (group) {
+    group.addEventListener('click', function (e) {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+      group.querySelectorAll('.chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c === chip)); });
+    });
+  });
+
+  // popup state
+  const popup = document.getElementById('popup');
+  const chip = document.getElementById('stateChip');
+  const list = document.getElementById('captureList');
+  const block = document.getElementById('stateBlock');
+  const foot = document.getElementById('popupFoot');
+  const footText = document.getElementById('footText');
+  const names = { connected: 'Connected', waking: 'Waking', unregistered: 'Not registered' };
+
+  document.querySelectorAll('[data-state]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('[data-state]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      const s = b.dataset.state;
+      popup.dataset.state = s;
+      chip.textContent = names[s];
+      const unreg = s === 'unregistered';
+      list.hidden = unreg;
+      block.hidden = !unreg;
+      foot.hidden = unreg;
+      if (s === 'waking') {
+        const first = list.querySelector('.capture-meta');
+        first.textContent = 'Starting Sucr…';
+        footText.textContent = 'The host is waking the app';
+      } else {
+        list.querySelector('.capture-meta').textContent = '812 MB, media.example.com';
+        footText.textContent = 'This tab: 3 links found';
+      }
+    });
+  });
+
+  // replay the refusal
+  const notice = document.getElementById('notice');
+  document.getElementById('replay').addEventListener('click', function () {
+    notice.style.animation = 'none';
+    void notice.offsetWidth;
+    notice.style.animation = '';
+  });
+})();
+</script>
+</body>
+</html>

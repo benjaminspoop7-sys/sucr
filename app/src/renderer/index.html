@@ -1,0 +1,1353 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'">
+  <title>Sucr</title>
+  <link rel="stylesheet" href="./tokens.css">
+  <link rel="stylesheet" href="./app.css">
+</head>
+<body>
+  <svg class="sprite" aria-hidden="true" width="0" height="0">
+    <defs>
+      <symbol id="i-octo" viewBox="0 0 24 24" fill="currentColor">
+        <circle cx="12" cy="7" r="5"/>
+        <path d="M7 11c-2 2-3 5-1 7s4 1 5-2c1 3 3 4 5 2s1-5-1-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="6" cy="18" r="1.5"/><circle cx="12" cy="19" r="1.5"/><circle cx="18" cy="18" r="1.5"/>
+      </symbol>
+      <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="11" cy="11" r="7"/><path d="M20 20l-4.2-4.2"/>
+      </symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M12 5v14M5 12h14"/>
+      </symbol>
+      <symbol id="i-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/>
+      </symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
+        <path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/>
+      </symbol>
+      <symbol id="i-wave" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M2 12c2.5-6 5-6 7.5 0s5 6 7.5 0 2.5-6 5 0"/>
+        <path d="M2 12c2.5 6 5 6 7.5 0s5-6 7.5 0 2.5 6 5 0" opacity=".45"/>
+      </symbol>
+      <symbol id="i-bar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M3 9h13M3 15h8"/><path d="M20 12h1" opacity=".5"/>
+      </symbol>
+      <symbol id="i-panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <rect x="3" y="3" width="18" height="18" rx="3"/><path d="M15 3v18"/><path d="M10 9l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="i-compact" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 3v18"/><rect x="5.1" y="10.1" width="2.8" height="3.8" rx="0.7" fill="currentColor" stroke="none"/>
+      </symbol>
+      <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M6 18L18 6M6 6l12 12"/>
+      </symbol>
+      <symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M4 6h16M4 12h16M4 18h10"/>
+      </symbol>
+      <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 20h16"/>
+      </symbol>
+      <symbol id="i-queue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>
+      </symbol>
+      <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/>
+      </symbol>
+      <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M12 3l9.5 17h-19L12 3z" stroke-linejoin="round"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".6" fill="currentColor"/>
+      </symbol>
+      <symbol id="i-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
+        <path d="M3 12V4a1 1 0 011-1h8l9 9-9 9-9-9z"/><circle cx="8" cy="8" r="1.4"/>
+      </symbol>
+      <symbol id="i-wifi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/>
+      </symbol>
+      <symbol id="i-ethernet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="4" width="16" height="12" rx="2"/>
+        <path d="M9 16v4M15 16v4M7 20h10"/>
+      </symbol>
+      <symbol id="i-usb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="18" r="2"/><line x1="12" y1="16" x2="12" y2="4"/><path d="M8 8l4-4 4 4"/><circle cx="6" cy="12" r="1.5"/><line x1="6" y1="12" x2="12" y2="12"/><rect x="16.5" y="10.5" width="3" height="3"/>
+      </symbol>
+      <symbol id="i-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="12" r="3.2"/>
+        <path d="M19.4 15a1.7 1.7 0 00.34 1.87l.06.06a2 2 0 11-2.83 2.83l-.06-.06A1.7 1.7 0 0015 19.4a1.7 1.7 0 00-1 1.56V21a2 2 0 11-4 0v-.09A1.7 1.7 0 009 19.4a1.7 1.7 0 00-1.87.34l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.7 1.7 0 004.6 15a1.7 1.7 0 00-1.56-1H3a2 2 0 110-4h.09A1.7 1.7 0 004.6 9a1.7 1.7 0 00-.34-1.87l-.06-.06a2 2 0 112.83-2.83l.06.06A1.7 1.7 0 009 4.6h.09A1.7 1.7 0 0010 3.04V3a2 2 0 114 0v.09a1.7 1.7 0 001 1.56 1.7 1.7 0 001.87-.34l.06-.06a2 2 0 112.83 2.83l-.06.06A1.7 1.7 0 0019.4 9v.09a1.7 1.7 0 001.56 1H21a2 2 0 110 4h-.09a1.7 1.7 0 00-1.51 1z" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="i-speedo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M4.93 19.07A10 10 0 1119.07 19.07" stroke-linecap="round"/>
+        <g class="needle-group">
+          <line x1="12" y1="14" x2="16.5" y2="9.5" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="12" cy="14" r="1.5" fill="currentColor"/>
+        </g>
+      </symbol>
+      <symbol id="i-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path class="chain-l" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke-linecap="round"/>
+        <path class="chain-r" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <rect x="8.5" y="8.5" width="12" height="12" rx="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M15.5 5.5a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="12" r="9"/>
+        <polyline points="12 7 12 12" stroke-linecap="round"/>
+        <g class="clock-minute-pivot">
+          <line x1="12" y1="12" x2="16.5" y2="12" stroke-width="1.8" stroke-linecap="round"/>
+        </g>
+      </symbol>
+      <symbol id="i-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" stroke-linecap="round" stroke-linejoin="round"/>
+        <g class="doc-sheet">
+          <line x1="8" y1="11" x2="16" y2="11" stroke-linecap="round" stroke-width="1.5" opacity=".8"/>
+          <line x1="8" y1="15" x2="13" y2="15" stroke-linecap="round" stroke-width="1.5" opacity=".8"/>
+        </g>
+      </symbol>
+      <symbol id="i-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path class="pulse-line" d="M2 12h4l3-6 4 12 3-6h6" stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="i-redo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12a9 9 0 11-2.64-6.36L21 8"/>
+        <polyline points="21 3 21 8 16 8"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <header class="titlebar">
+    <div class="tb-brand">
+      <span class="tb-ver" id="version"></span>
+    </div>
+
+    <label class="tb-search">
+      <svg class="tb-search-icon" aria-hidden="true"><use href="#i-search"/></svg>
+      <span class="sr-only">Search downloads</span>
+      <input id="search" type="search" placeholder="Search downloads" autocomplete="off" spellcheck="false">
+    </label>
+
+    <button class="tb-add" type="button" id="add" aria-expanded="false" aria-controls="add-bar">
+      <svg aria-hidden="true"><use href="#i-plus"/></svg>
+      <span>New link</span>
+    </button>
+
+    <div class="theme-seg" role="group" aria-label="Theme">
+      <button type="button" data-theme-pref="system" aria-pressed="true" title="Follow Windows">
+        <svg aria-hidden="true"><use href="#i-auto"/></svg><span>System</span>
+      </button>
+      <button type="button" data-theme-pref="light" aria-pressed="false" title="Light">
+        <svg aria-hidden="true"><use href="#i-sun"/></svg><span>Light</span>
+      </button>
+      <button type="button" data-theme-pref="dark" aria-pressed="false" title="Dark">
+        <svg aria-hidden="true"><use href="#i-moon"/></svg><span>Dark</span>
+      </button>
+    </div>
+
+    <button class="tb-mode" type="button" id="progress-mode" aria-pressed="false" title="Switch progress mode">
+      <svg aria-hidden="true"><use href="#i-bar" id="progress-icon"/></svg>
+      <span id="progress-label">Segmented</span>
+    </button>
+
+    <button class="tb-mode" type="button" id="rail-toggle" aria-pressed="false"
+            title="Hide the sidebar: hover the left edge to bring it back">
+      <svg aria-hidden="true"><use href="#i-compact"/></svg>
+      <span>Sidebar</span>
+    </button>
+
+    <button class="tb-inspector" type="button" id="drawer-toggle" aria-controls="inspector">
+      <svg aria-hidden="true"><use href="#i-panel"/></svg>
+      <span>Inspector</span>
+    </button>
+  </header>
+
+  <div class="shell">
+    <nav class="rail" aria-label="Sections">
+      <div class="rail-scroll">
+        <div class="nav-group">
+          <p class="nav-label">Library</p>
+          <button class="nav-item" type="button" data-view="all" data-title="All downloads" aria-current="true">
+            <svg class="nav-icon" aria-hidden="true"><use href="#i-list"/></svg>
+            <span class="nav-text">All downloads</span><span class="nav-count" data-count="all">0</span>
+          </button>
+          <button class="nav-item" type="button" data-view="downloading" data-title="Downloading">
+            <svg class="nav-icon" aria-hidden="true"><use href="#i-download"/></svg>
+            <span class="nav-text">Downloading</span><span class="nav-count" data-count="downloading">0</span>
+          </button>
+          <button class="nav-item" type="button" data-view="queued" data-title="Queued">
+            <svg class="nav-icon" aria-hidden="true"><use href="#i-queue"/></svg>
+            <span class="nav-text">Queued</span><span class="nav-count" data-count="queued">0</span>
+          </button>
+          <button class="nav-item" type="button" data-view="finished" data-title="Finished">
+            <svg class="nav-icon" aria-hidden="true"><use href="#i-check"/></svg>
+            <span class="nav-text">Finished</span><span class="nav-count" data-count="finished">0</span>
+          </button>
+          <button class="nav-item" type="button" data-view="attention" data-title="Needs attention">
+            <svg class="nav-icon" aria-hidden="true"><use href="#i-alert"/></svg>
+            <span class="nav-text">Needs attention</span><span class="nav-count" data-count="attention">0</span>
+          </button>
+        </div>
+
+        <div class="nav-group">
+          <p class="nav-label">Categories</p>
+          <ul class="cat-list" id="categories">
+            <li class="nav-empty">None yet</li>
+          </ul>
+        </div>
+
+        <div class="nav-group">
+          <p class="nav-label">System</p>
+          <button class="nav-item" type="button" data-view="networks" data-title="Networks">
+            <svg class="nav-icon" aria-hidden="true"><use href="#i-wifi"/></svg>
+            <span class="nav-text">Networks</span><span class="nav-count" id="net-count">0</span>
+          </button>
+          <button class="nav-item" type="button" data-view="settings" data-title="Settings">
+            <svg class="nav-icon" aria-hidden="true"><use href="#i-gear"/></svg>
+            <span class="nav-text">Settings</span>
+          </button>
+        </div>
+      </div>
+
+    </nav>
+
+    <main class="stage">
+      <header class="stage-head">
+        <div>
+          <h1 id="view-title">All downloads</h1>
+          <p class="stage-sub" id="view-sub">Every connection, every chunk, why it chose it.</p>
+        </div>
+        <span class="summary" id="summary">0 active · 0 B/s</span>
+      </header>
+
+      <form class="add-bar" id="add-bar" hidden>
+        <div class="add-url-row">
+          <input id="add-url" type="url" autocomplete="off" spellcheck="false"
+                 placeholder="https://example.com/file.zip" aria-label="Download URL">
+          <button class="primary" type="submit" id="add-submit">Download</button>
+          <button class="ghost" type="button" id="add-cancel">Cancel</button>
+        </div>
+        <div class="add-folder-row">
+          <div class="add-folder-meta">
+            <svg class="icon icon-folder" aria-hidden="true"><use href="#i-folder"/></svg>
+            <span class="add-folder-label">Save to</span>
+          </div>
+          <div class="add-folder-input-wrap">
+            <input id="add-folder" type="text" autocomplete="off" spellcheck="false"
+                   placeholder="Default download folder" aria-label="Save to folder">
+            <button class="add-folder-browse-btn" type="button" id="add-folder-browse" title="Choose folder">
+              <svg class="icon" aria-hidden="true"><use href="#i-folder"/></svg>
+              <span>Browse…</span>
+            </button>
+          </div>
+          <div class="add-folder-presets" id="add-folder-presets" role="group" aria-label="Quick folder presets">
+            <button class="add-preset-chip add-preset-reset" type="button" id="add-folder-reset" title="Reset to default download directory" hidden>Reset</button>
+          </div>
+        </div>
+        <p class="add-error" id="add-error" aria-live="polite" hidden></p>
+        <!-- A folder that is not there yet is not an error: it is one click away. -->
+        <div class="folder-notice" id="add-folder-notice" role="status" hidden>
+          <span class="folder-notice-text" id="add-folder-notice-text"></span>
+          <button class="folder-create-btn" type="button" id="add-folder-create">Create folder</button>
+        </div>
+      </form>
+
+      <div class="cards" id="rows" role="list" aria-label="Downloads"></div>
+
+      <div class="empty" id="empty">
+        <p class="empty-title" id="empty-title">No downloads yet</p>
+        <p class="empty-body" id="empty-body">Paste a URL into New link. Ranges, resume, retries and checksums are handled by the Rust engine.</p>
+      </div>
+
+      <div class="networks-view" id="networks-view" hidden>
+        <div class="net-summary-card">
+          <div class="net-summary-left">
+            <div class="net-status-badge-row">
+              <span class="net-status-badge" id="net-bond-status">
+                <i class="dot"></i><span id="net-bond-status-text">Single Network Connected</span>
+              </span>
+              <span class="net-policy-chip" id="net-policy-chip">Policy: Dynamic Aggregation</span>
+            </div>
+            <h2 class="net-headline" id="net-headline">Primary Network Active</h2>
+            <p class="net-desc" id="net-desc">
+              Download traffic is running across your primary system adapter. Connect a secondary device (e.g. Phone USB Tethering or Ethernet) to bond multiple connections.
+            </p>
+          </div>
+          <div class="net-summary-stats">
+            <div class="net-stat-box">
+              <span class="net-stat-num" id="net-stat-count">1</span>
+              <span class="net-stat-label">Active Adapters</span>
+            </div>
+            <div class="net-stat-box">
+              <span class="net-stat-num" id="net-stat-today">—</span>
+              <span class="net-stat-label">Downloaded Today</span>
+            </div>
+            <div class="net-stat-box">
+              <span class="net-stat-num" id="net-stat-lifetime">—</span>
+              <span class="net-stat-label">Downloaded Lifetime</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="net-section-head">
+          <h3>Throughput</h3>
+        </div>
+        <div class="tp-host net-tp" data-tp="total"></div>
+
+        <div class="net-section-head">
+          <h3>Connected devices</h3>
+        </div>
+        <div class="net-adapter-cards" id="net-adapter-cards"></div>
+
+        <div class="net-guide-card">
+          <div class="net-guide-head">
+            <svg class="net-guide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            <div>
+              <h4>How to Connect Multiple Devices (Bonding Guide)</h4>
+              <p>Multiply your download speed by aggregating independent network routes simultaneously</p>
+            </div>
+          </div>
+          <div class="net-guide-steps">
+            <div class="net-step-item">
+              <div class="net-step-num">1</div>
+              <div class="net-step-content">
+                <h5>Phone USB Tethering (Recommended)</h5>
+                <p>Connect your smartphone via USB and enable <b>USB Tethering</b> in phone settings. Sucr detects the high-speed cellular route instantly.</p>
+              </div>
+            </div>
+            <div class="net-step-item">
+              <div class="net-step-num">2</div>
+              <div class="net-step-content">
+                <h5>Wi-Fi + Ethernet Concurrency</h5>
+                <p>Stay on Wi-Fi while plugging in an Ethernet cable. Sucr binds distinct sockets to each IP to pull non-overlapping chunks concurrently.</p>
+              </div>
+            </div>
+            <div class="net-step-item">
+              <div class="net-step-num">3</div>
+              <div class="net-step-content">
+                <h5>How You Can Tell It's Working</h5>
+                <p>Open the <b>Chunks</b> tab and watch the progress bar: each chunk's row names the device that carried it, its dot in that device's colour — <b>Teal</b> for Device 1, <b>Amber</b> for Device 2 — in real time.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-view" id="settings-view" hidden>
+        <nav class="settings-nav" aria-label="Settings sections">
+          <button type="button" data-pillar="engine" aria-current="true">
+            <svg aria-hidden="true"><use href="#i-speedo"/></svg><span>Engine</span>
+          </button>
+          <button type="button" data-pillar="storage">
+            <svg aria-hidden="true"><use href="#i-folder"/></svg><span>Storage</span>
+          </button>
+          <button type="button" data-pillar="network">
+            <svg aria-hidden="true"><use href="#i-wifi"/></svg><span>Networks</span>
+          </button>
+          <button type="button" data-pillar="appearance">
+            <svg aria-hidden="true"><use href="#i-sun"/></svg><span>Appearance</span>
+          </button>
+          <button type="button" data-pillar="system">
+            <svg aria-hidden="true"><use href="#i-gear"/></svg><span>System</span>
+          </button>
+        </nav>
+
+        <div class="settings-body" id="settings-body">
+          <section class="settings-pillar" id="pillar-engine" data-pillar="engine" tabindex="-1">
+            <h2 class="pillar-title">Engine &amp; concurrency</h2>
+            <div class="settings-card">
+              <div class="settings-row">
+                <div class="settings-meta">
+                  <h4>Max active downloads</h4>
+                  <p>Queue excess items; a finished job frees the next slot.</p>
+                </div>
+                <div class="seg-control" data-set="engine.max_active_downloads">
+                  <button type="button" data-val="1">1</button>
+                  <button type="button" data-val="2">2</button>
+                  <button type="button" data-val="3">3</button>
+                  <button type="button" data-val="5">5</button>
+                  <button type="button" data-val="10">10</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="settings-meta">
+                  <h4>Default parallel streams</h4>
+                  <p>Concurrent HTTP connections per task. Auto opens 8 and, once a second, dares one more: the next second must bring at least half of what an average stream is already carrying, so the extra connection has to earn its share rather than merely answer. Up to 32; a refusal drops the ceiling below the width the host objected to and a quiet minute gives one step back. A number is a promise — the job never opens more than that.</p>
+                </div>
+                <div class="seg-control" data-set="engine.default_streams">
+                  <button type="button" data-val="auto">Auto</button>
+                  <button type="button" data-val="1">1</button>
+                  <button type="button" data-val="4">4</button>
+                  <button type="button" data-val="8">8</button>
+                  <button type="button" data-val="16">16</button>
+                  <button type="button" data-val="32">32</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="settings-meta">
+                  <h4>Global speed limit</h4>
+                  <p>Monotonic token bucket shared by every job.</p>
+                </div>
+                <div class="settings-inline">
+                  <span class="settings-readout" id="set-cap-readout">Unlimited</span>
+                  <button class="ghost" type="button" id="set-cap-btn">Set cap</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="settings-meta">
+                  <h4>Auto-start on add</h4>
+                  <p>Start the transfer the moment a link is added.</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-toggle="engine.auto_start" aria-label="Auto-start on add">
+                  <span aria-hidden="true"></span>
+                </label>
+              </div>
+              <div class="settings-row">
+                <div class="settings-meta">
+                  <h4>Download window</h4>
+                  <p>Start queued links only inside these hours.</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-toggle="engine.window_enabled" aria-label="Download window">
+                  <span aria-hidden="true"></span>
+                </label>
+              </div>
+              <div class="settings-row settings-row--stack">
+                <div class="settings-meta">
+                  <h4>Window hours and days</h4>
+                  <p id="set-window-note">Off: links start as soon as they are added.</p>
+                </div>
+                <div class="settings-inline">
+                  <input class="settings-path-box" id="set-window-start" type="time"
+                         data-set-time="engine.window_start" aria-label="Window opens at">
+                  <span class="settings-readout">&rarr;</span>
+                  <input class="settings-path-box" id="set-window-stop" type="time"
+                         data-set-time="engine.window_stop" aria-label="Window closes at">
+                  <div class="seg-control" id="set-window-days" aria-label="Days the window runs on">
+                    <button type="button" data-day="0">Mon</button>
+                    <button type="button" data-day="1">Tue</button>
+                    <button type="button" data-day="2">Wed</button>
+                    <button type="button" data-day="3">Thu</button>
+                    <button type="button" data-day="4">Fri</button>
+                    <button type="button" data-day="5">Sat</button>
+                    <button type="button" data-day="6">Sun</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="settings-pillar" id="pillar-storage" data-pillar="storage" tabindex="-1">
+            <h2 class="pillar-title">Storage &amp; file allocation</h2>
+            <div class="settings-card">
+              <div class="settings-row settings-row--stack">
+                <div class="settings-meta">
+                  <h4>Default download directory</h4>
+                  <p id="set-folder-note">Empty uses the app's Downloads folder.</p>
+                </div>
+                <div class="settings-inline settings-inline--wide">
+                  <input class="settings-path-box" id="set-folder" data-text="storage.default_folder"
+                         type="text" spellcheck="false" autocomplete="off" aria-label="Default download directory">
+                  <button class="ghost" type="button" id="set-folder-browse">Browse</button>
+                  <button class="ghost" type="button" id="set-folder-reset">Reset</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="settings-meta">
+                  <h4>NTFS pre-allocation</h4>
+                  <p>Sparse marks the staging file; full writes zeros up front.</p>
+                </div>
+                <div class="seg-control" data-set="storage.preallocation">
+                  <button type="button" data-val="sparse">Sparse</button>
+                  <button type="button" data-val="full">Full</button>
+                  <button type="button" data-val="none">None</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="settings-meta">
+                  <h4>Mark-of-the-Web</h4>
+                  <p>Writes Zone.Identifier (ZoneId=3) so SmartScreen sees provenance.</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-toggle="storage.motw" aria-label="Mark-of-the-Web">
+                  <span aria-hidden="true"></span>
+                </label>
+              </div>
+              <div class="settings-row">
+                <div class="settings-meta">
+                  <h4>Automatic checksum verify</h4>
+                  <p>SHA-256 identity is recorded on completion when no digest was given.</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-toggle="storage.auto_verify" aria-label="Automatic checksum verify">
+                  <span aria-hidden="true"></span>
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <section class="settings-pillar" id="pillar-network" data-pillar="network" tabindex="-1">
+            <h2 class="pillar-title">Network bonding &amp; adapters</h2>
+            <div class="settings-card">
+              <div class="settings-row">
+                <div class="settings-meta">
+                  <h4>Socket timeout</h4>
+                  <p>Connection handshake limit; a stalled attempt retries.</p>
+                </div>
+                <div class="seg-control" data-set="network.timeout_seconds">
+                  <button type="button" data-val="15">15s</button>
+                  <button type="button" data-val="30">30s</button>
+                  <button type="button" data-val="60">60s</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="settings-meta">
+                  <h4>Bonding policy</h4>
+                  <p>How chunks are spread across bonded routes.</p>
+                </div>
+                <div class="seg-control" data-set="network.bonding_policy">
+                  <button type="button" data-val="dynamic">Dynamic</button>
+                  <button type="button" data-val="hedging">Hedging</button>
+                  <button type="button" data-val="failover">Failover</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="settings-meta">
+                  <h4>Metered connection guard</h4>
+                  <p>Keeps a mobile-broadband connection out of the bond.</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-toggle="network.metered_guard" aria-label="Metered connection guard">
+                  <span aria-hidden="true"></span>
+                </label>
+              </div>
+              <p class="settings-note">
+                Bonding is live: with two or more devices enabled, each chunk leaves bound to the address of
+                the device that pulls it, and its row in the Chunks tab keeps that device's colour. One device is not a bond, so
+                nothing is bound and Windows picks the route. The policy below decides what the workers do with
+                those routes, and the metered guard holds a cellular device out of the pool entirely.
+              </p>
+            </div>
+            <div class="settings-card">
+              <div class="settings-row">
+                <div class="settings-meta">
+                  <h4>Proxy</h4>
+                  <p>Where Sucr's sockets leave. Direct is a decision, not an absence of one.</p>
+                </div>
+                <div class="seg-control" data-set="network.proxy_mode">
+                  <button type="button" data-val="direct">Direct</button>
+                  <button type="button" data-val="system">System</button>
+                  <button type="button" data-val="manual">Manual</button>
+                </div>
+              </div>
+              <div class="settings-row settings-row--stack">
+                <div class="settings-meta">
+                  <h4>Address and bypasses</h4>
+                  <p>
+                    Manual only. <code>http://proxy.corp:3128</code> or <code>https://</code> with the same
+                    shape; a bare <code>host:port</code> is http. No password in the address &mdash; a proxy
+                    that asks for one is its own slice. Bypass entries are hosts: a name, an IP, or one
+                    <code>*</code> at either end. A subnet range is refused, because nothing would match it
+                    and the internal traffic would still go through the proxy.
+                  </p>
+                </div>
+                <input class="settings-path-box" id="set-proxy-url" type="text" spellcheck="false"
+                       autocomplete="off" aria-label="Proxy address" placeholder="http://proxy.corp:3128">
+                <input class="settings-path-box" id="set-proxy-bypass" type="text" spellcheck="false"
+                       autocomplete="off" aria-label="Hosts to reach without the proxy"
+                       placeholder="internal.corp, *.lab">
+                <p class="settings-note" id="set-proxy-via"></p>
+              </div>
+              <div class="settings-row settings-row--stack">
+                <div class="settings-meta">
+                  <h4>Credential</h4>
+                  <p>
+                    A manual proxy only, and both halves commit together: to change one, type
+                    both; clear both to forget it. A system or environment proxy keeps whatever
+                    its own address already carries. What you type is saved in this app's library
+                    file exactly as written, not encrypted — the same file as your saved sessions.
+                  </p>
+                </div>
+                <div class="settings-row">
+                  <input class="settings-path-box" id="set-proxy-user" type="text" spellcheck="false"
+                         autocomplete="off" aria-label="Proxy username" placeholder="username">
+                  <input class="settings-path-box" id="set-proxy-pass" type="password" spellcheck="false"
+                         autocomplete="new-password" aria-label="Proxy password" placeholder="password">
+                </div>
+                <p class="settings-note" id="set-proxy-auth"></p>
+              </div>
+            </div>
+            <div class="settings-card">
+              <div class="settings-row settings-row--stack">
+                <div class="settings-meta">
+                  <h4>Site credentials</h4>
+                  <p>
+                    For a link that answers 401. Sucr puts the credential on the request before the
+                    server asks for it. A password pair commits as one: to change either, type both;
+                    clear both to forget it. A bearer token is sent exactly as pasted, after the word
+                    <code>Bearer</code>, and its username box is not used. One host holds one
+                    credential, so a token replaces the pair saved for it. A host covers every port
+                    and path of it, and either kind is readable on the wire over plain
+                    <code>http://</code>. Saved in the library file exactly as written, not encrypted
+                    &mdash; the same file as your saved sessions.
+                  </p>
+                </div>
+                <div id="origin-rows"></div>
+                <div class="settings-row">
+                  <div class="seg-control" id="origin-kind" role="group"
+                       aria-label="Which credential this host is given">
+                    <button type="button" data-val="basic" aria-pressed="true">Password</button>
+                    <button type="button" data-val="header-secret" aria-pressed="false">Bearer token</button>
+                  </div>
+                </div>
+                <input class="settings-path-box" id="origin-host" type="text" spellcheck="false"
+                       autocomplete="off" aria-label="Host, or the link that answered 401"
+                       placeholder="host, or the link that needs a credential">
+                <div class="settings-row">
+                  <input class="settings-path-box" id="origin-user" type="text" spellcheck="false"
+                         autocomplete="off" aria-label="Username for that host" placeholder="username">
+                  <input class="settings-path-box" id="origin-pass" type="password" spellcheck="false"
+                         autocomplete="new-password" aria-label="Password for that host" placeholder="password">
+                </div>
+                <div class="settings-inline">
+                  <button class="ghost" type="button" id="origin-save">Save credential</button>
+                  <button class="ghost" type="button" id="origin-clear-form">Clear</button>
+                </div>
+                <p class="settings-note" id="origin-note"></p>
+              </div>
+            </div>
+            <div class="settings-card">
+              <div class="settings-row settings-row--stack">
+                <div class="settings-meta">
+                  <h4>Browser sessions</h4>
+                  <p>
+                    Some hosts only hand a link to a browser they have already cleared. Paste that browser's
+                    Cookie header and its user agent here; Sucr sends them to that host and to no other. The
+                    cookie is stored as pasted, in the library file. Cloudflare ties <code>cf_clearance</code>
+                    to the browser that earned it, so copy the user agent with it or the host refuses again.
+                  </p>
+                </div>
+                <div id="session-rows"></div>
+                <input class="settings-path-box" id="session-host" type="text" spellcheck="false"
+                       autocomplete="off" aria-label="Host, or the link that was refused"
+                       placeholder="host, or the link that came back refused">
+                <textarea class="settings-area" id="session-cookie" spellcheck="false" autocomplete="off"
+                          aria-label="Cookie header copied from the browser"
+                          placeholder="Cookie: cf_clearance=…; …"></textarea>
+                <input class="settings-path-box" id="session-agent" type="text" spellcheck="false"
+                       autocomplete="off" aria-label="User agent copied from the browser"
+                       placeholder="User-Agent copied with it">
+                <div class="settings-inline">
+                  <button class="ghost" type="button" id="session-save">Save session</button>
+                  <button class="ghost" type="button" id="session-clear-form">Clear</button>
+                </div>
+                <p class="settings-note" id="session-note"></p>
+              </div>
+            </div>
+          </section>
+
+          <section class="settings-pillar" id="pillar-appearance" data-pillar="appearance" tabindex="-1">
+            <h2 class="pillar-title">Appearance &amp; behaviour</h2>
+            <div class="settings-card">
+              <div class="settings-row">
+                <div class="settings-meta">
+                  <h4>Transfer progress gauge</h4>
+                  <p>The hero card's bar or the aggregate squiggle wave.</p>
+                </div>
+                <div class="seg-control" data-set="ui.meter_style">
+                  <button type="button" data-val="segmented">Segmented</button>
+                  <button type="button" data-val="wave">Wave</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="settings-meta">
+                  <h4>Interface motion</h4>
+                  <p id="set-motion-note">System follows the Windows preference.</p>
+                </div>
+                <div class="seg-control" data-set="ui.motion">
+                  <button type="button" data-val="system">System</button>
+                  <button type="button" data-val="full">Full</button>
+                  <button type="button" data-val="reduced">Reduced</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="settings-meta">
+                  <h4>Completion chime</h4>
+                  <p>A short acoustic tick when a transfer finishes.</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-toggle="ui.sound_on_complete" aria-label="Completion chime">
+                  <span aria-hidden="true"></span>
+                </label>
+              </div>
+              <div class="settings-row">
+                <div class="settings-meta">
+                  <h4>Window close action</h4>
+                  <p id="set-close-note">Closing hides Sucr in the notification area; transfers keep running.</p>
+                </div>
+                <div class="seg-control" data-set="ui.close_to_tray">
+                  <button type="button" data-val="true">Minimize</button>
+                  <button type="button" data-val="false">Quit</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="settings-pillar" id="pillar-system" data-pillar="system" tabindex="-1">
+            <h2 class="pillar-title">System telemetry &amp; maintenance</h2>
+            <div class="settings-card">
+              <p class="settings-mono" id="set-runtime">Runtime details load from the engine.</p>
+              <div class="settings-row settings-row--stack">
+                <div class="settings-meta">
+                  <h4>Database</h4>
+                  <p>Every preference and download row lives here.</p>
+                </div>
+                <div class="settings-inline settings-inline--wide">
+                  <span class="settings-path-box" id="set-db-path">—</span>
+                  <button class="ghost" type="button" id="set-copy-path">Copy path</button>
+                </div>
+              </div>
+              <div class="settings-row settings-actions">
+                <button class="ghost" type="button" id="set-setup-tutorial">Launch Setup Tutorial</button>
+                <button class="ghost" type="button" id="set-clear-finished">Clear finished downloads</button>
+                <button class="ghost" type="button" id="set-reset-all">Reset all settings</button>
+              </div>
+              <p class="settings-note" id="set-system-note">
+                Clearing removes finished rows only; files on disk are kept.
+              </p>
+            </div>
+
+            <div class="settings-card" id="set-addon-card">
+              <div class="settings-row settings-row--stack">
+                <div class="settings-meta">
+                  <h4>Browser add-on</h4>
+                  <p>
+                    The capture add-on ships with this install. Sucr registers its relay for
+                    every browser it finds; loading the folder is the one step each browser
+                    keeps for you.
+                  </p>
+                </div>
+                <ul class="addon-list" id="set-addon-list">
+                  <li class="addon-empty">Looking for browsers…</li>
+                </ul>
+              </div>
+              <div class="settings-row settings-actions">
+                <button class="ghost" type="button" id="set-addon-setup">Set up add-on</button>
+                <button class="ghost" type="button" id="set-addon-folder">Open add-on folder</button>
+              </div>
+              <p class="settings-note" id="set-addon-note">
+                A sideloaded add-on cannot be pushed into a browser: Sucr stages it and opens
+                the page where it takes one toggle.
+              </p>
+            </div>
+
+            <div class="settings-card" id="set-update-card">
+              <div class="settings-row settings-row--stack">
+                <div class="settings-meta">
+                  <h4>Updates</h4>
+                  <p>
+                    Check for updates reads the release feed that ships with this build,
+                    compares its version with the one this build was compiled as, and hands
+                    the installer link to your browser — nothing installs on its own.
+                  </p>
+                </div>
+              </div>
+              <div class="settings-row settings-actions">
+                <div class="settings-inline">
+                  <button class="ghost" type="button" id="set-update-check">Check for updates</button>
+                  <button class="primary" type="button" id="set-update-download" hidden>Download update</button>
+                </div>
+                <button class="settings-quiet" type="button" id="set-update-toggle">Use a different feed</button>
+              </div>
+              <div class="settings-row settings-inline settings-inline--wide" id="set-update-feed-row" hidden>
+                <input class="settings-path-box" id="set-update-feed" type="text"
+                       spellcheck="false" autocomplete="off" aria-label="Release feed address"
+                       placeholder="https://…/latest.json">
+                <button class="ghost" type="button" id="set-update-save">Save feed</button>
+              </div>
+              <p class="settings-note" id="set-update-note">No update check has run yet.</p>
+            </div>
+
+            <div class="settings-card" id="set-debug-card">
+              <div class="settings-row">
+                <div class="settings-meta">
+                  <h4>Debug log</h4>
+                  <p>
+                    Writes what Sucr did, what it refused and where it crashed to a file
+                    beside the database. Nothing is sent anywhere; the file is only for you
+                    to read when something breaks.
+                  </p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-toggle="system.debug_log" aria-label="Write a debug log">
+                  <span aria-hidden="true"></span>
+                </label>
+              </div>
+              <div class="settings-row settings-inline settings-inline--wide">
+                <span class="settings-path-box" id="set-debug-path">—</span>
+                <button class="ghost" type="button" id="set-debug-open">Open log folder</button>
+                <button class="ghost" type="button" id="set-debug-clear">Clear log</button>
+                <button class="ghost" type="button" id="set-debug-issue">Report a problem</button>
+              </div>
+              <pre class="settings-log" id="set-debug-tail">Nothing logged yet.</pre>
+              <p class="settings-note" id="set-debug-note">
+                Writing is on. The file rolls over at 1 MB and keeps one previous copy.
+              </p>
+            </div>
+          </section>
+        </div>
+      </div>
+
+    </main>
+
+    <aside class="inspector" id="inspector" aria-label="Inspector">
+      <header class="ih">
+        <div class="ih-head">
+          <span class="ih-dot" aria-hidden="true"></span>
+          <span class="ih-title">Transfer Inspector</span>
+          <span class="ih-sub" id="ih-sub">—</span>
+        </div>
+        <button class="drawer-close" type="button" id="drawer-close" aria-label="Close inspector">
+          <svg aria-hidden="true"><use href="#i-close"/></svg>
+        </button>
+      </header>
+
+      <div class="tabs" role="tablist" aria-label="Inspector sections">
+        <div class="tab-pill" id="tab-indicator" aria-hidden="true"></div>
+        <!-- Tab icons are inlined rather than <use>: CSS selectors cannot reach
+             the shadow tree of a <use>, and each icon animates its own group. -->
+        <button role="tab" type="button" id="tab-overview" aria-controls="pane-overview" aria-selected="true" tabindex="0" data-pane="overview">
+          <svg class="tab-icon icon-speedo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M4.93 19.07A10 10 0 1119.07 19.07" stroke-linecap="round"/>
+            <g class="needle-group">
+              <line x1="12" y1="14" x2="16.5" y2="9.5" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="12" cy="14" r="1.5" fill="currentColor"/>
+            </g>
+          </svg><span>Overview</span>
+        </button>
+        <button role="tab" type="button" id="tab-connections" aria-controls="pane-connections" aria-selected="false" tabindex="-1" data-pane="connections">
+          <svg class="tab-icon icon-sucker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <rect x="3.5" y="3.5" width="6.5" height="6.5" rx="1.5"/>
+            <rect x="14" y="3.5" width="6.5" height="6.5" rx="1.5"/>
+            <rect x="3.5" y="14" width="6.5" height="6.5" rx="1.5"/>
+            <rect x="14" y="14" width="6.5" height="6.5" rx="1.5" stroke-dasharray="2 2"/>
+            <circle class="sucker-dot" cx="17.25" cy="17.25" r="2.2" fill="currentColor" stroke="none"/>
+          </svg><span>Chunks</span>
+        </button>
+        <button role="tab" type="button" id="tab-source" aria-controls="pane-source" aria-selected="false" tabindex="-1" data-pane="source">
+          <svg class="tab-icon icon-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path class="chain-l" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke-linecap="round"/>
+            <path class="chain-r" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke-linecap="round"/>
+          </svg><span>Source</span>
+        </button>
+        <button role="tab" type="button" id="tab-schedule" aria-controls="pane-schedule" aria-selected="false" tabindex="-1" data-pane="schedule">
+          <svg class="tab-icon icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"/>
+            <polyline points="12 7 12 12" stroke-linecap="round"/>
+            <g class="clock-minute-pivot">
+              <line x1="12" y1="12" x2="16.5" y2="12" stroke-width="1.8" stroke-linecap="round"/>
+            </g>
+          </svg><span>Schedule</span>
+        </button>
+        <button role="tab" type="button" id="tab-files" aria-controls="pane-files" aria-selected="false" tabindex="-1" data-pane="files">
+          <svg class="tab-icon icon-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" stroke-linecap="round" stroke-linejoin="round"/>
+            <g class="doc-sheet">
+              <line x1="8" y1="11" x2="16" y2="11" stroke-linecap="round" stroke-width="1.5" opacity=".8"/>
+              <line x1="8" y1="15" x2="13" y2="15" stroke-linecap="round" stroke-width="1.5" opacity=".8"/>
+            </g>
+          </svg><span>Files</span>
+        </button>
+        <button role="tab" type="button" id="tab-activity" aria-controls="pane-activity" aria-selected="false" tabindex="-1" data-pane="activity">
+          <svg class="tab-icon icon-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path class="pulse-line" d="M2 12h4l3-6 4 12 3-6h6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg><span>Activity</span>
+        </button>
+      </div>
+
+      <div class="panes">
+        <div role="tabpanel" id="pane-overview" aria-labelledby="tab-overview" data-pane="overview" tabindex="0">
+          <div id="detail"><p class="pane-empty">Progress, per-network contribution and file identity appear here once a download is selected.</p></div>
+        </div>
+        <div role="tabpanel" id="pane-connections" aria-labelledby="tab-connections" data-pane="connections" tabindex="0" hidden>
+          <h2 class="pane-title">Chunks</h2>
+          <div class="attempts" id="attempts"></div>
+        </div>
+        <div role="tabpanel" id="pane-source" aria-labelledby="tab-source" data-pane="source" tabindex="0" hidden>
+          <div id="source"><p class="pane-empty">The URL chain appears here once a download is selected.</p></div>
+        </div>
+        <div role="tabpanel" id="pane-schedule" aria-labelledby="tab-schedule" data-pane="schedule" tabindex="0" hidden>
+          <div id="schedule"><p class="pane-empty">Timestamps and queue state appear here once a download is selected.</p></div>
+        </div>
+        <div role="tabpanel" id="pane-files" aria-labelledby="tab-files" data-pane="files" tabindex="0" hidden>
+          <div id="files"><p class="pane-empty">The target file and staging path appear here once a download is selected.</p></div>
+        </div>
+        <div role="tabpanel" id="pane-activity" aria-labelledby="tab-activity" data-pane="activity" tabindex="0" hidden>
+          <div id="activity"><p class="pane-empty">Every automatic decision, with a <em>Why?</em> on each. Select a download to see its trail.</p></div>
+        </div>
+      </div>
+
+      <!-- The bonding pool belongs to the inspector, not the nav: as a rail child it
+           was either hidden (compact, narrow) or floating over the window, and the
+           right pane is the one surface that is always readable. flex:none keeps it
+           a fixed strip under the scrolling panes. -->
+      <div class="nic-deck" id="nic-deck" role="region" aria-label="Network Bonding">
+        <div class="nic-head">
+          <span class="nic-title">Network Bonding</span>
+          <span class="nic-state" id="nic-state"><i></i><span>idle</span></span>
+        </div>
+        <div class="nic-rows" id="nic-rows">
+          <p class="nic-empty">1 active route</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="scrim" id="scrim"></div>
+
+  <div id="speed-popover" class="speed-popover" role="dialog" aria-label="Speed limit control" hidden>
+    <div class="popover-header">
+      <span id="speed-popover-title" class="popover-title">Download speed limit</span>
+      <button id="speed-popover-close" class="popover-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="popover-presets">
+      <button class="preset-btn" data-bps="524288">512 KB/s</button>
+      <button class="preset-btn" data-bps="1048576">1 MB/s</button>
+      <button class="preset-btn" data-bps="2097152">2 MB/s</button>
+      <button class="preset-btn" data-bps="5242880">5 MB/s</button>
+      <button class="preset-btn" data-bps="10485760">10 MB/s</button>
+      <button class="preset-btn" data-bps="0">Unlimited</button>
+    </div>
+    <div class="popover-custom">
+      <input type="number" id="speed-custom-val" placeholder="Custom" min="1" step="1" aria-label="Custom speed">
+      <select id="speed-custom-unit" aria-label="Speed unit">
+        <option value="1048576">MB/s</option>
+        <option value="1024">KB/s</option>
+      </select>
+      <button id="speed-custom-apply" class="apply-btn">Apply</button>
+    </div>
+  </div>
+
+  <div id="net-limits-popover" class="speed-popover" role="dialog" aria-label="Adapter limits" hidden>
+    <div class="popover-header">
+      <span id="net-limits-title" class="popover-title">Adapter limits</span>
+      <button id="net-limits-close" class="popover-close" aria-label="Close">&times;</button>
+    </div>
+    <label class="popover-field-label" for="net-cap-val">Rate cap</label>
+    <div class="popover-custom">
+      <input type="number" id="net-cap-val" placeholder="Unlimited" min="0" step="any" aria-label="Rate cap">
+      <select id="net-cap-unit" aria-label="Rate cap unit">
+        <option value="1048576">MB/s</option>
+        <option value="1024">KB/s</option>
+      </select>
+    </div>
+    <label class="popover-field-label" for="net-allow-val">Monthly allowance</label>
+    <div class="popover-custom">
+      <input type="number" id="net-allow-val" placeholder="Unlimited" min="0" step="any" aria-label="Monthly data allowance">
+      <select id="net-allow-unit" aria-label="Allowance unit">
+        <option value="1073741824">GB</option>
+        <option value="1048576">MB</option>
+      </select>
+    </div>
+    <p class="popover-error is-hint" id="net-limits-note">Each limit spends only the traffic this adapter carries.</p>
+    <div class="popover-actions">
+      <button id="net-limits-save" class="primary-btn" type="button">Save</button>
+    </div>
+  </div>
+
+  <div id="remove-popover" class="speed-popover confirm-popover" role="dialog" aria-label="Remove from list" hidden>
+    <div class="popover-header">
+      <span class="popover-title">Remove from list</span>
+      <button id="remove-popover-close" class="popover-close" aria-label="Close">&times;</button>
+    </div>
+    <p class="popover-body" id="remove-popover-body">
+      The entry leaves the list either way. Choose what happens to the file on disk.
+    </p>
+    <p id="remove-popover-file" class="popover-file"></p>
+    <div class="popover-actions" id="remove-popover-actions">
+      <button id="remove-keep" class="ghost">Keep file</button>
+      <button id="remove-delete" class="danger-btn">Delete file</button>
+    </div>
+  </div>
+
+  <div id="refresh-url-popover" class="speed-popover refresh-url-popover" role="dialog" aria-label="Update download address" hidden>
+    <div class="popover-header">
+      <span class="popover-title">Update download address</span>
+      <button id="refresh-url-close" class="popover-close" aria-label="Close">&times;</button>
+    </div>
+    <p class="popover-body">
+      Paste a fresh URL for this file. Existing completed chunks are preserved.
+    </p>
+    <div class="popover-input-wrap">
+      <input type="url" id="refresh-url-input" class="popover-url-input" placeholder="https://..." aria-label="New download link" spellcheck="false">
+    </div>
+    <p class="popover-error" id="refresh-url-error" hidden></p>
+    <div class="popover-actions">
+      <button id="refresh-url-cancel" class="ghost" type="button">Cancel</button>
+      <button id="refresh-url-submit" class="primary-btn" type="button">Verify &amp; Resume</button>
+    </div>
+  </div>
+
+  <div id="card-context-menu" class="context-menu" role="menu" hidden>
+    <div class="context-menu-group" id="ctx-group-actions">
+      <button class="context-menu-item" type="button" role="menuitem" id="ctx-open">
+        <span class="ctx-label" id="ctx-open-label">Open</span>
+      </button>
+      <button class="context-menu-item" type="button" role="menuitem" id="ctx-reveal">
+        <span class="ctx-label">Show in Folder</span>
+      </button>
+    </div>
+    <div class="context-menu-divider" id="ctx-div-copy"></div>
+    <div class="context-menu-group" id="ctx-group-copy">
+      <button class="context-menu-item" type="button" role="menuitem" id="ctx-copy-name">
+        <span class="ctx-label" id="ctx-copy-name-label">Copy filename</span>
+      </button>
+      <button class="context-menu-item" type="button" role="menuitem" id="ctx-copy-link">
+        <span class="ctx-label">Copy Download Link</span>
+      </button>
+    </div>
+    <div class="context-menu-divider" id="ctx-div-category"></div>
+    <div class="context-menu-group" id="ctx-group-category">
+      <button class="context-menu-item" type="button" role="menuitem" id="ctx-category"
+              aria-haspopup="true" aria-expanded="false">
+        <span class="ctx-label">Category</span>
+        <span class="ctx-value" id="ctx-category-value"></span>
+        <svg class="ctx-caret" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="context-menu-divider" id="ctx-div-danger"></div>
+    <div class="context-menu-group" id="ctx-group-danger">
+      <button class="context-menu-item" type="button" role="menuitem" id="ctx-hide">
+        <span class="ctx-label">Hide from list</span>
+      </button>
+      <button class="context-menu-item context-menu-item--danger" type="button" role="menuitem" id="ctx-delete">
+        <span class="ctx-label">Delete File</span>
+      </button>
+    </div>
+    <div class="context-menu context-submenu" id="ctx-category-menu" role="menu"
+         aria-label="Category" hidden></div>
+  </div>
+
+  <div class="nic-modal-backdrop" id="nic-modal-backdrop" hidden>
+    <div class="nic-modal-dialog" id="nic-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="nic-modal-title">
+      <div class="nic-modal-head">
+        <div class="nic-modal-head-left">
+          <div class="nic-modal-badges">
+            <span class="net-status-badge" id="nic-modal-bond-badge">
+              <i class="dot"></i><span id="nic-modal-bond-text">Single Network Connected</span>
+            </span>
+            <span class="net-policy-chip">Dynamic Aggregation</span>
+          </div>
+          <h2 class="nic-modal-title" id="nic-modal-title">Network Bonding</h2>
+          <p class="nic-modal-sub" id="nic-modal-desc">
+            Bond multiple network routes simultaneously to aggregate bandwidth across all active devices.
+          </p>
+        </div>
+        <button class="ghost nic-modal-close" id="nic-modal-close" type="button" aria-label="Close">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 3l10 10M13 3L3 13" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="nic-modal-body">
+        <div class="nic-modal-section-head">
+          <h3>Connected devices</h3>
+          <span class="nic-modal-count" id="nic-modal-count">1 adapter</span>
+        </div>
+        <div class="nic-modal-cards" id="nic-modal-cards"></div>
+        <div class="nic-modal-guide">
+          <div class="nic-modal-guide-item">
+            <span class="nic-guide-badge">Tethering</span>
+            <p>Connect phone via USB and enable <b>USB Tethering</b> to bond mobile data with Wi-Fi or Ethernet.</p>
+          </div>
+          <div class="nic-modal-guide-item">
+            <span class="nic-guide-badge">Dual NIC</span>
+            <p>Plug in an Ethernet cable while Wi-Fi is connected for concurrent multi-route throughput.</p>
+          </div>
+        </div>
+      </div>
+      <div class="nic-modal-foot">
+        <span class="nic-modal-foot-tip">Changes take effect on the next download chunk or transfer.</span>
+        <button class="primary nic-modal-done-btn" id="nic-modal-done" type="button">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Setup Tutorial / Onboarding Wizard Modal -->
+  <div class="wizard-modal-backdrop" id="setup-wizard-backdrop" hidden>
+    <div class="wizard-modal-dialog" id="setup-wizard-dialog" role="dialog" aria-modal="true" aria-labelledby="wizard-title-1">
+      <!-- Wizard Progress Header -->
+      <div class="wizard-head">
+        <div class="wizard-brand">
+          <span class="wizard-brand-pill">Sucr Setup Guide</span>
+          <span class="wizard-step-indicator" id="wizard-step-indicator">Step 1 of 4</span>
+        </div>
+        <div class="wizard-progress-bar">
+          <div class="wizard-progress-fill" id="wizard-progress-fill" style="width: 25%;"></div>
+        </div>
+      </div>
+
+      <!-- Step Content Area -->
+      <div class="wizard-body">
+        <!-- STEP 1: Storage & Default Folder -->
+        <div class="wizard-step" id="wizard-step-1" data-step="1">
+          <div class="wizard-step-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <h2 class="wizard-title" id="wizard-title-1">Choose Your Download Location</h2>
+          <p class="wizard-sub">
+            Pick a dedicated directory for your downloads. We strongly recommend choosing a secondary drive rather than your C: system drive.
+          </p>
+
+          <div class="wizard-warning-box">
+            <div class="wizard-warning-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+            </div>
+            <div class="wizard-warning-text">
+              <strong>Avoid defaulting to C:\Users\...\Downloads</strong>
+              <p>Heavy downloads can rapidly exhaust your Windows OS drive, slow down system performance, and degrade SSD endurance. Storing on D:, E:, or a secondary drive keeps Windows fast and your files clean.</p>
+            </div>
+          </div>
+
+          <div class="wizard-field-group">
+            <label class="wizard-label" for="wizard-folder-input">Target Download Directory</label>
+            <div class="wizard-folder-row">
+              <input type="text" class="wizard-folder-input" id="wizard-folder-input" placeholder="e.g. D:\Downloads" spellcheck="false">
+              <button type="button" class="wizard-browse-btn" id="wizard-folder-browse">Browse...</button>
+            </div>
+          </div>
+
+          <div class="wizard-presets-wrap">
+            <span class="wizard-presets-label">Suggested Locations:</span>
+            <div class="wizard-presets-chips" id="wizard-presets-chips"></div>
+          </div>
+
+          <div class="folder-notice" id="wizard-folder-notice" role="status" hidden>
+            <span class="folder-notice-text" id="wizard-folder-notice-text"></span>
+            <button class="folder-create-btn" type="button" id="wizard-folder-create">Create folder</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: Download Categories -->
+        <div class="wizard-step" id="wizard-step-2" data-step="2" hidden>
+          <div class="wizard-step-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+          </div>
+          <h2 class="wizard-title" id="wizard-title-2">Organize by Download Categories</h2>
+          <p class="wizard-sub">
+            Sucr can automatically organize incoming files into clean category folders inside your chosen download drive.
+          </p>
+
+          <div class="wizard-toggle-card">
+            <div class="wizard-toggle-info">
+              <h4>Automatic Category Subfolders</h4>
+              <p>Sort files into dedicated subfolders based on file types upon completion.</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="wizard-cat-sorting" checked>
+              <span aria-hidden="true"></span>
+            </label>
+          </div>
+
+          <div class="wizard-categories-list" id="wizard-categories-list">
+            <div class="wizard-cat-item">
+              <span class="wizard-cat-icon">📦</span>
+              <div class="wizard-cat-details">
+                <div class="wizard-cat-name">Archives &amp; ISOs</div>
+                <div class="wizard-cat-exts">.zip · .rar · .7z · .iso · .tar · .gz · .pup</div>
+              </div>
+              <div class="wizard-cat-path" id="wizard-cat-path-archive">\Archives</div>
+            </div>
+            <div class="wizard-cat-item">
+              <span class="wizard-cat-icon">🎬</span>
+              <div class="wizard-cat-details">
+                <div class="wizard-cat-name">Videos &amp; Movies</div>
+                <div class="wizard-cat-exts">.mp4 · .mkv · .webm · .avi · .mov</div>
+              </div>
+              <div class="wizard-cat-path" id="wizard-cat-path-video">\Videos</div>
+            </div>
+            <div class="wizard-cat-item">
+              <span class="wizard-cat-icon">🎵</span>
+              <div class="wizard-cat-details">
+                <div class="wizard-cat-name">Audio &amp; Music</div>
+                <div class="wizard-cat-exts">.mp3 · .flac · .wav · .m4a · .ogg</div>
+              </div>
+              <div class="wizard-cat-path" id="wizard-cat-path-audio">\Audio</div>
+            </div>
+            <div class="wizard-cat-item">
+              <span class="wizard-cat-icon">📄</span>
+              <div class="wizard-cat-details">
+                <div class="wizard-cat-name">Documents</div>
+                <div class="wizard-cat-exts">.pdf · .docx · .xlsx · .epub · .txt</div>
+              </div>
+              <div class="wizard-cat-path" id="wizard-cat-path-doc">\Documents</div>
+            </div>
+            <div class="wizard-cat-item">
+              <span class="wizard-cat-icon">💻</span>
+              <div class="wizard-cat-details">
+                <div class="wizard-cat-name">Programs &amp; Installers</div>
+                <div class="wizard-cat-exts">.exe · .msi · .appx · .pkg · .dmg</div>
+              </div>
+              <div class="wizard-cat-path" id="wizard-cat-path-prog">\Programs</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: Network & Bonding Preferences -->
+        <div class="wizard-step" id="wizard-step-3" data-step="3" hidden>
+          <div class="wizard-step-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
+              <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+              <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+              <line x1="12" y1="20" x2="12.01" y2="20"/>
+            </svg>
+          </div>
+          <h2 class="wizard-title" id="wizard-title-3">Network Acceleration &amp; Bonding</h2>
+          <p class="wizard-sub">
+            Sucr can bond multiple network connections simultaneously (e.g. Ethernet + Wi-Fi or Phone USB Tethering).
+          </p>
+
+          <div class="wizard-options-grid">
+            <label class="wizard-option-card is-selected" data-policy="dynamic">
+              <input type="radio" name="wizard-policy" value="dynamic" checked>
+              <div class="wizard-option-top">
+                <strong>Dynamic Aggregation</strong>
+                <span class="wizard-option-badge">Recommended</span>
+              </div>
+              <p>Concurrently splits chunks across all active adapters to maximize download throughput.</p>
+            </label>
+
+            <label class="wizard-option-card" data-policy="hedging">
+              <input type="radio" name="wizard-policy" value="hedging">
+              <div class="wizard-option-top">
+                <strong>Hedging (Race Slow Chunks)</strong>
+              </div>
+              <p>Races a chunk whose stream has gone quiet onto a second connection, so a stalled finish still lands.</p>
+            </label>
+
+            <label class="wizard-option-card" data-policy="failover">
+              <input type="radio" name="wizard-policy" value="failover">
+              <div class="wizard-option-top">
+                <strong>Failover (Backup Standby)</strong>
+              </div>
+              <p>Uses only the primary connection, seamlessly failing over to secondary only if primary drops.</p>
+            </label>
+          </div>
+
+          <div class="wizard-toggle-card wizard-toggle-card--compact">
+            <div class="wizard-toggle-info">
+              <h4>Metered Connection Guard</h4>
+              <p>Keeps a mobile-broadband connection out of the bond. A phone tethered over USB reports as USB, not cellular, so that one stays your call.</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="wizard-metered-guard" checked>
+              <span aria-hidden="true"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- STEP 4: Appearance & Engine Behavior -->
+        <div class="wizard-step" id="wizard-step-4" data-step="4" hidden>
+          <div class="wizard-step-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/>
+              <line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+          </div>
+          <h2 class="wizard-title" id="wizard-title-4">Personalize Your Experience</h2>
+          <p class="wizard-sub">
+            Customize the look, feedback, and concurrency behavior for your setup.
+          </p>
+
+          <div class="wizard-settings-block">
+            <div class="wizard-setting-row">
+              <div class="wizard-setting-label">
+                <strong>App Theme</strong>
+                <span>Choose your preferred appearance interface</span>
+              </div>
+              <div class="seg-control wizard-seg" id="wizard-theme-seg">
+                <button type="button" data-val="dark" aria-pressed="true">Dark</button>
+                <button type="button" data-val="light" aria-pressed="false">Light</button>
+                <button type="button" data-val="system" aria-pressed="false">System</button>
+              </div>
+            </div>
+
+            <div class="wizard-setting-row">
+              <div class="wizard-setting-label">
+                <strong>Transfer Progress Meter</strong>
+                <span>Fluid animated liquid wave or crisp segmented chunks</span>
+              </div>
+              <div class="seg-control wizard-seg" id="wizard-meter-seg">
+                <button type="button" data-val="wave" aria-pressed="true">Wave</button>
+                <button type="button" data-val="segmented" aria-pressed="false">Segmented</button>
+              </div>
+            </div>
+
+            <div class="wizard-setting-row">
+              <div class="wizard-setting-label">
+                <strong>Sound on Complete</strong>
+                <span>Play an audible chime when all chunks finish</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="wizard-sound-complete" checked>
+                <span aria-hidden="true"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="wizard-summary-box">
+            <h4>Ready to download at full speed!</h4>
+            <div class="wizard-summary-pills">
+              <span class="wizard-summary-pill" id="wizard-summary-folder">&mdash;</span>
+              <span class="wizard-summary-pill">Dynamic Bonding</span>
+              <span class="wizard-summary-pill">Auto-Categories</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wizard Navigation Footer -->
+      <div class="wizard-foot">
+        <button type="button" class="ghost wizard-skip-btn" id="wizard-btn-skip">Skip Tutorial</button>
+        <div class="wizard-foot-nav">
+          <button type="button" class="ghost wizard-back-btn" id="wizard-btn-back" disabled>Back</button>
+          <button type="button" class="primary wizard-next-btn" id="wizard-btn-next">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-notice" class="toast-notice" role="status" aria-live="polite" hidden></div>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

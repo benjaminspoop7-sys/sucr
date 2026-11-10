@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" role="img" aria-labelledby="t4 d4">
+  <title id="t4">Partial file — ranges are missing</title>
+  <desc id="d4">Eight byte-range blocks: six verified, one outlined dashed (never fetched), one crossed (checksum mismatch).</desc>
+  <style>
+    .ok{fill:var(--success-tint,#E6F4EA);stroke:var(--success-ink,#146C2E);stroke-width:1.5}
+    .gap{fill:none;stroke:var(--border-strong,#B4B9BE);stroke-width:1.5;stroke-dasharray:4 3}
+    .bad{fill:var(--danger-tint,#FCE8E6);stroke:var(--danger-ink,#A31515);stroke-width:1.5}
+    .mk{fill:none;stroke:var(--danger-ink,#A31515);stroke-width:2;stroke-linecap:round}
+  </style>
+  <!-- row 1: contiguous and verified -->
+  <rect class="ok" x="28" y="46" width="24" height="16" rx="3"/>
+  <rect class="ok" x="56" y="46" width="24" height="16" rx="3"/>
+  <rect class="ok" x="84" y="46" width="24" height="16" rx="3"/>
+  <rect class="ok" x="112" y="46" width="24" height="16" rx="3"/>
+  <!-- row 2: verified, verified, hole, contradiction -->
+  <rect class="ok" x="28" y="66" width="24" height="16" rx="3"/>
+  <rect class="ok" x="56" y="66" width="24" height="16" rx="3"/>
+  <rect class="gap" x="84" y="66" width="24" height="16" rx="3"/>
+  <rect class="bad" x="112" y="66" width="24" height="16" rx="3"/>
+  <path class="mk" d="M117 70l14 8M131 70l-14 8"/>
+  <!-- hairline rule: the map is telemetry, so the empty span is drawn, not implied -->
+  <path class="gap" d="M28 30h108"/>
+</svg>

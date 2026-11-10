@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" role="img" aria-labelledby="t6 d6">
+  <title id="t6">This source is not reachable right now</title>
+  <desc id="desc6">A plug with two prongs separated from a dashed socket by a visible gap; the cable runs in from the left.</desc>
+  <style>
+    .ln{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .dash{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-dasharray:5 5;opacity:.55}
+    .ac{fill:none;stroke:var(--accent-ink,#1765CC);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .do{fill:var(--accent-tint,#E8F0FE);stroke:var(--accent-ink,#1765CC);stroke-width:1.5}
+  </style>
+  <!-- cable + strain relief -->
+  <path class="ln" d="M14 88h20"/>
+  <path class="ln" d="M34 88V64"/>
+  <!-- plug body: the accented half, because it is the thing the user controls -->
+  <rect class="ac" x="26" y="44" width="20" height="24" rx="6"/>
+  <path class="ac" d="M46 52h16M46 60h16"/>
+  <!-- socket: the half that is not answering -->
+  <rect class="dash" x="82" y="40" width="34" height="32" rx="6"/>
+  <path class="dash" d="M94 50v12M106 50v12"/>
+  <!-- the gap is the message; sucker dots mark the two idle tentacles -->
+  <circle class="do" cx="60" cy="90" r="6"/>
+  <circle class="do" cx="78" cy="96" r="4"/>
+  <circle class="do" cx="94" cy="88" r="3"/>
+</svg>

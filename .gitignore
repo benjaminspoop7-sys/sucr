@@ -1,0 +1,49 @@
+# --- build output -------------------------------------------------------
+app/node_modules/
+app/dist/
+app/err.txt
+app/src-tauri/target/
+app/src-tauri/target-*/
+app/src-tauri/gen/
+extension/dist/
+
+# --- secrets: local extension signing identity --------------------------
+# Regenerate with a fresh key; never publish these.
+extension/_devkey.b64
+extension/_devpub.der
+extension/_devid.txt
+*.pem
+*.key
+*.p12
+*.pfx
+
+# --- local harness / collaboration scratch ------------------------------
+# bridge/ fakes another agent's session and logs live tasks.
+bridge/
+relay/
+scratch/
+tmp/
+renders/
+extension/_shots/
+branding/_drafts/
+
+# --- runtime state that must never be versioned -------------------------
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.part
+*.sucrpart
+*.sucrpart.*
+*.log
+
+# --- OS / editor noise --------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+.idea/
+.vscode/

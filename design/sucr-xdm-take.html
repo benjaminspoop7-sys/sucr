@@ -1,0 +1,360 @@
+<title>Sucr — XDM-site take</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;padding:28px 22px 64px;background:#0E0F10;font-family:-apple-system,"Segoe UI",Roboto,Inter,sans-serif;
+       -webkit-font-smoothing:antialiased}
+  .doc{max-width:1180px;margin:0 auto;color:#B9BEC4;font-size:13px;line-height:1.5}
+  .doc h1{font-size:19px;font-weight:600;color:#EDEFF1;margin:0 0 6px;letter-spacing:-.2px}
+  .doc .sub{color:#8B9197;max-width:860px;margin:0 0 22px}
+  .doc h2{font-size:14px;font-weight:600;color:#EDEFF1;margin:34px 0 6px}
+  .doc h2 span{font-weight:400;color:#83898F;font-size:12px}
+  .doc p{margin:0 0 10px;max-width:880px}
+  .mono{font-family:"Cascadia Mono","Roboto Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+  code{font-family:"Cascadia Mono",Consolas,monospace;font-size:11.5px;color:#C9CED3}
+  /* the doc's code colour is tuned for the #0E0F10 page; on a pane it takes the pane's ink */
+  .pane code{color:inherit;font-size:inherit}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0 6px}
+  /* two panes only while a cell can hold the bar's 238px floor */
+  @media (max-width:1000px){.pair{grid-template-columns:1fr}}
+
+  /* ---------- theme surfaces ---------- */
+  .pane{border-radius:12px;overflow:hidden}
+  .t-light{--bg:#FFFFFF;--s1:#F8F9FA;--s2:#F1F3F4;--text:#202124;--text2:#5F6368;--t3:#666D73;
+    --border:#DADCE0;--bstrong:#B4B9BE;--track:#E8EAED;--accent:#1A73E8;--ink:#1765CC;--tint:#E8F0FE;
+    --accent-text:#FFFFFF;--glyph:var(--accent-text);--n1:#0E8D7F;--n2:#1A73E8;--n3:#D26A00;--n4:#6A52E8;
+    --e-2:0 1px 2px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.06);
+    background:var(--bg);color:var(--text);border:1px solid #DADCE0}
+  .t-dark{--bg:#1B1D1F;--s1:#252729;--s2:#2D2F31;--text:#E8EAED;--text2:#A8ADB2;--t3:#959AA0;
+    --border:#3C4043;--bstrong:#5F6368;--track:#3C4043;--accent:#8AB4F8;--ink:#A6C8FF;--tint:#26344A;
+    --accent-text:#0B1A33;--glyph:var(--accent-text);--n1:#4CC2B4;--n2:#8AB4F8;--n3:#F0955A;--n4:#B6A2FF;
+    --e-2:0 0 0 1px #5F6368;
+    background:var(--bg);color:var(--text);border:1px solid #3C4043}
+
+  .ttl{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);
+       font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;font-weight:600;color:var(--text2)}
+  .ttl .k{margin-left:auto;letter-spacing:0;text-transform:none;font-weight:400;font-size:11px;color:var(--t3)}
+  .body{padding:12px}
+
+  /* ---------- row ---------- */
+  .row{display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:9px;flex-wrap:wrap;row-gap:6px}
+  .row.sel{background:var(--tint);box-shadow:inset 0 0 0 1px var(--ink)}
+  /* --text-3 on the dark tint is 4.43; the icons climb one rung on the selected row only */
+  .row.sel .ib{color:var(--text2)}
+  .badge{width:36px;height:36px;flex:none;border-radius:9px;display:grid;place-items:center;background:var(--n2)}
+  .badge.v{background:var(--n2)}.badge.a{background:var(--n1)}.badge.z{background:var(--n4)}.badge.d{background:var(--n3)}
+  .badge svg{width:17px;height:17px;fill:none;stroke:var(--glyph);stroke-width:1.7;stroke-linejoin:round;stroke-linecap:round}
+  .cell{min-width:0;flex:1 1 260px}
+  .fname{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .meta{font-size:11.5px;color:var(--text2);margin-top:2px}
+  .spd{font-size:11.5px;color:var(--text2);flex:none;text-align:right;width:88px;margin-left:auto}
+  .act{display:flex;gap:2px;flex:none}
+  .ib{width:24px;height:24px;border:0;border-radius:6px;background:transparent;color:var(--t3);display:grid;place-items:center;cursor:default}
+  .ib:hover{background:var(--s2);color:var(--text)}
+  .ib svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+  /* The row bar is a 24-cell sample of the map, drawn with the map's own rule:
+     a band's width is that network's share of the span, the rest is track, and
+     two bands in one cell is a hedge. 24 x 8px + 23 x 2px gaps = 238px, the
+     cell floor in §4.5 — the bar drops to a 16-cell sample before it shrinks. */
+  .segbar{display:flex;gap:2px;height:8px;margin-top:7px;max-width:238px}
+  .segbar i{flex:1 1 0;min-width:8px;border-radius:1px;background:var(--track)}
+  .segbar .d1{background:var(--n1)}.segbar .d2{background:var(--n2)}.segbar .d3{background:var(--n3)}
+  /* hard stops land on whole pixels at 8px: 3px, 5px, 4px */
+  .segbar .p1{background:linear-gradient(90deg,var(--n1) 0 62.5%,var(--track) 62.5% 100%)}
+  /* a 1px track notch between the two racing bands: the net hues are 1.10 (light)
+     and 1.03 (dark) apart, so hue cannot carry the hedge — the notch does. */
+  .segbar .hg{background:linear-gradient(90deg,var(--n1) 0 37.5%,var(--track) 37.5% 50%,var(--n2) 50% 75%,var(--track) 75% 100%)}
+
+  /* ---------- ring ---------- */
+  .ring{position:relative;flex:none}
+  .ring svg{display:block;transform:rotate(-90deg)}
+  .ring .pct{position:absolute;inset:0;display:grid;place-items:center;font-size:11px;font-weight:500;color:var(--text)}
+  .rtrack{fill:none;stroke:var(--track);stroke-width:3.5}
+  .rarc{fill:none;stroke:var(--accent);stroke-width:3.5;stroke-linecap:round}
+
+  /* ---------- buttons ---------- */
+  .btn{height:30px;padding:0 13px;border:0;border-radius:8px;font-size:12.5px;font-weight:500;font-family:inherit;cursor:default;
+       background:var(--s2);color:var(--text);display:inline-flex;align-items:center;gap:6px}
+  .btn.pri{background:var(--accent);color:var(--accent-text)}
+  .btn.gho{background:transparent;color:var(--text2)}
+  .btn.gho:hover{background:var(--s2);color:var(--text)}
+  .btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+  /* ---------- floating card ---------- */
+  /* --e-2 is tokens.css's own level-2 elevation: a soft shadow in light, a 1px
+     #5F6368 ring in dark. One variable, so the card never tests the theme. */
+  .float{width:326px;max-width:100%;border-radius:12px;background:var(--s1);box-shadow:var(--e-2);overflow:hidden}
+  .fl-head{display:flex;align-items:center;gap:7px;padding:8px 10px;border-bottom:1px solid var(--border);
+           font-size:11.5px;color:var(--text2)}
+  .fl-head b{color:var(--text);font-weight:600;font-size:11.5px}
+  .fl-head .x{margin-left:auto;color:var(--t3)}
+  .fl-body{display:flex;gap:14px;padding:13px 12px 6px;align-items:center}
+  .fl-col{min-width:0;flex:1}
+  .fl-name{font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fl-sub{font-size:11px;color:var(--text2);margin-top:1px}
+  .fl-nums{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-top:9px}
+  .fl-body .segbar{max-width:none;margin-top:8px}
+  .fl-foot{display:flex;justify-content:flex-end;gap:8px;padding:10px 12px;border-top:1px solid var(--border);margin-top:10px}
+
+  /* ---------- rail comparison ---------- */
+  .rail{width:186px;padding:6px}
+  .ri{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;font-size:12px;color:var(--text)}
+  .ri .n{margin-left:auto;font-size:11px;color:var(--t3)}
+  .ri.a-cur{background:var(--tint);color:var(--ink);font-weight:500;box-shadow:inset 0 0 0 1px var(--ink)}
+  .ri.a-cur .n{color:var(--text2)}
+  .ri.n-cur{background:var(--s2);color:var(--text);font-weight:500;box-shadow:inset 0 0 0 1px var(--bstrong)}
+  .ri.n-cur .n{color:var(--t3)}
+  .cap{font-size:10.5px;color:var(--text2);margin:8px 0 0}
+
+  /* ---------- rejected ---------- */
+  .rej{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media (max-width:940px){.rej{grid-template-columns:1fr}}
+  .rc{background:#17191B;border:1px solid #2B2E31;border-radius:10px;padding:12px;color:#B9BEC4;font-size:12px}
+  .rc b{display:block;color:#EDEFF1;font-size:12.5px;font-weight:600;margin-bottom:6px}
+  .rc .sw{height:54px;border-radius:7px;margin:8px 0}
+  .grad{background:linear-gradient(135deg,#3B1E6E 0%,#2A2A7A 45%,#1B4C8A 100%)}
+  .soft{box-shadow:0 24px 48px rgba(0,0,0,.55);background:#252729}
+  .rc .ratio{font-family:"Cascadia Mono",Consolas,monospace;font-size:11px;color:#8B9197}
+  .bad{color:#F28B82}
+  .good{color:#81C995}
+  .doc table{border-collapse:collapse;font-family:"Cascadia Mono",Consolas,monospace;font-size:11.5px;margin-top:8px}
+  .doc th,.doc td{text-align:left;padding:5px 14px 5px 0;color:#9AA0A6;border-bottom:1px solid #232629;font-weight:400}
+  .doc th{color:#7E858B;font-size:10.5px;letter-spacing:.5px;text-transform:uppercase}
+  .doc td b{color:#DDE1E5;font-weight:500}
+</style>
+
+<div class="doc">
+  <h1>XDM site → Sucr: what to take</h1>
+  <p class="sub">Reference: <code>xtremedownloadmanager.com/assets/img/shots/*.webp</code>, saved in <code>design/refs/xdm-site/</code>.
+  Those images are a marketing redesign of a dated Swing app — not its shipped UI. Four ideas transfer; three do not.
+  Every colour below is a value from <code>tokens.css</code>; the names are shortened aliases
+  (<code>--s1</code>/<code>--surface-1</code>, <code>--t3</code>/<code>--text-3</code>, <code>--bstrong</code>/<code>--border-strong</code>,
+  <code>--ink</code>/<code>--accent-ink</code>, <code>--tint</code>/<code>--accent-tint</code>, <code>--n1</code>–<code>--n4</code>/<code>--net-*</code>),
+  and <code>--glyph</code> derives from <code>--accent-text</code>. No new colour is introduced.</p>
+
+  <h2>Take 1 — the progress bar is the map <span>their bar is segmented; ours is 24 cells of the map, bands and all</span></h2>
+  <div class="pair">
+    <div class="pane t-light">
+      <div class="ttl">Light · row + map sample <span class="k">24 cells · 8px · 2px gaps</span></div>
+      <div class="body">
+        <div class="row sel">
+          <div class="badge z"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M10 9.5v5l4.5-2.5z"/></svg></div>
+          <div class="cell">
+            <div class="fname">Sintel.2010.1080p.mkv</div>
+            <div class="meta mono">596.9 MB of 1.1 GB · 3 networks</div>
+            <div class="segbar"><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d1"></i><i class="d1"></i><i class="d1"></i><i class="d3"></i><i class="d3"></i><i class="d3"></i><i class="p1"></i><i class="hg"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <div class="spd mono">14.8 MB/s</div>
+          <div class="act">
+            <button class="ib" aria-label="Pause"><svg viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></svg></button>
+            <button class="ib" aria-label="Open folder"><svg viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="badge v"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M10 9.5v5l4.5-2.5z"/></svg></div>
+          <div class="cell">
+            <div class="fname">Blender-4.5-windows-x64.zip</div>
+            <div class="meta mono">380.6 MB · done · verified</div>
+            <div class="segbar"><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d1"></i><i class="d1"></i><i class="d1"></i><i class="d1"></i><i class="d1"></i><i class="d1"></i><i class="d3"></i><i class="d3"></i><i class="d3"></i><i class="d3"></i><i class="d3"></i><i class="d3"></i><i class="d3"></i><i class="d3"></i><i class="d3"></i></div>
+          </div>
+          <div class="spd mono" style="color:var(--text2)">verified</div>
+          <div class="act">
+            <button class="ib" aria-label="Open folder"><svg viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane t-dark">
+      <div class="ttl">Dark · same pair <span class="k">band width is share, not one accent</span></div>
+      <div class="body">
+        <div class="row sel">
+          <div class="badge z"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M10 9.5v5l4.5-2.5z"/></svg></div>
+          <div class="cell">
+            <div class="fname">Sintel.2010.1080p.mkv</div>
+            <div class="meta mono">596.9 MB of 1.1 GB · 3 networks</div>
+            <div class="segbar"><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d1"></i><i class="d1"></i><i class="d1"></i><i class="d3"></i><i class="d3"></i><i class="d3"></i><i class="p1"></i><i class="hg"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <div class="spd mono">14.8 MB/s</div>
+          <div class="act">
+            <button class="ib" aria-label="Pause"><svg viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></svg></button>
+            <button class="ib" aria-label="Open folder"><svg viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="badge v"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M10 9.5v5l4.5-2.5z"/></svg></div>
+          <div class="cell">
+            <div class="fname">Blender-4.5-windows-x64.zip</div>
+            <div class="meta mono">380.6 MB · done · verified</div>
+            <div class="segbar"><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d2"></i><i class="d1"></i><i class="d1"></i><i class="d1"></i><i class="d1"></i><i class="d1"></i><i class="d1"></i><i class="d3"></i><i class="d3"></i><i class="d3"></i><i class="d3"></i><i class="d3"></i><i class="d3"></i><i class="d3"></i><i class="d3"></i><i class="d3"></i></div>
+          </div>
+          <div class="spd mono" style="color:var(--text2)">verified</div>
+          <div class="act">
+            <button class="ib" aria-label="Open folder"><svg viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p><b>The one thing to keep.</b> XDM's marketing bar is a dashed fill — decoration shaped like data. Ours is a
+  <i>sample</i> of the map: 24 cells cut from the file's block plan, each drawn with the map's own rule — a band's
+  width is that network's share of the span, the remainder is track, and two bands in one cell is a hedge
+  (the same wording as the inspector's legend). The two racing bands are separated by a 1px track notch, because the
+  net hues measure 1.10 against each other in light and 1.03 in dark: hue cannot carry that boundary at any cell size,
+  so the notch does — and the map's own cells need the same notch. The bar then needs 24 × 8 px plus 23 × 2 px gaps =
+  238 px, exactly the cell floor §4.5 sets; a narrower pane drops to a 16-cell sample (158 px) instead of drawing 6 px
+  cells. The row's bar and the inspector's map become the same object at two sizes, for the cost of one flex container.</p>
+
+  <h2>Take 2 — solid category badge with a glyph, not a lettered border <span>their blue circles; our category hues</span></h2>
+  <div class="pair">
+    <div class="pane t-light">
+      <div class="ttl">Light <span class="k">glyph 3.0 gate, not 4.5 — it is a mark, not text</span></div>
+      <div class="body" style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+        <div class="badge v"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M10 9.5v5l4.5-2.5z"/></svg></div>
+        <div class="badge a"><svg viewBox="0 0 24 24"><path d="M4 7h16v13H4z"/><path d="M4 11h16M8 3v4M16 3v4"/></svg></div>
+        <div class="badge z"><svg viewBox="0 0 24 24"><path d="M12 3v10.5"/><circle cx="12" cy="18" r="3"/><path d="M12 13.5 18 9"/></svg></div>
+        <div class="badge d"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/></svg></div>
+      </div>
+    </div>
+    <div class="pane t-dark">
+      <div class="ttl">Dark <span class="k">glyph flips to ink-dark; hues stay the same family</span></div>
+      <div class="body" style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+        <div class="badge v"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M10 9.5v5l4.5-2.5z"/></svg></div>
+        <div class="badge a"><svg viewBox="0 0 24 24"><path d="M4 7h16v13H4z"/><path d="M4 11h16M8 3v4M16 3v4"/></svg></div>
+        <div class="badge z"><svg viewBox="0 0 24 24"><path d="M12 3v10.5"/><circle cx="12" cy="18" r="3"/><path d="M12 13.5 18 9"/></svg></div>
+        <div class="badge d"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/></svg></div>
+      </div>
+    </div>
+  </div>
+  <p>A 36px square filled with the category hue reads faster in a long list than a bordered box saying <code>MKV</code>, and it removes the one place the list still needed a 4.5 text gate on a saturating colour. The glyph is a graphic, so the gate is 3.0 — white clears it on all four light hues (3.62 on amber to 5.27 on violet, measured on this render); the extension stays in the tooltip and the table's Category column.</p>
+
+  <h2>Take 3 — the floating progress card <span>XDM ships a ProgressWindow; the site renders it well</span></h2>
+  <div class="pair">
+    <div class="pane t-light">
+      <div class="ttl">Light <span class="k">ring 64 · segmented bar · Hide / Pause</span></div>
+      <div class="body" style="display:flex;justify-content:center;padding:16px 12px 18px">
+        <div class="float">
+          <div class="fl-head"><b>52%</b><span>·</span><span class="mono" style="font-size:11px">Sintel.2010.1080p.mkv</span><span class="x">✕</span></div>
+          <div class="fl-body">
+            <div class="ring" style="width:64px;height:64px">
+              <svg width="64" height="64" viewBox="0 0 64 64"><circle class="rtrack" cx="32" cy="32" r="28"/><circle class="rarc" cx="32" cy="32" r="28" stroke-dasharray="91.5 175.9"/></svg>
+              <div class="pct mono">52%</div>
+            </div>
+            <div class="fl-col">
+              <div class="fl-name">Sintel.2010.1080p.mkv</div>
+              <div class="fl-sub">Downloading · 3 networks</div>
+              <div class="fl-nums mono"><span>596.9 MB / 1.1 GB</span><span>14.8 MB/s</span></div>
+              <div class="segbar"><i class="d2"></i><i class="d2"></i><i class="d1"></i><i class="d2"></i><i class="d3"></i><i class="hg"></i><i></i><i></i><i></i><i></i></div>
+            </div>
+          </div>
+          <div class="fl-foot"><button class="btn gho">Hide</button><button class="btn pri">Pause</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="pane t-dark">
+      <div class="ttl">Dark <span class="k">e-2 flips from shadow to a 1px ring</span></div>
+      <div class="body" style="display:flex;justify-content:center;padding:16px 12px 18px">
+        <div class="float">
+          <div class="fl-head"><b>52%</b><span>·</span><span class="mono" style="font-size:11px">Sintel.2010.1080p.mkv</span><span class="x">✕</span></div>
+          <div class="fl-body">
+            <div class="ring" style="width:64px;height:64px">
+              <svg width="64" height="64" viewBox="0 0 64 64"><circle class="rtrack" cx="32" cy="32" r="28"/><circle class="rarc" cx="32" cy="32" r="28" stroke-dasharray="91.5 175.9"/></svg>
+              <div class="pct mono">52%</div>
+            </div>
+            <div class="fl-col">
+              <div class="fl-name">Sintel.2010.1080p.mkv</div>
+              <div class="fl-sub">Downloading · 3 networks</div>
+              <div class="fl-nums mono"><span>596.9 MB / 1.1 GB</span><span>14.8 MB/s</span></div>
+              <div class="segbar"><i class="d2"></i><i class="d2"></i><i class="d1"></i><i class="d2"></i><i class="d3"></i><i class="hg"></i><i></i><i></i><i></i><i></i></div>
+            </div>
+          </div>
+          <div class="fl-foot"><button class="btn gho">Hide</button><button class="btn pri">Pause</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p>The card is the one place a ring earns its keep: it is watched, not read. It stays a <b>solid</b> arc — at 64px the circumference is 176px, so a 24-cell segmented arc would be 7px per cell, under the 8px floor, and an arc cell cannot show two bands at all. The bar underneath carries the per-block information, so nothing is lost. The card's elevation is <code>--e-2</code> and nothing else: soft shadow in light, 1px ring in dark, one variable.</p>
+
+  <h2>Take 4 — neutral selection vs accent selection <span>XDM's selected row is a neutral raised block</span></h2>
+  <div class="pair">
+    <div class="pane t-light">
+      <div class="ttl">Light <span class="k">two rails, same state</span></div>
+      <div class="body" style="display:flex;gap:22px;flex-wrap:wrap">
+        <div>
+          <div class="rail">
+            <div class="ri a-cur">All downloads<span class="n mono">14</span></div>
+            <div class="ri">In progress<span class="n mono">2</span></div>
+            <div class="ri">Finished<span class="n mono">8</span></div>
+          </div>
+          <div class="cap">accent tint + ink · count forced to <code>--text-2</code></div>
+        </div>
+        <div>
+          <div class="rail">
+            <div class="ri n-cur">All downloads<span class="n mono">14</span></div>
+            <div class="ri">In progress<span class="n mono">2</span></div>
+            <div class="ri">Finished<span class="n mono">8</span></div>
+          </div>
+          <div class="cap">neutral <code>--s2</code> + edge · count stays <code>--text-3</code></div>
+        </div>
+      </div>
+    </div>
+    <div class="pane t-dark">
+      <div class="ttl">Dark <span class="k">where the two differ</span></div>
+      <div class="body" style="display:flex;gap:22px;flex-wrap:wrap">
+        <div>
+          <div class="rail">
+            <div class="ri a-cur">All downloads<span class="n mono">14</span></div>
+            <div class="ri">In progress<span class="n mono">2</span></div>
+            <div class="ri">Finished<span class="n mono">8</span></div>
+          </div>
+          <div class="cap">accent tint + ink · count forced to <code>--text-2</code></div>
+        </div>
+        <div>
+          <div class="rail">
+            <div class="ri n-cur">All downloads<span class="n mono">14</span></div>
+            <div class="ri">In progress<span class="n mono">2</span></div>
+            <div class="ri">Finished<span class="n mono">8</span></div>
+          </div>
+          <div class="cap">neutral <code>--s2</code> + edge · count stays <code>--text-3</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p>Neutral selection stops the accent doing two jobs at once — "you are here" and "this is the primary action" — and it is what XDM's site does well. It also buys a contrast rung: on the dark accent tint a <code>--text-3</code> count measures 4.43, under the 4.5 gate, so it has to climb to <code>--text-2</code>; on <code>--s2</code> the same <code>--text-3</code> measures 4.74 and can stay quiet. Keep the accent tint for the <b>list row</b>, where the point is which row the inspector is showing, not where you are in the rail.</p>
+
+  <h2>Not taken <span>three things in those images that fail here</span></h2>
+  <div class="rej">
+    <div class="rc"><b>Gradient backdrop</b><div class="sw grad"></div>
+      Marketing chrome around a device shot. Inside an app it is a hue nothing else shares, it changes with nobody's theme, and it makes every measured token ratio a guess. The app surfaces stay flat.</div>
+    <div class="rc"><b>Saturated blue as text</b><div class="sw" style="display:grid;place-items:center;background:#252729">
+      <span style="color:#3B82F6;font-size:13px">Downloading 52%</span></div>
+      <div class="ratio">#3B82F6 on our card <span style="color:#C9CED3">--s1</span> = <span class="bad">4.08</span> · fails 4.5
+        (4.60 on bg, a 0.10 margin) · our <span class="good">#8AB4F8 = 7.11</span></div>
+      Fine as a fill, not as ink — and the card is where a status line actually sits. That is why the dark accent is two values.</div>
+    <div class="rc"><b>Soft shadow on dark</b><div class="sw soft" style="margin-bottom:2px"></div>
+      <div class="ratio">0 24px 48px rgba(0,0,0,.55) on #17191B → near-invisible, and it drags a halo over the list</div>
+      Dark elevation is <code>--e-2</code>, redefined to a 1px ring; a shadow is a light-theme tool.</div>
+  </div>
+
+  <h2>Measured, not asserted</h2>
+  <table>
+    <tr><th>Pair</th><th>Light</th><th>Dark</th><th>Gate</th></tr>
+    <tr><td>row name <b>--text</b> / bg</td><td>16.10</td><td>14.03</td><td>4.5 ✓</td></tr>
+    <tr><td>row meta <b>--text-2</b> / bg</td><td>6.05</td><td>7.48</td><td>4.5 ✓</td></tr>
+    <tr><td>row meta <b>--text-2</b> / selected tint</td><td>5.28</td><td>5.55</td><td>4.5 ✓</td></tr>
+    <tr><td>glyph / the four category hues</td><td>3.62–5.27</td><td>7.56–8.24</td><td>3.0 ✓</td></tr>
+    <tr><td>segments vs track</td><td>3.00–4.37</td><td>4.56–4.97</td><td>1.5 ✓</td></tr>
+    <tr><td>hedge <b>--n1</b> vs <b>--n2</b> bands</td><td>1.10</td><td>1.03</td><td>1.5 ✗ → notch</td></tr>
+    <tr><td>hedge band / the 1px notch</td><td>3.39</td><td>4.83</td><td>1.5 ✓</td></tr>
+    <tr><td>neutral <b>--s2</b> vs bg / its edge</td><td>1.11 / 1.78</td><td>1.26 / 2.22</td><td>1.5 ✓ edge</td></tr>
+    <tr><td>rail count <b>--text-3</b> on --s2 / on tint</td><td>4.72 / 4.58</td><td>4.74 / 4.43</td><td>4.5 — dark tint</td></tr>
+    <tr><td>primary button <b>--accent-text</b> / --accent</td><td>4.51</td><td>8.24</td><td>4.5 ✓</td></tr>
+    <tr><td>ring arc <b>--accent</b> / --track</td><td>3.74</td><td>4.97</td><td>3.0 ✓</td></tr>
+  </table>
+  <p class="sub" style="margin-top:14px">Ratios recomputed in-browser on this render, not copied from memory: 229 text runs
+  across the page, and the only one under its gate is the specimen in <b>Not taken #2</b> (#3B82F6 = 4.08), which is there to fail.
+  The hedge row is the interesting one — two racing bands measure 1.10 in light and 1.03 in dark, so no hue and no opacity can
+  carry that boundary; the bar inserts a 1px track notch and the adjacency becomes 3.39 / 4.83. The neutral selection measures
+  1.11 against its surface on its own, which is why it carries a 1px <code>--border-strong</code> edge — the same reason the dark
+  theme's elevation is a ring rather than a shadow.</p>
+</div>

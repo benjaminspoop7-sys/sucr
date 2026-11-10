@@ -1,0 +1,54 @@
+[package]
+name = "sucr"
+version = "0.1.0"
+description = "Sucr — the download manager that shows you the work"
+license = "MIT"
+edition = "2021"
+rust-version = "1.77"
+
+[lib]
+name = "sucr_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[dependencies]
+md-5 = "0.10"
+rusqlite = { version = "0.40.2", features = ["bundled"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+httparse = "1.10"
+sha1 = "0.10"
+sha2 = "0.10"
+tauri = { version = "2", default-features = false, features = ["wry", "tray-icon"] }
+ureq = { version = "3", default-features = false, features = ["native-tls"] }
+socket2 = "0.6"
+
+[target.'cfg(windows)'.dependencies]
+# IpHelper answers "which routes exist" (engine/network.rs).
+windows-sys = { version = "0.61", features = [
+    "Win32_NetworkManagement_IpHelper",
+    "Win32_NetworkManagement_Ndis",
+    "Win32_Networking_WinSock",
+] }
+# Already in the graph through tao, wry and tauri-runtime-wry, with these
+# modules enabled — naming it here opts pick.rs into the shell dialog without
+# adding a crate, a compile unit or a second copy of anything.
+windows = { version = "0.62", features = [
+    "Win32_Foundation",
+    "Win32_System_Com",
+    # The capture host's per-browser HKCU registration.
+    "Win32_System_Registry",
+    # SetThreadExecutionState: keeping the machine awake for a live transfer.
+    "Win32_System_Power",
+    "Win32_UI_Shell",
+    "Win32_UI_WindowsAndMessaging",
+] }

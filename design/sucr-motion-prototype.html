@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sucr — Official App Design & Precision Telemetry (by Antigravity)</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    :root, html[data-theme="light"], body[data-theme="light"] {
+      color-scheme: light;
+      --bg: #FFFFFF;
+      --s1: #F8F9FA;
+      --s2: #F1F3F4;
+      --text: #202124;
+      --text2: #5F6368;
+      --text3: #666D73;
+      --border: #DADCE0;
+      --border2: #E8EAED;
+      --bstrong: #B4B9BE;
+      --track: #E8EAED;
+      --accent: #1A73E8;
+      --accent-ink: #1765CC;
+      --accent-tint: #E8F0FE;
+      --accent-text: #FFFFFF;
+      --success: #188038;
+      --success-ink: #146C2E;
+      --success-tint: #E6F4EA;
+      --danger: #D93025;
+      --danger-ink: #A31515;
+      --danger-tint: #FCE8E6;
+      --warning: #B63A0A;
+      --warning-ink: #B63A0A;
+      --warning-fill: #F9AB00;
+      --warning-tint: #FEF7E0;
+      --n1: #0E8D7F; /* Wi-Fi */
+      --n2: #1A73E8; /* Ethernet */
+      --n3: #D26A00; /* 5G USB */
+      --n4: #6A52E8; /* Aux Link */
+      --pill-bg: #E8F0FE;
+      --pill-border: #1A73E8;
+      --pill-text: #1765CC;
+      --dur-theme: 200ms;
+      --e-std: cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    html.dark, html[data-theme="dark"], body.dark, body[data-theme="dark"], .sucr-theme-dark {
+      color-scheme: dark;
+      --bg: #1B1D1F;
+      --s1: #252729;
+      --s2: #2D2F31;
+      --text: #E8EAED;
+      --text2: #A8ADB2;
+      --text3: #959AA0;
+      --border: #3C4043;
+      --border2: #303133;
+      --bstrong: #5F6368;
+      --track: #3C4043;
+      --accent: #8AB4F8;
+      --accent-ink: #A6C8FF;
+      --accent-tint: #26344A;
+      --accent-text: #0B1A33;
+      --success: #81C995;
+      --success-ink: #81C995;
+      --success-tint: #10331C;
+      --danger: #F28B82;
+      --danger-ink: #F28B82;
+      --danger-tint: #3C1F1E;
+      --warning: #FDD663;
+      --warning-ink: #FDD663;
+      --warning-fill: #B8860B;
+      --warning-tint: #302A01;
+      --n1: #4CC2B4;
+      --n2: #8AB4F8;
+      --n3: #F0955A;
+      --n4: #B6A2FF;
+      --pill-bg: #26344A;
+      --pill-border: #8AB4F8;
+      --pill-text: #A6C8FF;
+      --dur-theme: 200ms;
+      --e-std: cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    /* Universal Smooth Theme Transitions (No popping, no harsh jumps) */
+    html, body, #mainContainer, header, aside, main, .drawer-panel, .card-surface, 
+    button, input, .tab-btn, .tab-pill, svg, path, line, circle, rect {
+      transition-property: background-color, border-color, color, fill, stroke;
+      transition-duration: var(--dur-theme);
+      transition-timing-function: var(--e-std);
+    }
+
+    body {
+      background-color: #141517;
+    }
+    body.light {
+      background-color: #F8F9FA;
+    }
+
+    /* Clean, Flat Tab Pill (No glow, flat Material styling) */
+    .tab-pill {
+      background-color: var(--pill-bg);
+      border: 1px solid var(--pill-border);
+      transition: transform 180ms var(--e-std), width 180ms var(--e-std), background-color var(--dur-theme), border-color var(--dur-theme);
+    }
+
+    /* ==========================================================================
+       SIMPLE, CALM, ELEGANT ICON ANIMATIONS (No glow, no cartoon bounce)
+       ========================================================================== */
+
+    .tab-btn {
+      position: relative;
+      outline: none;
+      user-select: none;
+    }
+    .tab-btn svg {
+      transform-origin: center center;
+      transition: transform 140ms var(--e-std), color 140ms var(--e-std);
+    }
+    .tab-btn:hover svg {
+      transform: translateY(-1px);
+    }
+
+    /* Simple, calm tap feedback: subtle 1.06x scale settling smoothly over 180ms */
+    @keyframes simpleTap {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+    .tab-btn.animating svg {
+      animation: simpleTap 180ms var(--e-std);
+    }
+
+    /* 1. Overview (Calm, precise needle glide) */
+    @keyframes needleGlide {
+      0%   { transform: rotate(0deg); }
+      60%  { transform: rotate(24deg); }
+      100% { transform: rotate(20deg); }
+    }
+    .icon-speedometer .needle-group {
+      transform-origin: 12px 14px;
+      transform-box: view-box;
+      transform: rotate(20deg);
+      transition: transform 180ms var(--e-std);
+    }
+    .tab-btn.animating .icon-speedometer .needle-group {
+      animation: needleGlide 240ms var(--e-std) forwards;
+    }
+
+    /* 2. Sucker Map (Subtle, clean cell settle) */
+    @keyframes suckerSettle {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    .icon-sucker .sucker-dot {
+      transform-origin: 17px 17px;
+      transform-box: view-box;
+      transition: transform 160ms var(--e-std);
+    }
+    .tab-btn.animating .icon-sucker .sucker-dot {
+      animation: suckerSettle 200ms var(--e-std) forwards;
+    }
+
+    /* 3. Source (Clean 1.5px magnetic slide) */
+    @keyframes linkSlideL {
+      0%   { transform: translate(-1.5px, 1px); }
+      100% { transform: translate(0, 0); }
+    }
+    @keyframes linkSlideR {
+      0%   { transform: translate(1.5px, -1px); }
+      100% { transform: translate(0, 0); }
+    }
+    .tab-btn.animating .icon-link .chain-l {
+      animation: linkSlideL 180ms var(--e-std) forwards;
+    }
+    .tab-btn.animating .icon-link .chain-r {
+      animation: linkSlideR 180ms var(--e-std) forwards;
+    }
+
+    /* 4. Schedule (Smooth 90-degree minute sweep) */
+    @keyframes clockQuarterSweep {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(90deg); }
+    }
+    .icon-clock .clock-minute-pivot {
+      transform-origin: 12px 12px;
+      transform-box: view-box;
+      transform: rotate(90deg);
+      transition: transform 200ms var(--e-std);
+    }
+    .tab-btn.animating .icon-clock .clock-minute-pivot {
+      animation: clockQuarterSweep 240ms var(--e-std) forwards;
+    }
+
+    /* 5. Files (Subtle 1.5px document lift) */
+    @keyframes folderDocLift {
+      0%   { transform: translateY(0); }
+      50%  { transform: translateY(-1.5px); }
+      100% { transform: translateY(0); }
+    }
+    .tab-btn.animating .icon-folder .doc-sheet {
+      animation: folderDocLift 200ms var(--e-std);
+    }
+
+    /* 6. Activity (Clean line trace, flat, no glow) */
+    @keyframes ekgCleanTrace {
+      0%   { stroke-dashoffset: 36; }
+      100% { stroke-dashoffset: 0; }
+    }
+    .icon-pulse .pulse-line {
+      stroke-dasharray: 36;
+      stroke-dashoffset: 0;
+    }
+    .tab-btn.animating .icon-pulse .pulse-line {
+      animation: ekgCleanTrace 240ms var(--e-std) forwards;
+    }
+
+    /* Google Material 3 Expressive Squiggle (Clean, flat stroke, zero glow) */
+    .m3-squiggle-path {
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Sucker Cell Hover (Subtle, flat) */
+    .sucker-cell {
+      transition: transform 80ms var(--e-std), outline 80ms var(--e-std);
+    }
+    .sucker-cell:hover {
+      transform: scale(1.2);
+      z-index: 20;
+      outline: 1px solid var(--text);
+    }
+  </style>
+</head>
+<body id="appBody" class="dark text-[var(--text)] antialiased p-3 font-sans selection:bg-[var(--accent-tint)] min-h-screen flex items-center justify-center">
+
+  <!-- Main Showcase Container -->
+  <div id="mainContainer" class="relative bg-[var(--bg)] border border-[var(--border)] rounded-2xl shadow-xl overflow-hidden w-full max-w-5xl flex flex-col h-[720px]">
+
+    <!-- Window Chrome Header -->
+    <header class="h-12 border-b border-[var(--border)] bg-[var(--s1)] flex items-center justify-between px-4 select-none shrink-0">
+      <div class="flex items-center gap-2.5">
+        <!-- V18 Octopus Mark -->
+        <svg class="w-5 h-5 text-[var(--accent)] hover:opacity-85 transition-opacity cursor-pointer" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="7" r="5"/>
+          <path d="M7 11c-2 2-3 5-1 7s4 1 5-2c1 3 3 4 5 2s1-5-1-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="6" cy="18" r="1.5"/>
+          <circle cx="12" cy="19" r="1.5"/>
+          <circle cx="18" cy="18" r="1.5"/>
+        </svg>
+        <span class="font-bold text-sm tracking-tight text-[var(--text)]">Sucr</span>
+        <span class="text-[11px] px-2 py-0.5 rounded-full bg-[var(--accent-tint)] text-[var(--accent-ink)] font-semibold border border-[var(--accent)]/20">Design Suite &bull; Antigravity</span>
+      </div>
+
+      <!-- Quick Toggles: Dedicated Light/Dark Segmented Control, M3 Squiggle Switch, Drawer -->
+      <div class="flex items-center gap-2.5 text-xs">
+        
+        <!-- Dedicated Segmented Theme Control: Light, Dark -->
+        <div class="flex items-center p-0.5 rounded-lg border border-[var(--border)] bg-[var(--s2)]" role="radiogroup" aria-label="Theme selection">
+          <button id="themeLightBtn" onclick="setTheme('light')" class="flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium text-[var(--text2)] hover:text-[var(--text)] transition-colors" aria-pressed="false">
+            <svg class="w-3.5 h-3.5 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/></svg>
+            <span>Light</span>
+          </button>
+          <button id="themeDarkBtn" onclick="setTheme('dark')" class="flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold bg-[var(--bg)] text-[var(--accent)] border border-[var(--border)] transition-colors" aria-pressed="true">
+            <svg class="w-3.5 h-3.5 text-indigo-400" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
+            <span>Dark</span>
+          </button>
+        </div>
+
+        <!-- M3 Squiggle vs Straight Bar Viewport Toggle -->
+        <button id="toggleSquiggleBtn" onclick="toggleSquiggleStyle()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--bg)] hover:bg-[var(--s2)] text-[var(--text)] font-medium transition-colors" title="Switch Progress Mode">
+          <span id="squiggleBtnLabel">〰️ M3 Squiggle: ON</span>
+        </button>
+
+        <!-- Speed Limit / Policy Toggle -->
+        <button id="speedPolicyBtn" onclick="toggleSpeedPolicy()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--bg)] hover:bg-[var(--s2)] text-[var(--text)] font-medium transition-colors" title="Toggle Speed Limit Policy">
+          <span id="speedPolicyLabel">⚡ Full Speed</span>
+        </button>
+
+        <!-- Inspector Drawer Toggle -->
+        <button id="toggleDrawerBtn" class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-[var(--accent)] bg-[var(--accent)] text-white hover:opacity-90 transition-opacity">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" rx="3"/>
+            <path d="M15 3v18"/>
+            <path d="M10 9l3 3-3 3"/>
+          </svg>
+          <span id="drawerBtnLabel">Inspector Drawer (⌥3)</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace Area -->
+    <div class="relative flex-1 flex overflow-hidden">
+
+      <!-- Left Rail Navigation -->
+      <aside class="w-56 border-r border-[var(--border2)] bg-[var(--s1)] p-3 flex flex-col justify-between select-none shrink-0">
+        <div class="space-y-1">
+          <div class="text-[10.5px] font-bold text-[var(--text3)] uppercase tracking-wider px-2 py-1">Navigation</div>
+          
+          <button class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg bg-[var(--accent-tint)] text-[var(--accent-ink)] text-xs font-semibold transition-colors">
+            <svg class="w-4 h-4 text-[var(--accent)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            Transfers (3)
+            <span class="ml-auto text-[10px] px-1.5 py-0.2 rounded-full bg-[var(--accent)] text-white font-mono">72 MB/s</span>
+          </button>
+
+          <button class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[var(--text2)] hover:bg-[var(--s2)] hover:text-[var(--text)] text-xs font-medium transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            Queues & Scheduler
+          </button>
+
+          <button class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[var(--text2)] hover:bg-[var(--s2)] hover:text-[var(--text)] text-xs font-medium transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01"/></svg>
+            Bonded Networks (4)
+          </button>
+
+          <button class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[var(--text2)] hover:bg-[var(--s2)] hover:text-[var(--text)] text-xs font-medium transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            Media Grabber (DASH/HLS)
+          </button>
+        </div>
+
+        <!-- Bonded Multi-NIC Attribution Deck -->
+        <div class="p-3 rounded-xl border border-[var(--border)] bg-[var(--bg)] text-xs space-y-2 card-surface">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-[var(--text3)] uppercase tracking-wider">Multi-NIC Bonding</span>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-[var(--success)]"></span>
+              <span class="text-[10px] font-bold text-[var(--success-ink)] font-mono">LIVE</span>
+            </div>
+          </div>
+          <div class="space-y-1.5 font-mono text-[11px]">
+            <div class="flex items-center justify-between">
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[var(--n1)]"></span>Wi-Fi 6</span>
+              <span class="font-semibold text-[var(--text)]">20.3 MB/s</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[var(--n2)]"></span>Ethernet</span>
+              <span class="font-semibold text-[var(--text)]">39.2 MB/s</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[var(--n3)]"></span>5G USB-C</span>
+              <span class="font-semibold text-[var(--text)]">13.0 MB/s</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Center Stage: Virtualized Library List -->
+      <main class="flex-1 p-5 bg-[var(--bg)] flex flex-col justify-between overflow-y-auto">
+        <div class="space-y-3.5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-base font-bold text-[var(--text)] tracking-tight">Active Downloads</h2>
+              <p class="text-xs text-[var(--text2)]">Google Material 3 Expressive Squiggle + Real-Time Wire Telemetry</p>
+            </div>
+            <div class="flex items-center gap-2 font-mono text-xs">
+              <span class="px-2.5 py-1 rounded-md bg-[var(--s2)] text-[var(--text)] font-semibold border border-[var(--border)]">3 Active &bull; 72.5 MB/s</span>
+            </div>
+          </div>
+
+          <!-- Hero Transfer Row (Interactive Card with Live M3 Squiggle Wave) -->
+          <div id="selectDownloadCard" class="p-4 rounded-xl border border-[var(--accent)] bg-[var(--accent-tint)]/20 flex flex-col gap-3 cursor-pointer hover:border-[var(--accent-ink)] transition-colors card-surface">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-[var(--accent)] text-white flex flex-col items-center justify-center font-mono font-bold text-xs">
+                  <span>ISO</span>
+                </div>
+                <div>
+                  <div class="text-sm font-bold text-[var(--text)]">Debian-Bookworm-x86_64-DVD-1.iso</div>
+                  <div class="text-xs text-[var(--text2)] font-mono flex items-center gap-2 mt-0.5">
+                    <span>4.8 GB</span> &bull; <span>3 Networks Bonded</span> &bull; <span class="text-[var(--success-ink)] font-semibold">Hedging active</span>
+                  </div>
+                </div>
+              </div>
+              <div class="text-right font-mono flex flex-col items-end gap-1">
+                <div class="flex items-center gap-1.5">
+                  <span id="speedCapPill" onclick="toggleSpeedModal(event)" class="badge-capped cursor-pointer hover:border-[var(--warning)] transition-colors" title="Click to adjust speed limit">
+                    <span class="cap-dot"></span>Capped: 15.0 MB/s
+                  </span>
+                  <div class="text-base font-bold text-[var(--accent-ink)]">14.8 MB/s</div>
+                </div>
+                <div class="text-xs text-[var(--text2)]">ETA 00:11</div>
+              </div>
+            </div>
+
+            <!-- LIVE GOOGLE MATERIAL 3 EXPRESSIVE SQUIGGLE CONTAINER -->
+            <div class="space-y-1">
+              <div id="progressCanvasWrapper" class="relative w-full h-6 flex items-center">
+                <!-- SVG Canvas for Smooth 60fps Traveling Sine Wave (No glow, flat clean stroke) -->
+                <svg id="m3SquiggleSvg" class="w-full h-6 overflow-visible select-none" preserveAspectRatio="none">
+                  <!-- Unfilled flat track -->
+                  <line id="flatTrackLine" x1="0" y1="12" x2="100%" y2="12" stroke="var(--track)" stroke-width="4" stroke-linecap="round"/>
+                  <!-- Active Traveling M3 Squiggle Path -->
+                  <path id="activeSquigglePath" class="m3-squiggle-path" d="" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round"/>
+                  <!-- Precision Frontier Thumb Dot Knob (Anchors exact 86% percentage, clean flat dot) -->
+                  <circle id="frontierThumb" cx="0" cy="12" r="5" fill="var(--bg)" stroke="var(--accent)" stroke-width="3"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Detailed Telemetry Sub-line & Attribution Chips -->
+            <div class="flex items-center justify-between text-xs font-mono text-[var(--text2)] pt-1 border-t border-[var(--border2)]">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-sm text-[var(--text)]">86.0%</span>
+                <span class="text-[var(--text3)]">&bull;</span>
+                <span class="text-[var(--text)] font-semibold">4.12 GB</span> of 4.80 GB
+                <span class="text-[var(--text3)]">&bull;</span>
+                <span class="text-[var(--accent-ink)] font-semibold">ETA 00:11</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[var(--s1)] border border-[var(--border)] text-[11px] font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-[var(--n1)]"></span>Wi-Fi 28%
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[var(--s1)] border border-[var(--border)] text-[11px] font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-[var(--n2)]"></span>LAN 44%
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[var(--s1)] border border-[var(--border)] text-[11px] font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-[var(--n3)]"></span>5G 14%
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Secondary Transfer Card 2 -->
+          <div class="p-3 rounded-xl border border-[var(--border)] bg-[var(--s1)] flex items-center justify-between card-surface">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-[var(--s2)] text-[var(--text)] flex items-center justify-center font-mono font-bold text-xs border border-[var(--border)]">
+                MSI
+              </div>
+              <div>
+                <div class="text-xs font-bold text-[var(--text)]">Blender-4.2.0-windows-x64.msi</div>
+                <div class="text-[11px] text-[var(--text2)] font-mono">310 MB / 420 MB &bull; 74% &bull; Ethernet + Wi-Fi</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="w-32 h-2 rounded-full bg-[var(--track)] overflow-hidden flex border border-[var(--border)]">
+                <div class="h-full bg-[var(--n1)]" style="width: 30%"></div>
+                <div class="h-full bg-[var(--n2)]" style="width: 44%"></div>
+              </div>
+              <div class="text-right font-mono text-xs font-bold text-[var(--text)]">28.4 MB/s</div>
+            </div>
+          </div>
+
+          <!-- Secondary Transfer Card 3 -->
+          <div class="p-3 rounded-xl border border-[var(--border)] bg-[var(--s1)] flex items-center justify-between card-surface opacity-85">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-[var(--s2)] text-[var(--text)] flex items-center justify-center font-mono font-bold text-xs border border-[var(--border)]">
+                TAR
+              </div>
+              <div>
+                <div class="text-xs font-bold text-[var(--text)]">UnrealEngine-5.4.3-Source.tar.gz</div>
+                <div class="text-[11px] text-[var(--text2)] font-mono">Queued &bull; 14.2 GB &bull; Scheduled for Night Window</div>
+              </div>
+            </div>
+            <div class="text-right font-mono text-xs text-[var(--text2)]">Pending</div>
+          </div>
+        </div>
+
+        <!-- 4-Tier Sucker Map Downscale Controller Deck -->
+        <div class="mt-4 p-4 rounded-xl border border-[var(--border)] bg-[var(--s1)] card-surface">
+          <div class="flex items-center justify-between mb-2.5">
+            <div>
+              <span class="text-xs font-bold text-[var(--text)]">4-Tier Sucker Map Auto-Downscale Engine</span>
+              <p class="text-[11px] text-[var(--text2)]">Prevents DOM bloat and layout thrash when block count exceeds 1,000</p>
+            </div>
+            <span id="currentTierBadge" class="text-[10.5px] px-2.5 py-0.5 rounded-full bg-[var(--accent-tint)] text-[var(--accent-ink)] font-bold font-mono border border-[var(--accent)]/20">
+              Tier 2: Standard (12px)
+            </span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="setMapTier(1)" id="tierBtn1" class="tier-btn px-2.5 py-1.5 rounded-lg border border-[var(--border)] text-xs font-medium bg-[var(--bg)] hover:bg-[var(--s2)] text-[var(--text)] transition-colors">
+              &le; 400 blocks (16px Comfort)
+            </button>
+            <button onclick="setMapTier(2)" id="tierBtn2" class="tier-btn px-2.5 py-1.5 rounded-lg border border-[var(--accent)] text-xs font-bold bg-[var(--accent)] text-white transition-colors">
+              &le; 1,000 blocks (12px Standard)
+            </button>
+            <button onclick="setMapTier(3)" id="tierBtn3" class="tier-btn px-2.5 py-1.5 rounded-lg border border-[var(--border)] text-xs font-medium bg-[var(--bg)] hover:bg-[var(--s2)] text-[var(--text)] transition-colors">
+              &le; 5,000 blocks (8px Dense)
+            </button>
+            <button onclick="setMapTier(4)" id="tierBtn4" class="tier-btn px-2.5 py-1.5 rounded-lg border border-[var(--border)] text-xs font-medium bg-[var(--bg)] hover:bg-[var(--s2)] text-[var(--text)] transition-colors">
+              &gt; 5,000 blocks (4px Micro)
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <!-- Ambient Scrim Backdrop for Drawer -->
+      <div id="drawerScrim" class="absolute inset-0 bg-black/30 opacity-100 transition-opacity duration-200 z-30"></div>
+
+      <!-- Slide-Out Overlay Inspector Drawer (392px) -->
+      <aside id="inspectorDrawer" class="absolute top-0 right-0 bottom-0 w-[420px] bg-[var(--bg)] border-l border-[var(--border)] shadow-xl z-40 flex flex-col transform translate-x-0 transition-transform duration-200 ease-[var(--e-std)] drawer-panel">
+        
+        <!-- Drawer Header with Keyboard Hints -->
+        <div class="h-12 border-b border-[var(--border)] bg-[var(--s1)] flex items-center justify-between px-4 select-none shrink-0">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[var(--accent)]"></span>
+            <span class="text-xs font-bold text-[var(--text)]">Transfer Inspector</span>
+            <span class="text-[10px] text-[var(--text3)] font-mono">#312-ISO</span>
+          </div>
+          <button id="closeDrawerBtn" class="p-1 rounded-md text-[var(--text2)] hover:bg-[var(--s2)] hover:text-[var(--text)] transition-colors" title="Close Drawer (Esc)">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <!-- Antigravity Gliding Tab Bar with Flat, Clean Pill -->
+        <div class="border-b border-[var(--border)] bg-[var(--s1)] px-2.5 pt-2 select-none shrink-0">
+          <div class="relative flex items-center bg-[var(--s2)] p-1 rounded-xl border border-[var(--border2)]">
+            
+            <!-- Sliding Active Pill Indicator (Flat clean border, no glow) -->
+            <div id="tabIndicator" class="tab-pill absolute top-1 bottom-1 left-1 rounded-lg z-0"></div>
+
+            <!-- Tab 0: Overview (Speedometer) -->
+            <button onclick="switchTab(0, this)" class="tab-btn active relative z-10 flex-1 flex flex-col items-center justify-center py-1.5 text-[11px] font-bold text-[var(--pill-text)] transition-colors">
+              <svg class="icon-speedometer w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M4.93 19.07A10 10 0 1119.07 19.07" stroke-linecap="round"/>
+                <g class="needle-group">
+                  <line x1="12" y1="14" x2="16.5" y2="9.5" stroke-width="2" stroke-linecap="round"/>
+                  <circle cx="12" cy="14" r="1.5" fill="currentColor"/>
+                </g>
+              </svg>
+              Overview
+            </button>
+
+            <!-- Tab 1: Sucker Map -->
+            <button onclick="switchTab(1, this)" class="tab-btn relative z-10 flex-1 flex flex-col items-center justify-center py-1.5 text-[11px] font-semibold text-[var(--text2)] transition-colors">
+              <svg class="icon-sucker w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <rect class="sucker-block" x="3.5" y="3.5" width="6.5" height="6.5" rx="1.5"/>
+                <rect class="sucker-block" x="14" y="3.5" width="6.5" height="6.5" rx="1.5"/>
+                <rect class="sucker-block" x="3.5" y="14" width="6.5" height="6.5" rx="1.5"/>
+                <rect class="sucker-block" x="14" y="14" width="6.5" height="6.5" rx="1.5" stroke-dasharray="2 2"/>
+                <circle class="sucker-dot" cx="17.25" cy="17.25" r="2.2" fill="var(--accent)" stroke="none"/>
+              </svg>
+              Map
+            </button>
+
+            <!-- Tab 2: Source -->
+            <button onclick="switchTab(2, this)" class="tab-btn relative z-10 flex-1 flex flex-col items-center justify-center py-1.5 text-[11px] font-semibold text-[var(--text2)] transition-colors">
+              <svg class="icon-link w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path class="chain-l" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke-linecap="round"/>
+                <path class="chain-r" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke-linecap="round"/>
+              </svg>
+              Source
+            </button>
+
+            <!-- Tab 3: Schedule -->
+            <button onclick="switchTab(3, this)" class="tab-btn relative z-10 flex-1 flex flex-col items-center justify-center py-1.5 text-[11px] font-semibold text-[var(--text2)] transition-colors">
+              <svg class="icon-clock w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9"/>
+                <polyline points="12 7 12 12" stroke-linecap="round"/>
+                <g class="clock-minute-pivot">
+                  <line x1="12" y1="12" x2="16.5" y2="12" stroke-width="1.8" stroke-linecap="round"/>
+                </g>
+              </svg>
+              Schedule
+            </button>
+
+            <!-- Tab 4: Files -->
+            <button onclick="switchTab(4, this)" class="tab-btn relative z-10 flex-1 flex flex-col items-center justify-center py-1.5 text-[11px] font-semibold text-[var(--text2)] transition-colors">
+              <svg class="icon-folder w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" stroke-linecap="round" stroke-linejoin="round"/>
+                <g class="doc-sheet">
+                  <line x1="8" y1="11" x2="16" y2="11" stroke-linecap="round" stroke-width="1.5" opacity="0.8"/>
+                  <line x1="8" y1="15" x2="13" y2="15" stroke-linecap="round" stroke-width="1.5" opacity="0.8"/>
+                </g>
+              </svg>
+              Files
+            </button>
+
+            <!-- Tab 5: Activity -->
+            <button onclick="switchTab(5, this)" class="tab-btn relative z-10 flex-1 flex flex-col items-center justify-center py-1.5 text-[11px] font-semibold text-[var(--text2)] transition-colors">
+              <svg class="icon-pulse w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path class="pulse-line" d="M2 12h4l3-6 4 12 3-6h6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Activity
+            </button>
+          </div>
+        </div>
+
+        <!-- Drawer Content Viewport -->
+        <div class="flex-1 p-4 overflow-y-auto">
+
+          <!-- View 0: Overview -->
+          <div id="tabView-0" class="tab-view space-y-3.5">
+            <div class="p-4 rounded-xl border border-[var(--border)] bg-[var(--s1)] space-y-2 card-surface">
+              <div class="text-[10.5px] font-bold text-[var(--text3)] uppercase tracking-wider">Total Bandwidth</div>
+              <div class="text-3xl font-mono font-bold text-[var(--text)]">72.5 <span class="text-sm font-normal text-[var(--text2)]">MB/s</span></div>
+              <div class="text-xs text-[var(--success-ink)] font-semibold flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                3 NICs bonded &bull; Zero stalls
+              </div>
+            </div>
+
+            <!-- Multi-NIC Live Telemetry Deck -->
+            <div class="p-3.5 rounded-xl border border-[var(--border)] bg-[var(--bg)] space-y-2.5 card-surface">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-[var(--text)]">Bonded Wire Telemetry</span>
+                <span class="text-[10.5px] px-2 py-0.5 rounded-full bg-[var(--success-tint)] text-[var(--success-ink)] font-bold font-mono">3 NICs Synced</span>
+              </div>
+              <div class="space-y-2 font-mono text-xs">
+                <div class="p-2 rounded-lg bg-[var(--s1)] border border-[var(--border2)] space-y-1">
+                  <div class="flex justify-between items-center text-[11px]">
+                    <span class="flex items-center gap-1.5 font-medium"><span class="w-2 h-2 rounded-full bg-[var(--n1)]"></span>Wi-Fi 6 (192.168.1.104)</span>
+                    <span class="font-bold text-[var(--text)]">20.3 MB/s <span class="text-[var(--text3)] font-normal">(28%)</span></span>
+                  </div>
+                  <div class="w-full h-1.5 rounded-full bg-[var(--track)] overflow-hidden">
+                    <div class="h-full bg-[var(--n1)] rounded-full" style="width: 58%"></div>
+                  </div>
+                </div>
+                <div class="p-2 rounded-lg bg-[var(--s1)] border border-[var(--border2)] space-y-1">
+                  <div class="flex justify-between items-center text-[11px]">
+                    <span class="flex items-center gap-1.5 font-medium"><span class="w-2 h-2 rounded-full bg-[var(--n2)]"></span>Ethernet (10.0.0.12)</span>
+                    <span class="font-bold text-[var(--text)]">39.2 MB/s <span class="text-[var(--text3)] font-normal">(54%)</span></span>
+                  </div>
+                  <div class="w-full h-1.5 rounded-full bg-[var(--track)] overflow-hidden">
+                    <div class="h-full bg-[var(--n2)] rounded-full" style="width: 82%"></div>
+                  </div>
+                </div>
+                <div class="p-2 rounded-lg bg-[var(--s1)] border border-[var(--border2)] space-y-1">
+                  <div class="flex justify-between items-center text-[11px]">
+                    <span class="flex items-center gap-1.5 font-medium"><span class="w-2 h-2 rounded-full bg-[var(--n3)]"></span>5G USB-C (172.20.10.2)</span>
+                    <span class="font-bold text-[var(--text)]">13.0 MB/s <span class="text-[var(--text3)] font-normal">(18%)</span></span>
+                  </div>
+                  <div class="w-full h-1.5 rounded-full bg-[var(--track)] overflow-hidden">
+                    <div class="h-full bg-[var(--n3)] rounded-full" style="width: 38%"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-[11px] text-[var(--text2)] font-mono pt-1">
+                <span>Sockets: 48 Active</span>
+                <span>Stalls: 0 (Hedged)</span>
+                <span>RTT: 11ms</span>
+              </div>
+            </div>
+
+            <!-- Network Attribution Breakdown -->
+            <div class="space-y-2 text-xs font-mono">
+              <div class="font-bold text-[var(--text)]">Network Attribution Share</div>
+              <div class="space-y-1.5">
+                <div class="flex justify-between items-center p-2 rounded bg-[var(--s2)]">
+                  <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-[var(--n1)]"></span>Wi-Fi 6 (192.168.1.104)</span>
+                  <span class="font-bold">28.4%</span>
+                </div>
+                <div class="flex justify-between items-center p-2 rounded bg-[var(--s2)]">
+                  <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-[var(--n2)]"></span>Ethernet (10.0.0.12)</span>
+                  <span class="font-bold">54.2%</span>
+                </div>
+                <div class="flex justify-between items-center p-2 rounded bg-[var(--s2)]">
+                  <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-[var(--n3)]"></span>5G USB-C (172.20.10.2)</span>
+                  <span class="font-bold">17.4%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- View 1: Sucker Map -->
+          <div id="tabView-1" class="tab-view hidden space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-xs font-bold text-[var(--text)]">The Sucker Map (Chunk Matrix)</div>
+                <div id="mapTelemetryText" class="text-[11px] text-[var(--text2)] font-mono">Rendering 640 blocks &bull; 12px cells</div>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-[var(--success-tint)] text-[var(--success-ink)] font-bold">Hedging Active</span>
+            </div>
+
+            <!-- Virtualized Sucker Matrix -->
+            <div class="p-2.5 rounded-xl border border-[var(--border)] bg-[var(--s1)] max-h-[300px] overflow-y-auto card-surface">
+              <div id="suckerGrid" class="grid gap-1 transition-all duration-200">
+                <!-- Dynamically rendered blocks -->
+              </div>
+            </div>
+
+            <!-- Hover Zoom Lens HUD -->
+            <div id="hudZoomLens" class="p-2.5 rounded-lg border border-[var(--accent)] bg-[var(--accent-tint)] text-xs font-mono flex items-center justify-between">
+              <div>
+                <span class="font-bold text-[var(--accent-ink)]" id="hudChunkIndex">Chunk #312</span> &bull; 4.0 MB &bull; Offset: 0x4E200000
+              </div>
+              <span class="text-[11px] font-bold text-[var(--success-ink)]" id="hudNetAttribution">Ethernet 82%</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-[11px] text-[var(--text2)] font-mono p-2 rounded-lg bg-[var(--s2)]">
+              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-[var(--n1)]"></span>Wi-Fi Stream</div>
+              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-[var(--n2)]"></span>Ethernet Stream</div>
+              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-[var(--n3)]"></span>5G Tether Stream</div>
+              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-[var(--success)]"></span>Verified Hash</div>
+            </div>
+          </div>
+
+          <!-- View 2: Source -->
+          <div id="tabView-2" class="tab-view hidden space-y-3 text-xs">
+            <div class="p-3 rounded-xl border border-[var(--border)] bg-[var(--s1)] space-y-2 card-surface">
+              <div class="font-bold text-[var(--text)]">HTTP Request & Handshake</div>
+              <div class="font-mono text-[11px] text-[var(--text2)] break-all">https://deb.debian.org/debian-cd/current/amd64/iso-dvd/Debian-Bookworm.iso</div>
+              <div class="text-[11px] text-[var(--success-ink)] font-semibold flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                TLS 1.3 &bull; AES-256-GCM &bull; HTTP/2
+              </div>
+            </div>
+            <div class="p-3 rounded-xl border border-[var(--border)] bg-[var(--s1)] space-y-1 card-surface">
+              <div class="font-bold text-[var(--text)]">Mark-of-the-Web (Zone.Identifier)</div>
+              <div class="text-[11px] font-mono text-[var(--text2)]">[ZoneTransfer] ZoneId=3<br>ReferrerUrl=https://debian.org/download</div>
+            </div>
+          </div>
+
+          <!-- View 3: Schedule -->
+          <div id="tabView-3" class="tab-view hidden space-y-3 text-xs">
+            <div class="p-3 rounded-xl border border-[var(--border)] bg-[var(--s1)] card-surface">
+              <div class="font-bold text-[var(--text)]">Schedule & Wake Policy</div>
+              <div class="text-[11px] text-[var(--text2)] mt-1">Windows Wake Timer: <span class="text-[var(--success-ink)] font-bold">Authorized</span></div>
+              <div class="text-[11px] text-[var(--text2)]">Global Night Window: 02:00 &mdash; 08:00 (Unlimited Speed)</div>
+            </div>
+          </div>
+
+          <!-- View 4: Files -->
+          <div id="tabView-4" class="tab-view hidden space-y-3 text-xs">
+            <div class="p-3 rounded-xl border border-[var(--border)] bg-[var(--s1)] card-surface">
+              <div class="font-bold text-[var(--text)]">Media Tracks / Segments</div>
+              <div class="text-[11px] text-[var(--text2)] mt-1">Single ISO File Archive &bull; Pre-allocated via FSCTL_SET_SPARSE</div>
+            </div>
+          </div>
+
+          <!-- View 5: Activity -->
+          <div id="tabView-5" class="tab-view hidden space-y-2 text-xs font-mono">
+            <div class="p-2 rounded bg-[var(--s1)] border border-[var(--border)] text-[11px] card-surface">
+              <span class="text-[var(--text2)]">19:14:01.120</span> <span class="text-[var(--accent-ink)] font-semibold">[Hedging]</span> Hedged chunk #412 on Ethernet (Wi-Fi fell &lt;10% median)
+            </div>
+            <div class="p-2 rounded bg-[var(--s1)] border border-[var(--border)] text-[11px] card-surface">
+              <span class="text-[var(--text2)]">19:14:00.890</span> <span class="text-[var(--success-ink)] font-semibold">[Frontier]</span> Stream #2 absorbed contiguous chunk #413
+            </div>
+            <div class="p-2 rounded bg-[var(--s1)] border border-[var(--border)] text-[11px] card-surface">
+              <span class="text-[var(--text2)]">19:13:58.440</span> <span class="text-[var(--accent-ink)] font-semibold">[Scale]</span> Block count verified: 640 blocks (12px standard)
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- Real-Time App Controls & Live M3 Squiggle Engine -->
+  <script>
+    let drawerOpen = true;
+    let currentTabIndex = 0;
+    let currentTheme = 'dark';
+    let uncappedSpeed = true;
+    let isSquiggleMode = true;
+    let wavePhase = 0;
+
+    const drawer = document.getElementById('inspectorDrawer');
+    const scrim = document.getElementById('drawerScrim');
+    const toggleBtn = document.getElementById('toggleDrawerBtn');
+    const closeBtn = document.getElementById('closeDrawerBtn');
+    const label = document.getElementById('drawerBtnLabel');
+    const indicator = document.getElementById('tabIndicator');
+    const grid = document.getElementById('suckerGrid');
+    const telemetryText = document.getElementById('mapTelemetryText');
+    const tierBadge = document.getElementById('currentTierBadge');
+    const hudChunk = document.getElementById('hudChunkIndex');
+    const hudNet = document.getElementById('hudNetAttribution');
+
+    // M3 SQUIGGLE WAVE ENGINE (Clean, flat, zero glow)
+    const activePath = document.getElementById('activeSquigglePath');
+    const flatTrack = document.getElementById('flatTrackLine');
+    const thumbDot = document.getElementById('frontierThumb');
+    const svgEl = document.getElementById('m3SquiggleSvg');
+
+    const PROGRESS_RATIO = 0.86; // 86% completed
+    const WAVE_AMP = 3.0;        // Calm 3.0px amplitude
+    const WAVELENGTH = 24;       // Harmonic 24px wavelength
+
+    function renderM3Squiggle() {
+      if (svgEl) {
+        const totalW = svgEl.clientWidth || 580;
+        const activeW = totalW * PROGRESS_RATIO;
+        const baselineY = 12;
+
+        if (isSquiggleMode) {
+          wavePhase += 0.055; // Steady, calm wave travel speed
+
+          // Generate Continuous Traveling Sine Wave for 0 -> activeW
+          let d = `M 0 ${baselineY}`;
+          const step = 2.0;
+          for (let x = 0; x <= activeW; x += step) {
+            const y = baselineY + Math.sin(((x / WAVELENGTH) * Math.PI * 2) - wavePhase) * WAVE_AMP;
+            d += ` L ${x.toFixed(1)} ${y.toFixed(2)}`;
+          }
+
+          activePath.setAttribute('d', d);
+          activePath.style.stroke = 'var(--accent)';
+          activePath.style.strokeWidth = '3.5';
+
+          // Unfilled remaining track: flat straight line from activeW to totalW
+          flatTrack.setAttribute('x1', activeW);
+          flatTrack.setAttribute('x2', totalW);
+          flatTrack.setAttribute('y1', baselineY);
+          flatTrack.setAttribute('y2', baselineY);
+
+          // Position Frontier Thumb Dot Knob exactly at the boundary
+          const thumbY = baselineY + Math.sin(((activeW / WAVELENGTH) * Math.PI * 2) - wavePhase) * WAVE_AMP;
+          thumbDot.setAttribute('cx', activeW);
+          thumbDot.setAttribute('cy', thumbY);
+          thumbDot.style.display = 'block';
+        } else {
+          // Flat straight bar mode
+          activePath.setAttribute('d', `M 0 ${baselineY} L ${activeW} ${baselineY}`);
+          activePath.style.stroke = 'var(--accent)';
+          activePath.style.strokeWidth = '3.5';
+
+          flatTrack.setAttribute('x1', activeW);
+          flatTrack.setAttribute('x2', totalW);
+          flatTrack.setAttribute('y1', baselineY);
+          flatTrack.setAttribute('y2', baselineY);
+
+          thumbDot.setAttribute('cx', activeW);
+          thumbDot.setAttribute('cy', baselineY);
+          thumbDot.style.display = 'block';
+        }
+      }
+      requestAnimationFrame(renderM3Squiggle);
+    }
+    requestAnimationFrame(renderM3Squiggle);
+
+    // Toggle Squiggle Mode
+    function toggleSquiggleStyle() {
+      isSquiggleMode = !isSquiggleMode;
+      const btn = document.getElementById('squiggleBtnLabel');
+      if (isSquiggleMode) {
+        btn.textContent = '〰️ M3 Squiggle: ON';
+      } else {
+        btn.textContent = '➖ Straight Bar: ON';
+      }
+    }
+
+    // Dedicated Theme Controller: Smooth Transitions across Light & Dark
+    function setTheme(mode) {
+      currentTheme = mode;
+      const isDark = mode === 'dark';
+      const html = document.documentElement;
+      const body = document.getElementById('appBody');
+      const lightBtn = document.getElementById('themeLightBtn');
+      const darkBtn = document.getElementById('themeDarkBtn');
+
+      if (isDark) {
+        html.classList.add('dark');
+        html.setAttribute('data-theme', 'dark');
+        html.style.colorScheme = 'dark';
+        body.classList.add('dark');
+        body.classList.remove('light');
+        body.setAttribute('data-theme', 'dark');
+        body.style.backgroundColor = '#141517';
+
+        // Update button states
+        darkBtn.setAttribute('aria-pressed', 'true');
+        darkBtn.className = 'flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold bg-[var(--bg)] text-[var(--accent)] border border-[var(--border)] transition-colors';
+        lightBtn.setAttribute('aria-pressed', 'false');
+        lightBtn.className = 'flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium text-[var(--text2)] hover:text-[var(--text)] transition-colors';
+      } else {
+        html.classList.remove('dark');
+        html.setAttribute('data-theme', 'light');
+        html.style.colorScheme = 'light';
+        body.classList.remove('dark');
+        body.classList.add('light');
+        body.setAttribute('data-theme', 'light');
+        body.style.backgroundColor = '#F8F9FA';
+
+        // Update button states
+        lightBtn.setAttribute('aria-pressed', 'true');
+        lightBtn.className = 'flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold bg-[var(--bg)] text-[var(--accent)] border border-[var(--border)] transition-colors';
+        darkBtn.setAttribute('aria-pressed', 'false');
+        darkBtn.className = 'flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium text-[var(--text2)] hover:text-[var(--text)] transition-colors';
+      }
+
+      // Re-align tab indicator smoothly
+      const activeBtn = document.querySelectorAll('.tab-btn')[currentTabIndex];
+      if (activeBtn) alignIndicator(activeBtn);
+    }
+
+    // Speed Policy Toggle
+    function toggleSpeedPolicy() {
+      uncappedSpeed = !uncappedSpeed;
+      const btn = document.getElementById('speedPolicyLabel');
+      if (uncappedSpeed) {
+        btn.textContent = '⚡ Full Speed';
+      } else {
+        btn.textContent = '🐢 Night Cap (25 MB/s)';
+      }
+    }
+
+    // Drawer Controls
+    function toggleDrawer(force) {
+      drawerOpen = force !== undefined ? force : !drawerOpen;
+      if (drawerOpen) {
+        drawer.style.transform = 'translateX(0%)';
+        scrim.style.opacity = '1';
+        scrim.style.pointerEvents = 'auto';
+        label.textContent = 'Close Drawer (Esc)';
+        const activeBtn = document.querySelectorAll('.tab-btn')[currentTabIndex];
+        switchTab(currentTabIndex, activeBtn);
+      } else {
+        drawer.style.transform = 'translateX(100%)';
+        scrim.style.opacity = '0';
+        scrim.style.pointerEvents = 'none';
+        label.textContent = 'Inspector Drawer (⌥3)';
+      }
+    }
+
+    toggleBtn.addEventListener('click', () => toggleDrawer());
+    closeBtn.addEventListener('click', () => toggleDrawer(false));
+    scrim.addEventListener('click', () => toggleDrawer(false));
+    document.getElementById('selectDownloadCard').addEventListener('click', () => toggleDrawer(true));
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && drawerOpen) toggleDrawer(false);
+      if ((e.altKey && e.key === '3') || (e.ctrlKey && e.key === '3')) {
+        e.preventDefault();
+        toggleDrawer();
+      }
+    });
+
+    // Helper to align indicator pill smoothly
+    function alignIndicator(btnElement) {
+      if (!btnElement || !indicator) return;
+      const parentRect = btnElement.parentElement.getBoundingClientRect();
+      const btnRect = btnElement.getBoundingClientRect();
+      const offsetLeft = btnRect.left - parentRect.left;
+      const width = btnRect.width;
+
+      indicator.style.transform = `translateX(${offsetLeft - 4}px)`;
+      indicator.style.width = `${width}px`;
+    }
+
+    // Antigravity Gliding Tab Motion Physics & Micro-Interactions (Simple, calm, no bounce)
+    function switchTab(index, btnElement) {
+      currentTabIndex = index;
+      const allBtns = document.querySelectorAll('.tab-btn');
+      allBtns.forEach((btn, idx) => {
+        btn.classList.remove('animating');
+        if (idx === index) {
+          btn.classList.add('active', 'font-bold', 'text-[var(--pill-text)]');
+          btn.classList.remove('font-semibold', 'text-[var(--text2)]');
+          
+          // Re-trigger simple calm micro-interaction
+          const svg = btn.querySelector('svg');
+          if (svg) {
+            svg.style.animation = 'none';
+            void svg.getBoundingClientRect(); // Force layout reflow
+            svg.style.animation = '';
+          }
+          btn.classList.add('animating');
+        } else {
+          btn.classList.remove('active', 'font-bold', 'text-[var(--pill-text)]');
+          btn.classList.add('font-semibold', 'text-[var(--text2)]');
+        }
+      });
+
+      // Reposition Gliding Pill
+      if (btnElement) {
+        alignIndicator(btnElement);
+      }
+
+      // Show Selected Content View with Directional Cross-Slide
+      const views = document.querySelectorAll('.tab-view');
+      views.forEach((v, idx) => {
+        if (idx === index) {
+          v.classList.remove('hidden');
+          v.style.animation = 'fadeInSlide 180ms cubic-bezier(0.05, 0.7, 0.1, 1)';
+        } else {
+          v.classList.add('hidden');
+        }
+      });
+
+      if (index === 1 && grid.children.length === 0) {
+        setMapTier(2); // Render default standard 12px grid
+      }
+    }
+
+    // 4-Tier Sucker Map Downscale Engine
+    const TIER_CONFIG = {
+      1: { size: '16px', cols: 'repeat(auto-fill, minmax(16px, 1fr))', count: 320, name: 'Tier 1: Comfort (16px)' },
+      2: { size: '12px', cols: 'repeat(auto-fill, minmax(12px, 1fr))', count: 640, name: 'Tier 2: Standard (12px)' },
+      3: { size: '8px',  cols: 'repeat(auto-fill, minmax(8px, 1fr))',  count: 2400, name: 'Tier 3: Dense (8px)' },
+      4: { size: '4px',  cols: 'repeat(auto-fill, minmax(4px, 1fr))',  count: 7200, name: 'Tier 4: Micro Heat-Map (4px)' }
+    };
+
+    function setMapTier(tier) {
+      const cfg = TIER_CONFIG[tier];
+      tierBadge.textContent = cfg.name;
+      telemetryText.textContent = `Rendering ${cfg.count.toLocaleString()} blocks • ${cfg.size} cells`;
+
+      // Update button styling
+      for (let t = 1; t <= 4; t++) {
+        const b = document.getElementById(`tierBtn${t}`);
+        if (t === tier) {
+          b.className = 'tier-btn px-2.5 py-1.5 rounded-lg border border-[var(--accent)] text-xs font-bold bg-[var(--accent)] text-white transition-colors';
+        } else {
+          b.className = 'tier-btn px-2.5 py-1.5 rounded-lg border border-[var(--border)] text-xs font-medium bg-[var(--bg)] hover:bg-[var(--s2)] text-[var(--text)] transition-colors';
+        }
+      }
+
+      // Re-populate virtualized grid
+      grid.innerHTML = '';
+      grid.style.gridTemplateColumns = cfg.cols;
+
+      const fragment = document.createDocumentFragment();
+      for (let i = 0; i < cfg.count; i++) {
+        const block = document.createElement('div');
+        block.className = 'sucker-cell rounded-sm cursor-pointer transition-colors';
+        block.style.height = cfg.size;
+
+        // Assign realistic download attribution state
+        if (i < cfg.count * 0.78) {
+          block.style.backgroundColor = 'var(--success)';
+          block.dataset.state = 'Verified Complete';
+        } else if (i < cfg.count * 0.86) {
+          const rand = (i % 3);
+          if (rand === 0) {
+            block.style.backgroundColor = 'var(--n1)';
+            block.dataset.state = 'Wi-Fi 6 In-Flight';
+          } else if (rand === 1) {
+            block.style.backgroundColor = 'var(--n2)';
+            block.dataset.state = 'Ethernet In-Flight';
+          } else {
+            block.style.backgroundColor = 'var(--n3)';
+            block.dataset.state = '5G USB-C In-Flight';
+          }
+        } else if (i < cfg.count * 0.88) {
+          block.style.backgroundColor = 'var(--warning-fill)';
+          block.dataset.state = 'Hedging (Dual Stream)';
+        } else {
+          block.style.backgroundColor = 'var(--surface-2)';
+          block.style.opacity = '0.35';
+          block.dataset.state = 'Pending Pre-Allocation';
+        }
+
+        // Hover inspection HUD
+        block.addEventListener('mouseenter', () => {
+          hudChunk.textContent = `Chunk #${i + 1}`;
+          hudNet.textContent = block.dataset.state;
+        });
+
+        fragment.appendChild(block);
+      }
+      grid.appendChild(fragment);
+    }
+
+    // Initialize default state
+    window.addEventListener('DOMContentLoaded', () => {
+      setTheme('dark');
+      const firstTab = document.querySelectorAll('.tab-btn')[0];
+      switchTab(0, firstTab);
+      setMapTier(2);
+      setTimeout(() => alignIndicator(firstTab), 80);
+    });
+    window.addEventListener('resize', () => {
+      const activeBtn = document.querySelectorAll('.tab-btn')[currentTabIndex];
+      if (activeBtn) alignIndicator(activeBtn);
+    });
+  </script>
+</body>
+</html>

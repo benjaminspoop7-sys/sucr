@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" role="img" aria-labelledby="t2 d2">
+  <title id="t2">Nothing matches this search</title>
+  <desc id="d2">Three dimmed list rows, the last one dashed, with a magnifier resting over the list.</desc>
+  <style>
+    .dim{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;opacity:.45}
+    .dash{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-dasharray:5 5;opacity:.45}
+    .ac{fill:none;stroke:var(--accent-ink,#1765CC);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .glass{fill:var(--bg,#FFFFFF);fill-opacity:.6;stroke:var(--accent-ink,#1765CC);stroke-width:2}
+  </style>
+  <circle class="dim" cx="34" cy="38" r="5"/>
+  <path class="dim" d="M50 38h72"/>
+  <circle class="dim" cx="34" cy="60" r="5"/>
+  <path class="dim" d="M50 60h40"/>
+  <circle class="dash" cx="34" cy="82" r="5"/>
+  <path class="dash" d="M50 82h40"/>
+  <!-- the magnifier sits on top: glass is a translucent flat plate, not a gradient -->
+  <circle class="glass" cx="106" cy="66" r="22"/>
+  <path class="ac" d="M121 81l15 15"/>
+</svg>
