@@ -4,7 +4,7 @@
 
 <h1 align="center">Sucr</h1>
 
-<p align="center"><strong>Sucr 0.1.0 (Alpha)</strong> — a download manager for Windows that shows you the work: every connection, every chunk, and which adapter carried it.</p>
+<p align="center"><strong>Sucr 0.1.0 (Alpha)</strong> — a multi-tether download manager for Windows: turn on more than one network and one file leaves across all of them, every chunk tagged by the adapter that carried it.</p>
 
 Sucr is a single native executable (Tauri 2 + WebView2, no Electron) of about 4.7 MB. It does not ship a browser engine, a background service, or an installer that runs at boot.
 
@@ -12,18 +12,28 @@ Sucr is a single native executable (Tauri 2 + WebView2, no Electron) of about 4.
 
 ![Sucr downloading a file](docs/screenshots/downloads.png)
 
+## Multi-tether
+
+Windows hands each new socket to one interface, so most download managers' "multi-connection" downloads still ride a single adapter. Sucr binds its connections to the networks you have enabled instead, so Ethernet, Wi-Fi and a phone tethered over USB carry the same file at once — and the Chunks inspector colours every block by the route that delivered it.
+
+- **Dynamic** — every route carries blocks at once, and a straggler's tail is handed to whichever worker is free, on any route.
+- **Hedging** — the primary carries the bulk; a block whose stream goes quiet for three seconds is raced on a secondary route, and the first half to arrive wins.
+- **Failover** — one route until it errors, with the backup link left idle until then.
+
+A metered guard keeps a metered connection out of the bond, and each adapter keeps its own speed cap and data allowance.
+
+![Networks screen](docs/screenshots/networks.png)
+
 ## What it does
 
-- **Multi-connection downloads.** A job starts with 8 concurrent HTTP connections and widens toward 32 only when an extra connection earns its share of the bandwidth. If the host refuses one, the job narrows again instead of stalling.
+- **Multi-tether downloads.** One job spreads its blocks over every adapter you enable — Ethernet, Wi-Fi, a tethered phone — instead of queueing behind the one route Windows would have picked.
+- **Eight connections that earn more.** A job starts with 8 concurrent HTTP connections and widens toward 32 only when an extra connection earns its share of the bandwidth. If the host refuses one, the job narrows again instead of stalling.
 - **Resuming that checks.** A paused transfer continues only when the remote's ETag, `Last-Modified` and sampled bytes still match what was downloaded.
-- **An inspector per download.** Overview, chunks (with the route that carried each block), source, schedule, files and activity.
-- **Network control.** Per-adapter speed caps and data allowances, a bonding policy across adapters (dynamic, hedging, failover) and a guard that keeps a metered connection out of the bond.
+- **An inspector per download.** Overview, chunks with the route that carried each block, source, schedule, files and activity.
 - **Proxies and credentials.** System, direct or manual proxy with Basic auth and bypasses, plus per-host site credentials for links that need a login.
 - **Browser capture.** A Manifest V3 add-on that hands downloads to Sucr — Chromium (Chrome, Edge, Helium) and Firefox (Firefox, Zen).
 - **Download window.** Queued links start only inside the hours and days you pick.
 - **Updates, debug log and a report button** that opens a pre-filled GitHub issue. Nothing is sent unless you submit it.
-
-![Networks screen](docs/screenshots/networks.png)
 
 ## Install
 
