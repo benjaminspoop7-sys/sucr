@@ -4,11 +4,11 @@
 
 <h1 align="center">Sucr</h1>
 
-<p align="center"><strong>Sucr 0.1.0 (Alpha)</strong> — a multi-tether download manager for Windows: turn on more than one network and one file leaves across all of them, every chunk tagged by the adapter that carried it.</p>
+<p align="center"><strong>Sucr 0.1.1 (Alpha)</strong> — a multi-tether download manager for Windows: turn on more than one network and one file leaves across all of them, every chunk tagged by the adapter that carried it.</p>
 
 Sucr is a single native executable (Tauri 2 + WebView2, no Electron) of about 4.7 MB. It does not ship a browser engine, a background service, or an installer that runs at boot.
 
-> **Alpha.** This is the first build of the Alpha stage, released as 0.1.0. The feature set can change between releases.
+> **Alpha.** This is 0.1.1 of the Alpha stage. The feature set can change between releases.
 
 ![Sucr downloading a file](docs/screenshots/downloads.png)
 
@@ -21,6 +21,8 @@ Windows hands each new socket to one interface, so most download managers' "mult
 - **Failover** — one route until it errors, with the backup link left idle until then.
 
 A metered guard keeps a metered connection out of the bond, and each adapter keeps its own speed cap and data allowance.
+
+*Credit: the multi-tether idea — bonding several network connections onto one download — comes from Plexo; Sucr's implementation is its own.*
 
 ![Networks screen](docs/screenshots/networks.png)
 
@@ -35,9 +37,25 @@ A metered guard keeps a metered connection out of the bond, and each adapter kee
 - **Download window.** Queued links start only inside the hours and days you pick.
 - **Updates, debug log and a report button** that opens a pre-filled GitHub issue. Nothing is sent unless you submit it.
 
+## Benchmarks
+
+Engine speed, measured with Sucr's own harness: a local HTTP fixture on the loopback interface serving a deterministic payload, staging on a SATA hard disk, six runs per scenario reported as medians, and every download validated byte-for-byte before its timer stops. The elapsed time covers the whole job — fetch, write, and the SHA-256 verification at publish — not just socket reads. These are machine-local numbers: they measure the engine, not any particular internet link.
+
+| Scenario | Payload | Median |
+| --- | --- | --- |
+| One streamed range | 256 MiB, 1 connection | 1.115 s (≈ 230 MiB/s) |
+| Split across 8 connections | 256 MiB, 8 connections | 0.866 s (≈ 296 MiB/s) |
+| Server-paced single stream | 32 MiB, 4 MiB/s per request | 8.383 s (the server's own pace sets the floor) |
+| Server-paced, 8 connections | 32 MiB, 8 connections | 1.374 s (≈ 23 MiB/s) |
+| Server without `Range` support | 32 MiB | 4.278 s (≈ 7.5 MiB/s) |
+
+The first two rows ran on the current development build. Before a write-latency fix they took 5.668 s and 7.647 s: with the staging drive on spinning disk, every ledger commit had been forcing its own flush.
+
+The fixture and harness used for these runs live under `scratch/`, which is not part of the published tree; the method described above is what makes the numbers reproducible.
+
 ## Install
 
-1. Open [Releases](https://github.com/benjaminspoop7-sys/sucr/releases/latest) and download `Sucr_0.1.0_x64-setup.exe`.
+1. Open [Releases](https://github.com/benjaminspoop7-sys/sucr/releases/latest) and download `Sucr_0.1.1_x64-setup.exe`.
 2. Run it. It installs per-user (no administrator prompt) into `%LOCALAPPDATA%\Sucr`.
 3. The build is unsigned, so Windows SmartScreen will warn you: **More info → Run anyway**.
 
@@ -90,12 +108,28 @@ PATH="/path/to/cargo/bin:$PATH" ./node_modules/.bin/tauri build --bundles nsis
 
 `npm run build` locates the real `cargo` through `CARGO_HOME` (falling back to `~/.cargo`) because the Tauri CLI cannot spawn a POSIX `cargo` shim.
 
+A development run is a separate app from the installed one. `npm run dev` builds the debug binary under the identifier `app.sucr.dev` with the window titled `Sucr Alpha (dev)`, so its WebView2 profile lives in `%LOCALAPPDATA%\app.sucr.dev`. A debug build also keeps its own data root, `%APPDATA%\Sucr Dev`: the database, logs, downloads, capture door and the native-messaging manifests it registers all live there, and its relay answers to `app.sucr.capture.dev` rather than the installed `app.sucr.capture`. The installed app keeps its data, its registration and its add-on untouched, and the two can run at the same time without sharing a row, a setting or a browser hand-off.
+
 The add-on has its own build:
 
 ```sh
 cd extension
-./build.sh           # writes dist/chrome and dist/firefox
+./build.sh           # writes dist/chrome and dist/firefox, plus dist/dev for a debug build
 ```
+
+A capture test from a local build runs in a browser session of its own:
+
+```sh
+cd app
+npm run browser:dev                          # Helium, or the first Chromium it finds
+npm run browser:dev -- --browser=zen         # any browser registered under StartMenuInternet
+npm run browser:dev -- -- --remote-debugging-port=9334
+npm run browser:dev -- --remove              # unregister the dev relay when done
+```
+
+The launcher packages the dev add-on (it asks for `app.sucr.capture.dev`) and copies it to `%APPDATA%\Sucr Dev\addon\<family>`, then opens the browser on a throwaway profile under `%APPDATA%\Sucr Dev\browser\<browser>`. The copy carries no pinned `key` and the Firefox copy names `capture-dev@sucr.local`, so the dev add-on has an extension ID of its own and cannot stand in for the installed one even if both are loaded in one profile.
+
+Rather than register anything system-wide, the launcher starts the debug app if its door is not already answering and writes the door's `{port, token}` to `relay.json` beside the add-on; a small watcher keeps that file following app restarts while the browser is open. The add-on reads that file only when its baked relay name ends in `.dev`, and the release copy refuses it, so a dropped `relay.json` beside the shipped add-on is ignored. The launcher opens a **Sucr dev session** tab that marks the window as a test session. Chromium browsers load the add-on directly; for a Firefox-family browser it prints the manifest path to load in `about:debugging`, because Gecko has no command-line way to install an unpacked add-on.
 
 ## Repository layout
 

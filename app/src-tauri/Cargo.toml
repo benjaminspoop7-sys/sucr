@@ -1,6 +1,6 @@
 [package]
 name = "sucr"
-version = "0.1.0"
+version = "0.1.1"
 description = "Sucr — the download manager that shows you the work"
 license = "MIT"
 edition = "2021"

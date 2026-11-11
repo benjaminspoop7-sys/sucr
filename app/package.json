@@ -1,7 +1,7 @@
 {
   "name": "sucr",
   "productName": "Sucr",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "license": "MIT",
   "description": "Sucr — the download manager that shows you the work",
@@ -9,6 +9,7 @@
     "build:web": "node scripts/build.mjs",
     "typecheck": "tsc -p tsconfig.renderer.json",
     "dev": "npm run build:web && node scripts/run-dev.mjs",
+    "browser:dev": "node scripts/dev-browser.mjs",
     "build": "npm run build:web && node scripts/build-app.mjs",
     "start": "node scripts/run-dev.mjs --skip-build",
     "verify": "node scripts/verify-m0.mjs"
