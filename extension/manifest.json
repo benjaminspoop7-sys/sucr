@@ -16,7 +16,8 @@
   "host_permissions": [
     "http://127.0.0.1/*",
     "https://*.googlevideo.com/*",
-    "https://www.youtube.com/*"
+    "https://www.youtube.com/*",
+    "<all_urls>"
   ],
   "content_scripts": [
     {

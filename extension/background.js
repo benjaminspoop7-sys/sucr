@@ -17,6 +17,13 @@
 
 const HOST = 'app.sucr.capture';
 
+// A dev copy asks for a different relay, and it needs no system registration to
+// find it: the launcher writes `relay.json` beside this file, so the dev session
+// stays inside its own profile and its own data folder. The release copy never
+// reads that file — a dropped relay.json beside a shipped add-on would be a way
+// to hand its token to something else.
+const DEV_RELAY = HOST !== 'app.sucr.capture';
+
 /** @type {{port:number, token:string}|null} */
 let door = null;
 let doorAt = 0;
@@ -170,10 +177,33 @@ function nativeCall(op, payload = {}) {
   });
 }
 
+// The dev relay's door, from the file its launcher keeps current beside this
+// add-on. A missing or unreadable file means the session was not started by the
+// launcher; there is nothing to fall back to, and nothing was registered.
+async function devDoor() {
+  try {
+    const res = await fetch(api.runtime.getURL('relay.json'), { cache: 'no-store' });
+    if (!res.ok) return null;
+    const info = await res.json();
+    if (!info || !info.port || !info.token) return null;
+    return { port: info.port, token: info.token, startedAt: info.at || 0 };
+  } catch {
+    return null;
+  }
+}
+
 async function findDoor({ wake = 'hello' } = {}) {
   // A visible wake must always reach the relay: the cached door says the app
   // is up, not that its window is. Only hello carries the /show ask.
   if (wake !== 'hello' && door && Date.now() - doorAt < DOOR_TTL) return door;
+  if (DEV_RELAY) {
+    const info = await devDoor();
+    if (info) {
+      door = info;
+      doorAt = Date.now();
+      return door;
+    }
+  }
   const msg = await nativeCall(wake === false ? 'status' : wake);
   if (!msg || !msg.ok || !msg.port || !msg.token) {
     const e = new Error(msg && msg.code ? msg.code : 'not-running');
@@ -964,6 +994,13 @@ api.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         sendResponse({ ok: true });
         break;
       }
+      case 'manifest-list': {
+        // The injection-race pull: answer a content script that came up
+        // after its own page was already served as a manifest.
+        const set = tabManifests.get(sender.tab && sender.tab.id);
+        sendResponse({ ok: true, urls: set ? [...set] : [] });
+        break;
+      }
       case 'panel-close': {
         closePanel(sender.tab && sender.tab.id);
         sendResponse({ ok: true });
@@ -1097,11 +1134,24 @@ api.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         break;
       }
       case 'open': {
+        if (DEV_RELAY) {
+          const out = await call('/show', {});
+          sendResponse(out.ok ? { ok: true } : { ok: false, code: 'not-running', message: 'the dev app is not running' });
+          break;
+        }
         const r = await nativeCall('hello');
         sendResponse(r);
         break;
       }
       case 'register': {
+        if (DEV_RELAY) {
+          sendResponse({
+            ok: false,
+            code: 'dev-session',
+            message: 'a dev add-on takes its relay from the session launcher; run npm run browser:dev',
+          });
+          break;
+        }
         const r = await nativeCall('register');
         sendResponse(r);
         break;
@@ -1117,3 +1167,40 @@ api.runtime.onInstalled.addListener(() => {
   loadSettings().then(sweep).then(armRetry);
 });
 loadSettings().then(sweep).then(armRetry);
+
+// --- Manifest sniffing (Task 291) -------------------------------------------
+// Sniff HLS (.m3u8) and DASH (.mpd) manifests to enable generic capture.
+// The listener filter narrows what wakes the worker — an unfiltered
+// <all_urls> dispatches every request on every tab and Chrome drops events
+// past its rate cap — while the body re-checks the pathname, so a signed
+// .m3u8?token=... URL counts and a path like clip.m3u8backup does not.
+// The same gates as every other capture surface: Sucr off globally or for
+// the host means silent. No receiver in the tab (or no tab at all) is
+// expected, not an error: swallow the rejection. A page whose own document
+// is the manifest is served before its content script exists, so the push
+// races injection; what a tab sniffed also stays in tabManifests, and the
+// script pulls that ledger when it comes up.
+const tabManifests = new Map(); // tabId -> Set(href)
+api.tabs.onRemoved.addListener(({ tabId }) => tabManifests.delete(tabId));
+if (api.webRequest && api.webRequest.onResponseStarted) {
+  api.webRequest.onResponseStarted.addListener(
+    (d) => {
+      if (d.tabId < 0 || !settings.enabled || siteOff(d.url)) return;
+      let u;
+      try {
+        u = new URL(d.url);
+      } catch {
+        return;
+      }
+      if (!/\.(m3u8|mpd)$/i.test(u.pathname)) return;
+      let seen = tabManifests.get(d.tabId);
+      if (!seen) {
+        seen = new Set();
+        tabManifests.set(d.tabId, seen);
+      }
+      seen.add(u.href);
+      api.tabs.sendMessage(d.tabId, { op: 'manifest-detected', url: d.url }).catch(() => {});
+    },
+    { urls: ['*://*/*.m3u8*', '*://*/*.mpd*'] }
+  );
+}

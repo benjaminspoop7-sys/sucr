@@ -13,6 +13,44 @@
 
   const api = typeof browser !== 'undefined' ? browser : chrome;
 
+  // Manifests the background sniffed for this tab (HLS/DASH), href -> true.
+  // The grabber lists these; the toast names the file so a page without an
+  // open grabber still says what was found. One toast per distinct manifest:
+  // a live playlist re-polls the same URL every few seconds, and re-saying
+  // it would keep the toast alive forever. The background pushes what it
+  // sees after injection; a page whose own document is the manifest is
+  // served before this script exists, so it also pulls the tab's ledger.
+  const manifests = new Map();
+  function rememberManifest(raw) {
+    let u;
+    try {
+      u = new URL(raw);
+    } catch {
+      return null;
+    }
+    if (!/\.(m3u8|mpd)$/i.test(u.pathname) || manifests.has(u.href)) return null;
+    manifests.set(u.href, true);
+    return u;
+  }
+  const toastManifest = (u) =>
+    say(`Sucr detected manifest: ${u.pathname.split('/').filter(Boolean).pop() || u.host}`, null, false);
+  api.runtime.onMessage.addListener((msg) => {
+    if (!msg || msg.op !== 'manifest-detected') return;
+    const u = rememberManifest(msg.url);
+    if (u) toastManifest(u);
+  });
+  api.runtime.sendMessage({ op: 'manifest-list' })
+    .then((r) => {
+      if (!r || !Array.isArray(r.urls)) return;
+      let last = null;
+      for (const raw of r.urls) {
+        const u = rememberManifest(raw);
+        if (u) last = u;
+      }
+      if (last) toastManifest(last);
+    })
+    .catch(() => {});
+
   const host = document.createElement('div');
   host.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;z-index:2147483647;pointer-events:none';
   const shadow = host.attachShadow({ mode: 'closed' });
@@ -641,6 +679,20 @@
       if (!u || !mediaNetUrl(u)) return;
       push({ url: u, filename: nameOf(u), label: type || 'Media file', meta: new URL(u).host });
     };
+    // Manifests sniffed for this tab. Taking one hands the manifest URL to
+    // Sucr as-is: until the engine parses manifests (Task 292) that saves
+    // the playlist file, not a playable video — the label says manifest.
+    const mTitle = cleanName(document.title) || 'video';
+    for (const u of manifests.keys()) {
+      const isHls = /\.m3u8$/i.test(new URL(u).pathname);
+      push({
+        url: u,
+        filename: `${mTitle}.${isHls ? 'm3u8' : 'mpd'}`,
+        label: isHls ? 'HLS Manifest · m3u8' : 'DASH Manifest · mpd',
+        meta: new URL(u).host,
+        isManifest: true,
+      });
+    }
     if (el) {
       addSrc(el.currentSrc || el.src, el.type || '');
       for (const s of el.querySelectorAll('source')) addSrc(s.src, s.type);
