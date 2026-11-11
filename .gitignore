@@ -1,6 +1,7 @@
 # --- build output -------------------------------------------------------
 app/node_modules/
 app/dist/
+app/.devdata/
 app/err.txt
 app/src-tauri/target/
 app/src-tauri/target-*/

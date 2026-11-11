@@ -27,8 +27,10 @@ pub fn resolve() -> AppPaths {
     };
 
     // A data-dir override also moves downloads inside it, so test runs and
-    // smoke gates never touch the real Downloads folder.
-    let downloads_dir = if flag_is_set() {
+    // smoke gates never touch the real Downloads folder. A debug build is an
+    // override in spirit: its whole data root is its own, so its downloads stay
+    // there rather than landing in the library the person actually keeps.
+    let downloads_dir = if flag_is_set() || cfg!(debug_assertions) {
         data_dir.join("downloads")
     } else {
         default_downloads()
@@ -268,19 +270,33 @@ fn home() -> PathBuf {
         .unwrap_or_else(|| PathBuf::from("."))
 }
 
+/// The folder name under the platform's data root. A debug build is a separate
+/// app — its own bundle identifier and WebView2 profile — so it also owns a
+/// separate data root: nothing a local build writes can reach the library an
+/// installed Sucr keeps, and a browser that starts the dev relay (which is
+/// launched with no arguments and so resolves this default) finds the dev data,
+/// never the installed one. Release builds keep the shipped name.
+fn app_folder() -> &'static str {
+    if cfg!(debug_assertions) {
+        "Sucr Dev"
+    } else {
+        "Sucr"
+    }
+}
+
 fn default_dir() -> PathBuf {
     if cfg!(windows) {
         let appdata = std::env::var_os("APPDATA")
             .map(PathBuf::from)
             .unwrap_or_else(|| home().join("AppData").join("Roaming"));
-        appdata.join("Sucr")
+        appdata.join(app_folder())
     } else if cfg!(target_os = "macos") {
-        home().join("Library").join("Application Support").join("Sucr")
+        home().join("Library").join("Application Support").join(app_folder())
     } else {
         std::env::var_os("XDG_DATA_HOME")
             .map(PathBuf::from)
             .unwrap_or_else(|| home().join(".local").join("share"))
-            .join("Sucr")
+            .join(app_folder())
     }
 }
 

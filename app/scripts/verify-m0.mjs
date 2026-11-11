@@ -374,12 +374,13 @@ if (existsSync(reportPath)) {
   );
   // This box reports prefers-reduced-motion: reduce, so the OS flag alone cannot
   // tell a live animation from a collapsed one. ui.motion is Sucr's own switch,
-  // and it has to outrank Windows in both directions, then hand back on clear.
+  // and it has to outrank Windows in both directions; clearing the key returns
+  // the row to the install default, which is Full.
   check(
     "Sucr's motion switch outranks the OS preference",
     report.motion?.fullMoves === true &&
       report.motion?.reducedStills === true &&
-      report.motion?.clearedFollowsOs === true,
+      report.motion?.clearedIsFull === true,
     JSON.stringify(report.motion),
   );
   // A pasted session is written once and never read back: the link reduces to the

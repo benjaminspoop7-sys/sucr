@@ -3,7 +3,7 @@
    the `cargo` on PATH here (it is a POSIX shim), so this locates the real
    cargo.exe and passes the same environment the shim would have set. */
 import { spawnSync } from 'node:child_process';
-import { existsSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
@@ -46,6 +46,21 @@ const args = [
 
 const env = { ...process.env, CARGO_HOME: cargoHome };
 if (rustupHome) env['RUSTUP_HOME'] = rustupHome;
+
+// A debug build is its own app, so it can run next to an installed Sucr: the
+// bundle identifier is what moves WebView2's profile (localStorage, cookies,
+// cache) to %LOCALAPPDATA%\app.sucr.dev, and the title suffix tells the two
+// windows apart. Release builds are untouched, so the shipped identity stays
+// exactly what tauri.conf.json says.
+if (debug && !env['TAURI_CONFIG']) {
+  const conf = JSON.parse(readFileSync(join('src-tauri', 'tauri.conf.json'), 'utf8'));
+  env['TAURI_CONFIG'] = JSON.stringify({
+    identifier: 'app.sucr.dev',
+    app: {
+      windows: conf.app.windows.map((w) => ({ ...w, title: `${w.title} (dev)` })),
+    },
+  });
+}
 
 console.log(`build-app: ${cargo} ${args.join(' ')}`);
 const result = spawnSync(cargo, args, { stdio: 'inherit', env, cwd: process.cwd() });

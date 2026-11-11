@@ -667,20 +667,44 @@ fn reply(stream: &mut TcpStream, status: u16, origin: Option<&str>, value: &Valu
 // Native messaging host registration (HKCU only, no elevation).
 // ---------------------------------------------------------------------------
 
+#[cfg(not(debug_assertions))]
 pub const HOST_NAME: &str = "app.sucr.capture";
+/// A local build registers under its own name, so a browser it starts reaches
+/// the dev relay and never the one the installed Sucr owns. The name keeps the
+/// `app.sucr.capture.` stem that the relay's own browser-launch detection reads.
+#[cfg(debug_assertions)]
+pub const HOST_NAME: &str = "app.sucr.capture.dev";
 pub const FIREFOX_ID: &str = "capture@sucr.local";
 /// The stable id of the unpacked/`key`-pinned Chrome build in this repo. The
 /// store assigns its own id on publication; that one is appended when known.
 pub const CHROME_ID: &str = "hilnalhpghfpbphghnicaadhlegjaebf";
 
+#[cfg(not(debug_assertions))]
 const CHROME_KEY: &str = r"Software\Google\Chrome\NativeMessagingHosts\app.sucr.capture";
+#[cfg(debug_assertions)]
+const CHROME_KEY: &str = r"Software\Google\Chrome\NativeMessagingHosts\app.sucr.capture.dev";
+#[cfg(not(debug_assertions))]
 const EDGE_KEY: &str = r"Software\Microsoft\Edge\NativeMessagingHosts\app.sucr.capture";
+#[cfg(debug_assertions)]
+const EDGE_KEY: &str = r"Software\Microsoft\Edge\NativeMessagingHosts\app.sucr.capture.dev";
+#[cfg(not(debug_assertions))]
 const BRAVE_KEY: &str = r"Software\BraveSoftware\Brave-Browser\NativeMessagingHosts\app.sucr.capture";
+#[cfg(debug_assertions)]
+const BRAVE_KEY: &str = r"Software\BraveSoftware\Brave-Browser\NativeMessagingHosts\app.sucr.capture.dev";
+#[cfg(not(debug_assertions))]
 const VIVALDI_KEY: &str = r"Software\Vivaldi\NativeMessagingHosts\app.sucr.capture";
+#[cfg(debug_assertions)]
+const VIVALDI_KEY: &str = r"Software\Vivaldi\NativeMessagingHosts\app.sucr.capture.dev";
+#[cfg(not(debug_assertions))]
 const CHROMIUM_KEY: &str = r"Software\Chromium\NativeMessagingHosts\app.sucr.capture";
+#[cfg(debug_assertions)]
+const CHROMIUM_KEY: &str = r"Software\Chromium\NativeMessagingHosts\app.sucr.capture.dev";
 /// The root every Gecko-family browser reads, forks included — Zen, LibreWolf
 /// and Waterfox keep Firefox's key rather than publishing one of their own.
+#[cfg(not(debug_assertions))]
 const MOZILLA_KEY: &str = r"Software\Mozilla\NativeMessagingHosts\app.sucr.capture";
+#[cfg(debug_assertions)]
+const MOZILLA_KEY: &str = r"Software\Mozilla\NativeMessagingHosts\app.sucr.capture.dev";
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Family {
@@ -940,14 +964,24 @@ fn exe_dir(exe: &Path) -> PathBuf {
 /// Where one family's add-on actually is. The installer copies it beside the
 /// exe (`addon/<family>`); Tauri's resource folder is the second candidate, and
 /// the repo layout is the last, so a development build stages the same folders
-/// the installer ships.
+/// the installer ships. A debug build takes only the dev flavour: that copy
+/// carries the dev relay's name, and staging the release flavour into dev data
+/// would let the dev session answer for — and wake — the installed app.
 fn find_addon(exe: &Path, family: &str) -> Option<PathBuf> {
     let dir = exe_dir(exe);
+    // A release install carries its add-on beside the exe; a debug tree never
+    // does, and taking one from there would stage the release flavour.
+    #[cfg(not(debug_assertions))]
     let mut candidates = vec![
         dir.join("addon").join(family),
         dir.join("resources").join("addon").join(family),
     ];
+    #[cfg(debug_assertions)]
+    let mut candidates: Vec<PathBuf> = Vec::new();
     for ancestor in dir.ancestors() {
+        #[cfg(debug_assertions)]
+        candidates.push(ancestor.join("extension").join("dist").join("dev").join(family));
+        #[cfg(not(debug_assertions))]
         candidates.push(ancestor.join("extension").join("dist").join(family));
     }
     candidates
