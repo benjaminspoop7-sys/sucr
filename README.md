@@ -97,10 +97,6 @@ With capture on, a browser download is handed to Sucr before it starts. Hold <kb
 
 Everything is stored locally in one SQLite file, `%APPDATA%\Sucr\sucr.db`. There is no account and no sync.
 
-## Two themes
-
-![Light theme](docs/screenshots/downloads-light.png)
-
 ## Build from source
 
 Prerequisites: a current Node.js LTS, a Rust toolchain, and the WebView2 runtime that ships with Windows.
