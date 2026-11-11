@@ -3768,3 +3768,51 @@ fn a_failed_sound_leg_keeps_the_picture_for_the_next_run() {
         "the picture is fetched once, not again on the resume"
     );
 }
+
+#[test]
+#[ignore = "requires an external local benchmark server; run by hand"]
+fn external_speed_benchmark() {
+    let url = std::env::var("SUCR_BENCH_URL").expect("SUCR_BENCH_URL is required");
+    assert!(
+        url.starts_with("http://127.0.0.1:"),
+        "SUCR_BENCH_URL must start with http://127.0.0.1:"
+    );
+    let size: usize = std::env::var("SUCR_BENCH_SIZE")
+        .expect("SUCR_BENCH_SIZE is required")
+        .parse()
+        .expect("SUCR_BENCH_SIZE must be a byte count");
+    let streams: u64 = std::env::var("SUCR_BENCH_STREAMS")
+        .expect("SUCR_BENCH_STREAMS is required")
+        .parse()
+        .expect("SUCR_BENCH_STREAMS must be an integer");
+    let block: Option<u64> = match std::env::var("SUCR_BENCH_BLOCK") {
+        Ok(value) => Some(value.parse().expect("SUCR_BENCH_BLOCK must be a byte count")),
+        Err(std::env::VarError::NotPresent) => None,
+        Err(err) => panic!("invalid SUCR_BENCH_BLOCK: {err}"),
+    };
+    assert!(size > 0, "SUCR_BENCH_SIZE must be positive");
+    assert!(streams > 0 && streams <= i64::MAX as u64, "invalid SUCR_BENCH_STREAMS");
+    if let Some(block) = block {
+        assert!(block > 0 && block <= i64::MAX as u64, "invalid SUCR_BENCH_BLOCK");
+    }
+    let stamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
+    let fx = Fixture::new(&format!("external-speed-{stamp}"), &url, block, Some(streams));
+
+    let started = Instant::now();
+    let result = fx.run();
+    let elapsed = started.elapsed().as_secs_f64();
+
+    result.expect("external benchmark download");
+    assert_eq!(fx.status(), "finished");
+    assert!(fx.published() == body(size), "benchmark payload must match every byte");
+    println!(
+        "SUCR_BENCH_JSON {}",
+        serde_json::json!({
+            "elapsed_seconds": elapsed,
+            "size": size,
+            "streams": streams,
+            "block": block,
+            "validation": true,
+        })
+    );
+}

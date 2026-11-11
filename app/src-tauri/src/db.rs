@@ -20,6 +20,14 @@ pub fn open(path: &Path) -> Result<Connection, String> {
     if !mode.eq_ignore_ascii_case("wal") {
         return Err(format!("sucr.db: expected WAL journal mode, got {mode}"));
     }
+    // WAL's standard pairing: commits stop fsyncing the WAL on every write.
+    // With FULL, each of a job's ~150 ledger autocommits paid a disk flush,
+    // which on a spinning data drive serialized the supervisor behind the
+    // platter (5.3 s of a 6.6 s transfer). NORMAL keeps process-crash
+    // durability; a power loss can drop the newest commits but never corrupts
+    // the database, and a resumed job re-verifies its bytes anyway.
+    conn.pragma_update(None, "synchronous", "NORMAL")
+        .map_err(|e| format!("synchronous: {e}"))?;
 
     migrate(&conn)?;
     Ok(conn)
@@ -1260,6 +1268,8 @@ mod tests {
         assert_eq!(version, 4);
         let mode: String = conn.query_row("PRAGMA journal_mode", [], |r| r.get(0)).unwrap();
         assert_eq!(mode, "wal");
+        let sync: i64 = conn.query_row("PRAGMA synchronous", [], |r| r.get(0)).unwrap();
+        assert_eq!(sync, 1, "WAL must run NORMAL, not FULL: per-commit fsyncs serialize the supervisor on a spinning data drive");
         let tables: i64 = conn
             .query_row(
                 "SELECT count(*) FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'",
