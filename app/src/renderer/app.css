@@ -296,8 +296,14 @@ svg { display: block; }
 .nav-empty { padding: 2px var(--s-2); font-size: 11.5px; color: var(--text-3); }
 
 /* --- compact rail --------------------------------------------------------
-   Everything hides. The rail collapses to a 9 px edge and hovering that edge
-   slides the full 186 px panel in from off the left of the window.
+   The rail is one panel parked off the left of the window, not a column that
+   appears and disappears. `--rail-w` says how much of it is inside the window
+   -- 9 px parked, the full 186 px when it is held open -- and the panel's
+   translate is derived from that same number, so the column and the panel can
+   never disagree. Holding the rail (a nav click, or the Sidebar button) grows
+   the column while the panel stays put; the list then slides out from behind
+   the panel's right edge on the panel's own curve, which is why the dock is one
+   motion rather than a cut followed by a slide.
 
    The panel MOVES; it is not unmasked in place. The version before this one
    animated `clip-path`, which leaves every label rooted while its own right
@@ -324,33 +330,49 @@ svg { display: block; }
    is already an icon strip with its own rules, so the overlay, and the width it
    reserves, stand down there rather than fighting them. */
 @media (min-width: 901px) {
-  body.rail-compact { --rail-w: var(--rail-strip); }
+  /* Only the rail's column animates: the list is `minmax(0, 1fr)` and the
+     inspector is a fixed 392 px, so the rail's number is the whole change. */
+  .shell { transition: grid-template-columns var(--dur-rail-in) var(--e-rail-in); }
 
-  body.rail-compact .rail { position: relative; }
+  .rail { position: relative; border-right: 0; }
 
-  body.rail-compact .rail-scroll {
+  .rail-scroll {
     position: absolute; top: 0; bottom: 0; left: 0;
     width: var(--rail-open);
-    /* The rail column is 9 px wide, so the revealed panel is an overflow of it.
-       Without a stacking level of its own the later grid item (the list) paints
-       over that overflow and eats the pointer: the panel looks open and every
-       row in it is unclickable. Still under the popovers (60), so a menu that
-       opens over the rail keeps winning where the two meet. */
+    /* The rail column can be 9 px wide, so the revealed panel is an overflow of
+       it. Without a stacking level of its own the later grid item (the list)
+       paints over that overflow and eats the pointer: the panel looks open and
+       every row in it is unclickable. Still under the popovers (60), so a menu
+       that opens over the rail keeps winning where the two meet. */
     z-index: 15;
     background: var(--surface-1);
     border-right: var(--hairline) solid var(--border-2);
-    box-shadow: var(--e-2);
-    /* Out of the window except for the strip: 186 - 9 = 177 px parked left. */
-    translate: calc(var(--rail-strip) - var(--rail-open));
+    translate: calc(var(--rail-w, var(--rail-open)) - var(--rail-open));
     transition: translate var(--dur-rail-out) ease;
-    /* The hold is on the way out, and it lives here because a transition takes
-       the properties of the state it is travelling TO: the hover rule below
-       carries no delay, so the reveal answers the pointer at once. */
+  }
+
+  body.rail-compact { --rail-w: var(--rail-strip); }
+
+  body.rail-compact .rail-scroll {
+    box-shadow: var(--e-2);
+    /* The hold is on the way out, and it lives on this state because a
+       transition takes the properties of the state it is travelling TO: only
+       a move towards compact waits, so the reveal and the dock answer at once
+       and the list's column starts on the same frame as the panel. */
     transition-delay: var(--dur-rail-hold);
   }
 
+  body.rail-compact .shell {
+    transition: grid-template-columns var(--dur-rail-out) ease var(--dur-rail-hold);
+  }
+
+  /* Pointer reveal is the whole rule for the mouse. Keyboard focus may reveal
+     too, but only while `rail-kbd` says the last input was a Tab (main.ts sets
+     it on Tab and clears it on any pointer event): a nav row left focused by a
+     click or by an earlier Tab must never pin the panel once the pointer is
+     away, which is the "hover stays on the left" defect. */
   body.rail-compact .rail:hover > .rail-scroll,
-  body.rail-compact .rail:focus-within > .rail-scroll {
+  body.rail-compact.rail-kbd .rail:has(:focus-visible) > .rail-scroll {
     translate: 0;
     transition: translate var(--dur-rail-in) var(--e-rail-in);
   }
@@ -3020,8 +3042,11 @@ html[data-motion="reduced"] [role="tabpanel"].slide-in-left { animation: none; }
 html[data-motion="reduced"] .tbar[data-live="true"] .tbar-fill::after { animation: none; content: none; }
 html[data-motion="reduced"] .attempt[data-state="active"] .dot { animation: none; }
 
-/* The reveal still works, it just stops sliding. */
-html[data-motion="reduced"] body.rail-compact .rail-scroll { transition: none; }
+/* The reveal still works, it just stops sliding. The rail's hold delay is a
+   `transition-delay`, which the blanket rule above shortens the duration of and
+   not the wait, so the rail names its own transitions. */
+html[data-motion="reduced"] .rail-scroll,
+html[data-motion="reduced"] .shell { transition: none; }
 
 @media (prefers-contrast: more) {
   .card, .info-card, .ov-card, .nic-deck { border-width: 1px; }

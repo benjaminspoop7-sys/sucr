@@ -643,3 +643,208 @@ token it references is free. `npm run typecheck` clean; `node scripts/verify-m0.
 **The rule kept from this:** a 30 fps screen recording cannot measure a delay shorter than its own frame period and
 cannot attribute a dwell to an edge of the gesture. When the reference is a video but the reference *app's* source is
 readable, the pref default is the evidence and the video only proves the behaviour exists at all.
+
+## 14. The rail holds: choosing a section docks it (2026-11-10)
+
+**The ask.** `Qoder_nXwfl309wO.mp4` plus "I need the Sucr sidebar animation to be held like this. Based on Zen
+browser." The reference is not a curve to copy, it is a *state*: the sidebar stays out.
+
+**What the recording actually contains.** Re-measured 2026-11-10 with `scratch/vid.mjs`, which did not exist when this
+section was written. The clip is **Qoder Desktop** (1920x1032, 30 fps, 14.47 s), not Zen. Its sidebar ends at a 1 px
+divider at x=252; a dark gutter runs to a second divider at x=319 where the content pane begins. Both sit at the same
+pixel in every 1 s sample from 0 s to 13 s. A transition would move that divider; a held panel keeps it. So the video
+proves "held", and nothing about timing.
+
+**Retracted (2026-11-10).** This section first claimed the first bright column "sits at x=42 ... and x=59 ... in every
+frame, no moving edge anywhere in the clip", measured over the left 700 px. That was wrong twice over: the region
+includes the embedded browser pane, which moves constantly (per-frame difference peaks at 5.2 around t=2.85 s and 8.9
+at t=9.77 s, both inside that pane), and the probe never reached the sidebar's real edge at x=252. The evidence for
+"held" is the constant divider, not frame-identical pixels. §15 carries the clip's real hover measurement.
+
+**Zen's model, from its source** (`D:\RE\_coldstart-harness\zen-src`). Two independent reasons for the sidebar to be
+open: `zen-has-hover` (transient -- the pointer is on the strip) and `zen-user-show` (persistent -- the user asked for
+it, `toggleSidebar()` flips it). `isSidebarPotentiallyOpen()` is their union, and the CSS expands on both. Hover is
+the peek; `zen-user-show` is the hold. That is the distinction Sucr was missing: it had the peek only.
+
+**The decision, and the trigger.** A nav row is the point where the user has committed to the nav, so choosing a
+section calls `holdRail()` -> `setRailCompact(false)` (main.ts, both the `pointerdown` handler and the keyboard/`click`
+fallback). Hover stays exactly as §12/§13 left it: reveal on contact, Zen's 150 ms keep-hover, retreat. The Sidebar
+button and Alt+1 still toggle, and are the way back to compact. Rationale: a hover reveal that retracts the moment
+the pointer leaves is wrong for the second click -- the panel retreats mid-reach and the row just chosen is gone.
+
+**The mechanism, one number.** `--rail-w` drives both the grid column (`grid-template-columns`) and the panel's
+`translate: calc(var(--rail-w) - var(--rail-open))`, so the panel edge and the list's edge can never disagree.
+Docking is *not* a second animation: the panel is already at `translate: 0`, the column grows 9 -> 186 with the
+arrival curve, and the list slides out from behind the panel's right edge on the same curve -- one motion, not a cut
+followed by a slide. The hold delay for the departure stays on `body.rail-compact .rail-scroll` and
+`body.rail-compact .shell` only, because a transition takes the properties of the state it is travelling *to*; the
+dock and the reveal therefore answer on the frame they are asked for.
+
+**Measured** in the running Dev binary (`target/debug/sucr.exe`, CDP 9336, 40 ms state sampler, real OS cursor
+driven with `SetCursorPos`/`mouse_event`):
+
+| leg | observation |
+|---|---|
+| hover the 9 px strip | panel 0, peak overshoot +1.64 px, column unchanged |
+| click "Queued" (80,155) | `compact=false`; column 46.6 -> 187.6 -> 186 while the panel stays `translate: 0` |
+| mid-dock, 201 ms | panel edge -70.5 + 186 = 115.5 == `col1` 115.5 -- panel and list in lockstep |
+| pointer leaves to (1020,521) | **held** 1.4 s later: `compact=false`, `translate: 0`, `col1: 186px`, `view=Queued`, `aria-pressed=false` |
+| Sidebar button | `compact=true`, ~160 ms hold, then panel 0 -> -177 while the column 186 -> 9 collapses on the same frames |
+
+Screenshot of the docked state: `scratch/rail-open.png` (LIBRARY / CATEGORIES / SYSTEM visible, "Queued" current,
+`columns "186px 702px 392px"`, hit test at (60,120) is `nav-text`).
+
+**A harness trap, recorded.** CDP `Input.dispatchMouseEvent` does not hold `:hover` in this WebView2 window -- the
+synthetic pointer sits inside the panel while the page reports `:hover` false and the panel retracts. Any hover leg
+here must drive the real cursor; samples were taken with `scratch/drive-real.mjs` + `scratch/drive-rail.ps1`.
+
+**Cost: unmeasured by ruling.** The user's standing instruction is to keep all changes in the Dev build and cut the
+Alpha by hand later, so neither the release exe nor the installer was rebuilt for this slice. `target/release/sucr.exe`
+still measures 4,758,528 B and the installed 0.1.0 exe 4,757,504 B -- both untouched. The change itself is CSS
+declarations plus one small function and two call sites in `main.ts`; the byte price will be taken with `stat` at
+the Alpha build, not inferred here.
+
+**Hover, re-measured after the dock landed (2026-11-10, same build).** Three full peek-retreat cycles were driven
+with the real cursor: away -> strip (324,421) -> into the panel body (400,301) -> away (1020,521), twice, then a final
+leave to (900,760).
+
+| leg | observation |
+|---|---|
+| hover the strip | reveal starts on the next sample, overshoots +1.73 px and +1.92 px in the two passes, settles at `translate: 0` |
+| pointer inside the panel body | stays fully open (`x=0`, column still 9 px); the row under the pointer takes its own hover fill |
+| pointer leaves | `:hover` false at once, panel holds at 0 for ~160 ms, then retreats -177 over ~160 ms |
+| hover frames overall | 176 samples with `:hover` true, `compact` **true in all of them** |
+
+The last row is the point of the leg: hovering never docks the rail. The hold was reserved for a nav choice, so a peek
+could not leave the window permanently wider.
+
+**Superseded 2026-11-10 — see §16.** The nav-click dock is gone: the user's clips ask for reveal-on-contact and
+collapse-on-leave with no session pin, and a nav row that stayed focused was pinning the panel a second way.
+
+Captures: `scratch/h-1-strip.png` (panel out, "All downloads" current), `scratch/h-2-inside.png` (pointer on the
+Finished row, panel still out), `scratch/h-3-leave.png` (back to the 9 px strip, list reflowed to x=9).
+
+## 15. The reference's actual hover: a hard fill and one colour fade (2026-11-10)
+
+The only hover in `Qoder_nXwfl309wO.mp4` is a task-row hover ("Install openclaude to h drive", x 8-252, y 634-661).
+It is not a rail expand (§14) and it is not timed. Measured frame by frame at 30 fps with `scratch/vid.mjs` plus raw
+gray-frame probes over a text-free band of the row (y 636-640) and the label's 99th-percentile luma:
+
+| property | hover in | hover out |
+|---|---|---|
+| row fill, luma 16 -> 62 | one frame: 0% at 4.833 s, 100% at 4.867 s | one frame: 62 at 6.980 s, 16 at 7.013 s |
+| `...` action button, mean 16 -> 68 | same frame as the fill | same frame as the fill |
+| label p99, 141 -> 242 | 7% 4.880 · 70% 4.913 · 92% 4.947 · 100% 4.980 | 75% 7.047 · 4% 7.080 · 0% 7.113 |
+
+Nothing about the fill is animated: it appears and disappears inside one 33 ms frame, with no intermediate value in
+either direction, and the action button rides with it. The label's colour is the only animated property -- about
+**150 ms cubic-out** in (cubic-out predicts 73% at 53 ms and 93% at 87 ms; measured 70% and 92%) and about
+**100 ms cubic-out** out (predicts 71% at 34 ms and 96% at 67 ms; measured 75% and 96%). No transform, no shadow, no
+width change: the pill's left and right edges are x=8 and x=252 in every frame of the transition.
+
+Sucr's `.nav-item` animates `background` over `--dur-2` = 120 ms, `--e-std` = `cubic-bezier(.2, 0, 0, 1)` (app.css:264,
+tokens.css:197/203), so the reference is the *less* animated of the two: it hard-cuts the fill and fades only the text.
+Matching it would mean removing the rail rows' fill transition, not adding one.
+
+Artifacts: `scratch/vid-row-zoom2.png` (hovered row, 4x), `scratch/vid-rowtx-tile.png` (six consecutive frames across
+hover-in), `scratch/vid-right-4.767.png` (the resize cursor on the divider, one frame before the fill).
+
+## 16. The dock is withdrawn: the rail collapses on leave again (2026-11-10)
+
+**The ask.** Three clips and: "The hover still stays on the left even after cursor is not on it ... I need it to
+collapse like how it did in 2nd video attachment. I need you to preserve the animation that's in 3rd video attachment."
+§14 is what the user is rejecting: it made a nav choice dock the rail open for the rest of the session.
+
+**What each clip is.** ~~`explorer_CYn9Sap5iK.mp4` (1920x1080, 23.7 s) is Windows File Explorer with the details pane
+opening and closing; it shows no rail and nothing to copy.~~ **Retracted in §17**: it is a Zen window on GitHub and it
+does carry the tab-strip sidebar, mostly collapsed. `zen_dW5MrW3s1W.mp4` (1920x1032, 11.9 s) is a Zen window on
+GitHub: while the pointer is inside the sidebar it is 190 px wide (t=4.95 s, arrow at ~(100,377); t=9.5 s, arrow at
+~(75,422)), and once the pointer is over the page it is gone and the content fills the window from x=0 (t=10.8 s,
+11.5 s, 11.8 s). That is reveal-on-contact and collapse-on-leave, with the content reflowing into the freed width.
+`sucr_zfngs1JmXV.mp4` (1920x1032, 6.2 s) is the defect: the rail is compact for ~0.75 s, then stays 186 px wide for
+the remaining 5.4 s while the user clicks through All downloads, Downloading, Queued, Finished, Error.
+
+**The cause was two pins, not one.** `holdRail()` called `setRailCompact(false)` from both the `pointerdown` and the
+`click` fallback, which removed `body.rail-compact` — and the whole reveal/collapse block lives under that class, so
+the rail could never return. Fixing only that left a second pin: a nav row is a `<button>`, so the click leaves it
+focused, and `body.rail-compact .rail:focus-within > .rail-scroll` kept the panel at `translate: 0` with the pointer
+long gone. The rule is now `:has(:focus-visible)`, which is false for a pointer-activated button and true for Tab.
+
+**What changed.** `src/renderer/main.ts`: `holdRail()` and its two call sites deleted. `src/renderer/app.css:369-378`:
+the focus half of the reveal selector is `:has(:focus-visible)`. Nothing in the animation moved — `--dur-rail-in`
+250 ms `--e-rail-in` in, `--dur-rail-hold` 150 ms then `--dur-rail-out` 150 ms out — which is the "preserve the
+animation" half of the ask.
+
+**Measured in the running Dev binary** (`target/debug/sucr.exe`, CDP 9336, 40 ms sampler, real OS cursor via
+`scratch/hover-stage.ps1`; harness `scratch/rail-collapse.mjs`, 1139 frames):
+
+| leg | observation |
+|---|---|
+| at rest | `compact=true`, `translate: -177px`, column `9px` |
+| hover the strip | reveal over ~240 ms, overshoot +1.9 px at 3800 ms, settle `0` |
+| click "Queued" with the pointer still on the rail | `compact=true` throughout, `view=Queued`, focus on the row |
+| pointer leaves to (1020,521) | holds at `0` for ~150 ms, then -8.8 -> -177 over ~120 ms; focus still on Queued |
+| re-hover, then leave | same reveal and same retreat |
+| keyboard | first Tab lands in the rail with `:focus-visible` true and the panel still reveals |
+
+Keyboard focus keeps the rail out while the user is in it; that is the one intended difference from a pure hover
+state. Note the harness trap in §14 still applies: synthetic `Input.dispatchMouseEvent` does not hold `:hover` in this
+WebView2 window, so every hover leg above used the real cursor.
+
+**Cost.** Renderer-only: debug exe unchanged in size. The release exe and the installer were **not** rebuilt, per the
+standing instruction to keep all changes in the Dev build until the Alpha is cut by hand; the byte price is taken at
+that build with `stat`.
+
+## 17. The last pin was focus, not hover: a keyboard-only reveal latch (2026-11-10)
+
+**Retraction first.** §16 says the first clip "shows no rail and nothing to copy". That is wrong, and the user said so
+twice ("Check the first video properly"). `explorer_CYn9Sap5iK.mp4` is a Zen window on
+`github.com/benjaminspoop7-sys/sucr` whose left tab strip is mostly collapsed. Sampling the strip's width off raw
+frames (flat-column variance, band y 200-900, 10 fps) gives ~7-16 px for most of the 23.7 s, with brief exposures at
+2.6 s (~178 px), 9.4 s (76), 15.8 s (103), 17.8 s (141) and 21.3 s (76), and the collapses land at 2.7 / 10.7 / 15.9 /
+18.5 / 18.7 s. The capture draws no cursor, so whether those exposures are hover or toggling cannot be decided from
+pixels — but the clip is a rail that stays narrow and returns, which is exactly the shape the user asked for. The
+§16 reading came from a downscaled contact sheet; a full-frame sheet at 640 px per tile is what showed the strip.
+
+**The surviving pin.** After §16 the mouse paths all collapsed, yet the panel could still open with the pointer far
+away: a nav row left with `:focus-visible` keeps `body.rail-compact .rail:has(:focus-visible) > .rail-scroll` at
+`translate: 0`. Reproduced by Tabbing into the rail (`scratch/rail-hover2.mjs` leg E ended at `t=0px`, `fv=true`,
+`hover=false`) and found live: `{"stored":"true","compact":true,"active":"BUTTON#All downloads","fv":true,
+"translate":"0px","hover":false}`. A keyboard user pays for that rule; a mouse user must never be caught by it, because
+a click on a `<button>` can leave `:focus-visible` behind through script focus, a browser find, or a Tab that happened
+minutes ago. The old note that a pointer-activated button never matches `:focus-visible` is true of the click itself
+and false of the state it leaves behind.
+
+**The latch.** `body.rail-kbd` gates the focus half of the reveal. `main.ts` adds the class on `keydown` of Tab and
+removes it on the first `pointerdown` or `pointermove` (both captured on `document`), so the reveal is armed only while
+the keyboard is the last thing the user touched. The same listener now also carries Alt+1, which was previously a
+separate handler. `app.css` compact block:
+
+```css
+body.rail-compact .rail:hover > .rail-scroll,
+body.rail-compact.rail-kbd .rail:has(:focus-visible) > .rail-scroll { translate: 0; transition: translate var(--dur-rail-in) var(--e-rail-in); }
+```
+
+Nothing in the timeline moved: 250 ms `--e-rail-in` in (overshoot measured at +1.7 px), `--dur-rail-hold` 150 ms then
+150 ms `ease` out, `.shell` column animated on the same frames.
+
+**Measured in the running Dev binary** (`target/debug/sucr.exe`, CDP 9336, real OS cursor and real clicks; harnesses
+`scratch/rail-hover2.mjs`, `scratch/rail-kbd.mjs`, `scratch/rail-pin.mjs`, `scratch/rail-leave-window.mjs`):
+
+| leg | end state |
+|---|---|
+| click a nav row, then leave | `t:-177px`, `compact:true`, `hover:false`, `fv:false` |
+| click empty panel space, then leave | `t:-177px`, `compact:true`, `fv:false` |
+| flick out of the rail | `t:-177px` |
+| leave via the titlebar | `t:-177px` |
+| Tab into the rail, pointer parked at (1330,521) | `kbd:true`, `t:0px` — reveal |
+| move the pointer anywhere afterwards | `kbd:false`, `t:-177px` while the row keeps `fv:true` |
+| toggle the rail (Sidebar button) | `compact:false`, stays `t:0px` with the pointer away; toggling back returns `-177px` |
+| Alt+1 | same two-way toggle, same stored key |
+| reveal, then leave the whole window to the desktop | `t:-177px`, `hover:false`, `body:hover` false |
+
+Screenshots (`scratch/rh-at-rest.png` … `rh-gone.png`): at rest and after leaving the tiles are byte-identical; the
++80 ms tile still shows the panel open (the 150 ms hold), and the +230 ms tile is back to the strip.
+
+**Cost.** `app.css` + `main.ts` only; no Rust, no IPC, no new asset. The release exe and installer were **not** rebuilt
+per the standing rule; the byte price is taken with `stat` when the Alpha is cut.

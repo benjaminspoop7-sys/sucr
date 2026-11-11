@@ -77,7 +77,7 @@ type MotionPref = 'system' | 'full' | 'reduced';
 const MOTION_KEY = 'sucr.motion';
 const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-let motionPref: MotionPref = 'system';
+let motionPref: MotionPref = 'full';
 const storedMotion = localStorage.getItem(MOTION_KEY);
 if (storedMotion === 'system' || storedMotion === 'full' || storedMotion === 'reduced') motionPref = storedMotion;
 
@@ -168,7 +168,10 @@ const SETTING_DEFAULTS: Record<string, string> = {
   'network.proxy_bypass': '',
   'ui.theme': 'system',
   'ui.meter_style': 'segmented',
-  'ui.motion': 'system',
+  // Full on a fresh install: Sucr's motion is part of the product, and the
+  // common Windows profile here reports `prefers-reduced-motion`, so following
+  // the OS would ship a still app to most people. Reduced is one click away.
+  'ui.motion': 'full',
   'ui.sound_on_complete': 'true',
   'ui.close_to_tray': 'true',
   'system.debug_log': 'true',
@@ -195,8 +198,8 @@ async function loadSettings(): Promise<void> {
   if (theme === 'system' || theme === 'light' || theme === 'dark') pref = theme;
   const meter = storedSettings['ui.meter_style'];
   if (meter === 'segmented' || meter === 'wave') progressMode = meter;
-  // Merged `settings`, not `storedSettings`: an absent row means the default,
-  // so a cleared key returns motion to the OS instead of leaving the
+  // Merged `settings`, not `storedSettings`: an absent row means the default
+  // (Full), so a cleared key returns motion to that instead of leaving the
   // localStorage mirror in charge.
   const motion = settings['ui.motion'];
   if (motion === 'system' || motion === 'full' || motion === 'reduced') {
@@ -221,8 +224,8 @@ async function saveSetting(key: string, value: string | null): Promise<void> {
     progressMode = value;
     applyProgressMode();
   } else if (key === 'ui.motion') {
-    // A cleared key is the default, not "whatever the last write left".
-    const next: MotionPref = value === 'full' || value === 'reduced' ? value : 'system';
+    // A cleared key is the default (Full), not "whatever the last write left".
+    const next: MotionPref = value === 'system' || value === 'reduced' ? value : 'full';
     if (motionPref !== next) {
       motionPref = next;
       applyMotion();
@@ -2628,7 +2631,7 @@ async function resetAllSettings(): Promise<void> {
   globalCap = (await sucr.app.setSpeedLimit(null)).globalSpeedLimit;
   pref = 'system';
   progressMode = 'segmented';
-  motionPref = 'system';
+  motionPref = 'full';
   applyTheme();
   applyProgressMode();
   applyMotion();
@@ -3593,13 +3596,22 @@ setRailCompact(localStorage.getItem(RAIL_KEY) !== 'false');
 railToggleEl.addEventListener('click', () => {
   setRailCompact(!document.body.classList.contains('rail-compact'));
 });
+
+/* The rail's focus reveal is armed only by Tab and disarmed by the first
+   pointer event anywhere. Without that, a nav row left focused keeps the panel
+   open after the pointer walks away -- the reveal is a peek, not a pin. */
+const armRailKeyboard = () => document.body.classList.add('rail-kbd');
+const disarmRailKeyboard = () => document.body.classList.remove('rail-kbd');
 document.addEventListener('keydown', (event) => {
   const e = event as KeyboardEvent;
+  if (e.key === 'Tab') armRailKeyboard();
   if (e.altKey && e.key === '1') {
     e.preventDefault();
     setRailCompact(!document.body.classList.contains('rail-compact'));
   }
 });
+document.addEventListener('pointerdown', disarmRailKeyboard, { capture: true });
+document.addEventListener('pointermove', disarmRailKeyboard, { capture: true });
 
 /* --- inspector panes ----------------------------------------------------- */
 function infoCard(title?: string): { card: HTMLElement; body: HTMLElement } {
@@ -6611,13 +6623,12 @@ async function runSmoke(info: AppInfo, channelsMatch: boolean, firstRun: boolean
     // one — it could only report the OS. `ui.motion` is Sucr's override, and the
     // proof is a computed transition on a real element: Full must bring the
     // durations back even while the OS says reduce, Reduced must collapse them,
-    // and clearing hands the decision back.
+    // and clearing hands the decision back to the install default.
     const railProbe = document.querySelector<HTMLElement>('.nav-item');
     const transitionOf = () => (railProbe ? getComputedStyle(railProbe).transitionDuration : 'no probe');
     const stillness = (spec: string) =>
       spec.split(',').every((part) => Number.parseFloat(part) <= 0.002);
     const osReduce = motionQuery.matches;
-    const systemFirst = transitionOf();
     await saveSetting('ui.motion', 'full');
     const fullSpec = transitionOf();
     await saveSetting('ui.motion', 'reduced');
@@ -6625,7 +6636,6 @@ async function runSmoke(info: AppInfo, channelsMatch: boolean, firstRun: boolean
     await saveSetting('ui.motion', null);
     const motion = {
       osReduce,
-      systemFirst,
       full: fullSpec,
       reduced: reducedSpec,
       cleared: transitionOf(),
@@ -6634,7 +6644,8 @@ async function runSmoke(info: AppInfo, channelsMatch: boolean, firstRun: boolean
       attribute: document.documentElement.dataset['motion'] ?? '',
       fullMoves: !stillness(fullSpec),
       reducedStills: stillness(reducedSpec),
-      clearedFollowsOs: transitionOf() === systemFirst && stillness(transitionOf()) === osReduce,
+      // A cleared key returns to the install default, which is Full.
+      clearedIsFull: transitionOf() === fullSpec && !stillness(transitionOf()),
     };
     const added = await sucr.download.add({ url: 'http://127.0.0.1:9/not-a-real-file' });
     const capped = await sucr.download.setSpeedLimit(added.id, 131_072);
@@ -6924,7 +6935,7 @@ async function runSmoke(info: AppInfo, channelsMatch: boolean, firstRun: boolean
       settingsCleared['engine.max_active_downloads'] === undefined &&
       motion.fullMoves &&
       motion.reducedStills &&
-      motion.clearedFollowsOs &&
+      motion.clearedIsFull &&
       globalCleared.globalSpeedLimit === null &&
       afterAdd.length === 2 &&
       session.host === '127.0.0.1' &&

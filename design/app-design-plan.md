@@ -338,6 +338,6 @@ When navigating to Settings from the system rail, the central download list is r
 ### Pillar 5: Appearance, Audio & Behavior
 - **Theme:** Segmented control [ System | Light | Dark ] with 200ms smooth cross-fade.
 - **Telemetry Bar Style:** [ Segmented Telemetry (Default) | M3 Squiggle Wave ].
-- **Motion Calibration:** Segmented control [ System (Default) | Full | Reduced ]. System follows `prefers-reduced-motion`; Full and Reduced are Sucr's own call and outrank it. The row's helper line states which way System currently resolves, so the setting is never a mystery.
+- **Motion Calibration:** Segmented control [ System | Full (Default) | Reduced ]. Full is the install default, because most Windows profiles report `prefers-reduced-motion` and following it would ship a still app; System follows `prefers-reduced-motion`; Full and Reduced are Sucr's own call and outrank it. The row's helper line states which way System currently resolves, so the setting is never a mystery.
 - **Audio Chime:** Subtle acoustic confirmation tick upon 100% hash verification.
 - **Close Behavior:** Minimize to System Tray vs Exit Application.
