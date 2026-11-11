@@ -53,6 +53,19 @@ The first two rows ran on the current development build. Before a write-latency 
 
 The fixture and harness used for these runs live under `scratch/`, which is not part of the published tree; the method described above is what makes the numbers reproducible.
 
+### Multi-tether, over the real internet
+
+The table above is loopback, so it measures the engine rather than a link. This one is a real download across two Ethernet adapters on one machine, to show what bonding actually buys. The target is `SysinternalsSuite.zip` (374 682 911 bytes) served with HTTP range support. The only variable is how many adapters Sucr may bind to — **two bonded** versus **one**, the single path Windows hands a socket to on its own. Three runs each, interleaved, reported as medians.
+
+| Adapters | Median throughput | Bytes carried by the second adapter |
+| --- | --- | --- |
+| One (single path) | ≈ 18.0 MiB/s | — |
+| Two (bonded) | ≈ 20.6 MiB/s | 22–27% of the file |
+
+Bonding delivered the same file **about 14.6% faster**, and the runs did not overlap: the slowest bonded download still beat the fastest single-path one. All six downloads hashed byte-for-byte identical, so bonding assembled a correct multi-source file, not just a fast one.
+
+This is one box, one target, on one day. The gain scales with the spare capacity on your second link and can fall toward nothing if that link is slower than idle noise, so read it as a real-world confirmation of the feature rather than a portable headline number. This test's harness lives under `scratch/` as well.
+
 ## Install
 
 1. Open [Releases](https://github.com/benjaminspoop7-sys/sucr/releases/latest) and download `Sucr_0.1.1_x64-setup.exe`.
